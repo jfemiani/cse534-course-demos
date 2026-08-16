@@ -1,5 +1,4 @@
 """Demo sampling a bernoulli trial"""
-# I hated what ChatGPT produced from the prompt and wrote this --JF
 
 import numpy as np
 import matplotlib.pyplot as plt
