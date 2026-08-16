@@ -2,25 +2,23 @@
 
 This repository contains the reviewed Python demonstrations used in CSE 534: Generative Artificial Intelligence.
 
-Each folder matches a course topic. Use the Canvas lesson for explanations and instructions; use GitHub when you want to read, download, or compare versions of the source code.
+Each demonstration folder contains:
 
-## Mathematical Foundations
+- the reviewed Python file used in the course; and
+- a PROMPT.md file that can regenerate the API example or ask an AI assistant to explain it.
 
-The [Mathematical Foundations folder](mathematical_foundations) currently contains:
+Use the Canvas lesson for explanations, sequence, and assignment directions. Use GitHub when you want to read, download, or compare versions of the source.
 
-- a continuous uniform sampling demonstration;
-- a Bernoulli sampling demonstration;
-- a categorical sampling demonstration; and
-- the Python requirements file for those programs.
+## Course modules
 
-Each program prints a few individual samples before summarizing the results in a graph. Start with the module's Canvas lesson, which explains what to notice and what small change to try.
+### [Prompt Engineering and API Integration](prompt_engineering_api)
+
+Six introductory demonstrations: the first Responses API request, non-streaming chat, streaming chat, optional Rich terminal formatting, and structured output.
+
+### [Mathematical Foundations](mathematical_foundations)
+
+Three sampling demonstrations: continuous uniform, Bernoulli, and categorical distributions. Each one prints sample rows before comparing expected and observed results in a graph.
 
 ## Running a demonstration
 
-Download the files in the module folder, open a terminal in that folder, and install the listed packages:
-
-    python -m pip install -r requirements-math-foundations.txt
-
-Then run a program, for example:
-
-    python 02_bernoulli.py
+Open the relevant module folder and read its README and the Canvas lesson first. Install the module's requirements in your course Python environment, then run the reviewed Python file named on the lesson page.
