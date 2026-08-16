@@ -10,36 +10,20 @@ import pandas as pd
 SEED = 7
 SAMPLE_SIZE = 10_000
 
-# A categorical draw chooses exactly one of K possible categories. This toy
-# distribution could represent three possible next tokens from a small model.
 CATEGORIES = np.array(["cat", "dog", "horse"])
 PROBABILITIES = np.array([0.50, 0.30, 0.20])
-
-# A valid categorical distribution must assign nonnegative probabilities that
-# sum to one. Failing early makes mistakes in the probability list obvious.
-if np.any(PROBABILITIES < 0) or not np.isclose(PROBABILITIES.sum(), 1.0):
-    raise ValueError("Categorical probabilities must be nonnegative and sum to 1.")
 
 rng = np.random.default_rng(seed=SEED)
 samples = rng.choice(CATEGORIES, size=SAMPLE_SIZE, p=PROBABILITIES)
 
-sample_df = pd.DataFrame(
-    {
-        "draw": np.arange(1, SAMPLE_SIZE + 1),
-        "category": samples,
-    }
-)
+sample_df = pd.DataFrame( { "draw": np.arange(1, SAMPLE_SIZE + 1), "category": samples, })
 
 print("First ten categorical draws:")
 print(sample_df.head(10).to_string(index=False))
 
 # Count each category, convert the counts to proportions, and place the rows in
 # the same order as CATEGORIES so expected and observed values line up.
-observed = (
-    sample_df["category"]
-    .value_counts(normalize=True)
-    .reindex(CATEGORIES, fill_value=0.0)
-)
+observed = sample_df["category"].value_counts(normalize=True).reindex(CATEGORIES, fill_value=0.0)
 
 summary_df = pd.DataFrame(
     {
@@ -48,16 +32,11 @@ summary_df = pd.DataFrame(
         "observed_probability": observed.to_numpy(),
     }
 )
-summary_df["observed_minus_expected"] = (
-    summary_df["observed_probability"] - summary_df["expected_probability"]
-)
 
 print("\nExpected and observed categorical probabilities:")
 print(summary_df.to_string(index=False))
 
-output_dir = Path("outputs")
-output_dir.mkdir(exist_ok=True)
-output_path = output_dir / "03_categorical.png"
+output_path = "03_categorical.png"
 
 # Categories do not have meaningful numeric intervals, so side-by-side bars are
 # clearer than a continuous histogram.

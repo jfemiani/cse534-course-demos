@@ -4,21 +4,21 @@ import matplotlib.pyplot as plt
 
 SAMPLE_SIZE = 10_000
 BIN_COUNT = 10
-SEED = 42
+SEED = 43
+OUTPUT="01_uniform_2.png"
 
-np.random.seed(SEED)
+np.random.seed(SEED)  # seed' = (C1*seed + C2)% C3 (maybe)
 samples = np.random.uniform(0, 1, SAMPLE_SIZE)
+# 1000 like [0.2, 0.4, 0.1, 0.789... ]
 
 print("First five samples:")
 print(samples[:5])
-
-os.makedirs("outputs", exist_ok=True)
 
 # Plot the samples in 10 equal-width bins
 plt.hist(samples, bins=BIN_COUNT, range=(0, 1),   edgecolor="black")
 plt.xlabel("Value")
 plt.ylabel("Count")
 plt.title("Uniform(0, 1)")
-plt.savefig("outputs/uniform_histogram.png")
+plt.savefig(OUTPUT)
 plt.close()
-
+print(f"Plot saved to: {OUTPUT}")
