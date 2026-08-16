@@ -6,4 +6,12 @@ Generated code and explanations can contain mistakes. Compare the result with th
 
 ## Prompt
 
-Create a short, commented Python demonstration of continuous uniform sampling. Use NumPy with a fixed seed to draw 10,000 values from Uniform(0, 1). Put every value in a pandas DataFrame and print its first five rows. Divide the interval into ten equal-width bins, print a table containing each bin's count, observed probability, and expected probability, and save a clearly labeled Matplotlib histogram. Keep constants such as sample size and bin count near the top so a student can change them. Save the graph in an outputs folder. After the code, explain what should change when the sample size is reduced from 10,000 to 100.
+Create a very short Python demonstration of continuous uniform sampling for teaching probability distributions.
+
+Use NumPy with a fixed seed to draw 10,000 samples from Uniform(0, 1), print the first five values, and plot a Matplotlib histogram with 10 equal-width bins over [0, 1]. Save the histogram as outputs/uniform_histogram.png.
+
+Keep SAMPLE_SIZE, BIN_COUNT, and SEED near the top so students can easily change them.
+
+Keep the code minimal. Do not use pandas, do not manually compute bin counts or bin edges, and do not add anything beyond what is needed to generate, inspect, and plot the samples.
+
+After the code, briefly explain what students should observe if SAMPLE_SIZE is changed from 10,000 to 100.
