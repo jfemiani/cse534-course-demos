@@ -1,0 +1,48 @@
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">PCA and eigenfaces: compressing high-dimensional data</h2>
+<p>Lesson 7 showed that a covariance matrix describes the directions and scales of an elliptical cloud of data. This lesson applies that geometry to real image data. <strong>Principal component analysis (PCA)</strong> finds the directions with the greatest variation and keeps only the most informative ones, enabling dramatic compression.</p>
+<p>Face images contain thousands of pixels, but PCA reveals that most variation can be captured by a much smaller number of principal directions. When applied to faces, these directions are called <strong>eigenfaces</strong>.</p>
+<p><strong>What you will do:</strong> Load a real face dataset, compute eigenfaces via PCA, and reconstruct faces from compressed representations.</p>
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Why PCA matters for generative AI</h2>
+<p>Modern generative models like diffusion models and VAEs operate in high-dimensional pixel space, but much of that space contains nonsensical images. PCA finds the subspace where real data actually lives. Understanding this dimensionality reduction helps you grasp how generative models learn compact representations.</p>
+<p>Image generation quality is often evaluated by comparing feature distributions in reduced-dimensional spaces (like FiD, covered in a later lesson after you understand how to compare multivariate Gaussians).</p>
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Principal component analysis (PCA)</h2>
+<p>PCA finds the directions of greatest variation in high-dimensional data. The algorithm:</p>
+<ol>
+<li><strong>Center</strong> the data by subtracting mean vector &mu;</li>
+<li>Compute the covariance matrix</li>
+<li>Find its <strong>eigenvectors</strong> (directions that transform without rotation)</li>
+<li>Sort by <strong>eigenvalue</strong> (variance along that direction), largest first</li>
+<li>Keep the first <em>k</em> directions to compress data</li>
+</ol>
+<div style="display: flex; align-items: center; margin: 0.75rem 0;">
+<div style="flex: 1 1 auto; min-width: 0; text-align: center; overflow-x: auto;"><math style="font-size: 1.2rem;" xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="Equation 8.1. The lower-dimensional coordinate vector z equals Q sub k transpose times x minus mu."><mrow><mi mathvariant="bold">z</mi><mo>=</mo><msup><msub><mi mathvariant="bold">Q</mi><mi>k</mi></msub><mi>T</mi></msup><mo stretchy="false">(</mo><mi mathvariant="bold">x</mi><mo>&minus;</mo><mi mathvariant="bold">&mu;</mi><mo stretchy="false">)</mo></mrow></math></div>
+<span style="width: 3.5rem; flex: 0 0 3.5rem; text-align: right;" aria-hidden="true">(8.1)</span></div>
+<p>In Equation (8.1), columns of <strong>Q</strong><sub><em>k</em></sub> are the first <em>k</em> principal directions. The projection gives reduced coordinates <strong>z</strong>. Each eigenvalue tells how much variance that direction captures. Keeping the first <em>k</em> directions preserves as much variance as possible among all <em>k</em>-dimensional linear projections.</p>
+
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Eigenfaces: PCA on face images</h2>
+<p>A grayscale face image with <em>h</em> &times; <em>w</em> pixels can be treated as a vector with <em>h</em> &middot; <em>w</em> dimensions. For 50x37 images, that is 1,850 dimensions. PCA finds recurring patterns across many face images.</p>
+<p>The eigenvectors, when reshaped back to images, are called <strong>eigenfaces</strong>. Each eigenface captures a mode of variation (e.g., lighting direction, facial hair, glasses). A face can be represented as:</p>
+<div style="text-align: center; margin: 0.5rem 0;"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mtext>face</mtext><mo>&approx;</mo><mtext>mean face</mtext><mo>+</mo><munderover><mo>&sum;</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>k</mi></munderover><msub><mi>z</mi><mi>i</mi></msub><mo>&sdot;</mo><msub><mtext>eigenface</mtext><mi>i</mi></msub></mrow></math></div>
+<p>Instead of storing 1,850 numbers, we store <em>k</em> ≈ 150 coefficients plus the shared eigenfaces. This is <strong>lossy compression</strong>: reconstructions are approximate but preserve recognizable features.</p>
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Run the demonstrations</h2>
+<p><strong>Primary demo:</strong></p>
+<p><iframe style="width: 100%; height: 900px;" title="embedded content" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2Fmathematical_foundations%2F14_eigenfaces%2F14_eigenfaces.py&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on" loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<p>This demo loads real face images and computes eigenfaces. It shows how 150 principal components can capture most variation in 1,850-dimensional face space.</p>
+<p><strong>Optional supporting demo:</strong> <code>13_mahalanobis.py</code> shows covariance-aware distance (not on quiz).</p>
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Additional resources (optional)</h2>
+<p><em>Core concepts:</em></p>
+<ul>
+<li><a href="https://www.youtube.com/watch?v=FgakZw6K1QQ" target="_blank" rel="noopener">StatQuest: PCA main ideas</a> (5 min)</li>
+<li><a href="https://www.youtube.com/watch?v=HMOI_lkzW08" target="_blank" rel="noopener">StatQuest: PCA step-by-step</a> (20 min)</li>
+<li><a href="https://www.youtube.com/watch?v=BfTMmoDFXyE" target="_blank" rel="noopener">3Blue1Brown: Eigenvectors and eigenvalues</a> (17 min)</li>
+</ul>
+<p><em>Textbook:</em></p>
+<ul>
+<li>PRML Section 12.1 (PCA)</li>
+<li><em>The Elements of Statistical Learning</em>, Section 14.5</li>
+</ul>
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Quiz scope</h2>
+<ul>
+<li><strong>Quiz:</strong> Explain PCA steps (center, covariance, eigenvectors, projection); interpret eigenvalues as variance; describe eigenfaces compression; explain why fewer dimensions loses information.</li>
+<li><strong>Not on quiz:</strong> Mahalanobis distance, whitening, SVD-based PCA, kernel PCA, probabilistic PCA.</li>
+</ul>
