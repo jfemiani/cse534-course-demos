@@ -5,8 +5,8 @@ Load counts and generate text.
 import json
 import numpy as np
 
-ORDER = 4  # must match training
-ALPHA = 1.0
+ORDER = 8  # must match training
+ALPHA = 0.0001
 PAD = "^"
 END = "$"
 MAX_LEN = 500

@@ -6,9 +6,10 @@ import json
 from urllib.request import urlopen
 from rich.progress import track
 
-ORDER = 4  # context length (ORDER=4 means 5-gram)
+ORDER = 8  # context length (ORDER=8 means 9-gram)
 PAD = "^"  # padding character at start of sequence
 END = "$"  # end of sequence marker
+ALPHA = 0.0001  # add-alpha smoothing
 
 # Fetch corpus
 url = "https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt"
@@ -18,7 +19,7 @@ with urlopen(url) as r:
 # Split into lines (sentences)
 lines = [line.strip() for line in corpus.split('\n') if line.strip()]
 
-print(f"ORDER={ORDER}, lines={len(lines)}")
+print(f"ORDER={ORDER}, ALPHA={ALPHA}, lines={len(lines)}")
 
 # Build count dict: count[ctx_string] = {char: count}
 count = {}
