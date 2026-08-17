@@ -22,11 +22,11 @@ for mu in candidates:
     # Log-likelihood (sum of log probabilities)
     log_likelihood = np.sum([np.log(mu) if x == 1 else np.log(1 - mu) for x in data])
     
-    print(f"\nμ = {mu:.1f}:")
-    print(f"  L(μ)  = {likelihood:.2e}")
-    print(f"  ℓ(μ)  = {log_likelihood:.2f}")
+    print(f"\nmu = {mu:.1f}:")
+    print(f"  L(mu)  = {likelihood:.2e}")
+    print(f"  ell(mu)  = {log_likelihood:.2f}")
 
-print("\n→ Likelihood underflows to 0, log-likelihood stays computable")
+print("\n-> Likelihood underflows to 0, log-likelihood stays computable")
 
 response = input("\nPress Enter to continue (or 'q' to quit)...")
 if response.lower() == 'q':
@@ -39,9 +39,9 @@ print("=" * 50)
 x = torch.tensor(data, dtype=torch.float32)
 
 # Try gradient descent on raw likelihood (will fail)
-print("\nAttempt 1: Gradient descent on likelihood L(μ)")
+print("\nAttempt 1: Gradient descent on likelihood L(mu)")
 mu1 = torch.tensor([0.3], requires_grad=True)
-print(f"Initial μ = {mu1.item():.3f}")
+print(f"Initial mu = {mu1.item():.3f}")
 
 for step in range(50):
     # Compute likelihood (product)
@@ -53,13 +53,13 @@ for step in range(50):
         mu1.clamp_(0.01, 0.99)
         mu1.grad.zero_()
 
-print(f"Final μ = {mu1.item():.3f}")
-print("→ Fails! Gradients vanish due to underflow")
+print(f"Final mu = {mu1.item():.3f}")
+print("-> Fails! Gradients vanish due to underflow")
 
 print("\nAttempt 2: Gradient descent on negative log-likelihood")
 mu2 = torch.tensor([0.3], requires_grad=True)
 optimizer = torch.optim.Adam([mu2], lr=0.05)
-print(f"Initial μ = {mu2.item():.3f}")
+print(f"Initial mu = {mu2.item():.3f}")
 
 for step in range(100):
     mu_safe = torch.clamp(mu2, 0.001, 0.999)
@@ -72,6 +72,6 @@ for step in range(100):
     with torch.no_grad():
         mu2.clamp_(0.001, 0.999)
 
-print(f"Final μ = {mu2.item():.3f}")
+print(f"Final mu = {mu2.item():.3f}")
 print(f"Observed fraction = {data.mean():.3f}")
-print("→ Works! Log-likelihood enables gradient-based optimization")
+print("-> Works! Log-likelihood enables gradient-based optimization")
