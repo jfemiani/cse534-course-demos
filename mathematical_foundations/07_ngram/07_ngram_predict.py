@@ -9,19 +9,19 @@ ORDER = 8  # must match training
 PAD = "^"
 END = "$"
 MAX_LEN = 500
-NUM_SENTENCES = 5
+NUM_BLOCKS = 5
 
 # Load counts
 with open("ngram_counts.json") as f:
     count = json.load(f)
 
 print(f"Loaded {len(count)} contexts")
-print(f"\nGenerating {NUM_SENTENCES} sentences:\n")
+print(f"\nGenerating {NUM_BLOCKS} blocks:\n")
 
 rng = np.random.default_rng(None)
 
-for _ in range(NUM_SENTENCES):
-    # Start each sentence with padding
+for _ in range(NUM_BLOCKS):
+    # Start each block with padding
     gen = PAD * ORDER
     
     for _ in range(MAX_LEN):
@@ -39,5 +39,6 @@ for _ in range(NUM_SENTENCES):
             break
     
     # Strip padding and end marker
-    sentence = gen[ORDER:].replace(END, "")
-    print(sentence)
+    block = gen[ORDER:].replace(END, "")
+    print(block)
+    print()  # blank line between blocks

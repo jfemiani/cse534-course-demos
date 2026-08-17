@@ -15,16 +15,16 @@ url = "https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshake
 with urlopen(url) as r:
     corpus = r.read().decode('utf-8')
 
-# Split into lines (sentences)
-lines = [line.strip() for line in corpus.split('\n') if line.strip()]
+# Split on blank lines (dialogue blocks)
+blocks = [block.strip() for block in corpus.split('\n\n') if block.strip()]
 
-print(f"ORDER={ORDER}, lines={len(lines)}")
+print(f"ORDER={ORDER}, blocks={len(blocks)}")
 
 # Build count dict: count[ctx_string] = {char: count}
 count = {}
-for line in track(lines, description="Counting N-grams"):
+for block in track(blocks, description="Counting N-grams"):
     # Pad start and add end marker
-    seq = PAD * ORDER + line + END
+    seq = PAD * ORDER + block + END
     for i in range(len(seq) - ORDER):
         ctx = seq[i:i+ORDER]
         next_char = seq[i+ORDER]
