@@ -6,7 +6,6 @@ import json
 import numpy as np
 
 ORDER = 8  # must match training
-ALPHA = 0.0001
 PAD = "^"
 END = "$"
 MAX_LEN = 500
@@ -16,11 +15,7 @@ NUM_SENTENCES = 5
 with open("ngram_counts.json") as f:
     count = json.load(f)
 
-# Reconstruct vocab from counts
-vocab = sorted(set(c for ctx in count for c in count[ctx]))
-V = len(vocab)
-
-print(f"Loaded {len(count)} contexts, vocab size={V}")
+print(f"Loaded {len(count)} contexts")
 print(f"\nGenerating {NUM_SENTENCES} sentences:\n")
 
 rng = np.random.default_rng(None)
@@ -31,11 +26,14 @@ for _ in range(NUM_SENTENCES):
     
     for _ in range(MAX_LEN):
         ctx = gen[-ORDER:]
-        # P(next|ctx) with add-alpha smoothing
         ctx_counts = count.get(ctx, {})
-        probs = np.array([(ctx_counts.get(c, 0) + ALPHA) for c in vocab])
+        if not ctx_counts:  # unseen context, stop
+            break
+        # Sample from observed next chars only
+        chars = list(ctx_counts.keys())
+        probs = np.array([ctx_counts[c] for c in chars])
         probs = probs / probs.sum()
-        next_char = rng.choice(vocab, p=probs)
+        next_char = rng.choice(chars, p=probs)
         gen += next_char
         if next_char == END:
             break
