@@ -39,10 +39,11 @@
 <p>An unseen context&ndash;character pair would otherwise receive probability zero. Its logarithm would then be undefined, producing an infinite loss. The demonstration uses <strong>add-one smoothing</strong>: it acts as though every possible next character had been seen once, so every vocabulary character receives a small nonzero probability. This prevents the evaluation from collapsing because of one unseen pair.</p>
 <h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Demonstrations</h2>
 
-<h3>Demo 07: Bigram Counts</h3>
-<p>Expose the count-to-probability calculation on one tiny string.</p>
-<script src="https://emgithub.com/embed-v2.js?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2Fmathematical_foundations%2F07_bigram%2F07_bigram_counts.py&style=default&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></script>
+<h3>Demo 07: N-Gram Language Model</h3>
+<p>Character-level N-gram model split into training and generation. First run the training script to count N-grams and save the model, then run the prediction script to generate text. Change <code>ORDER</code> to 1, 2, 4, and 8 (corresponding to bigram, trigram, 5-gram, and 9-gram models) to see how context length affects generation quality.</p>
 
-<h3>Demo 08: N-Gram Generator</h3>
-<p>Train, evaluate, and sample a character N-gram model. Change <code>ORDER</code> to 1, 2, 4, and 8. These context lengths correspond to bigram, trigram, 5-gram, and 9-gram models. Compare generated samples, number of learned contexts, validation loss, and perplexity. More context is not automatically better when data are limited.</p>
-<script src="https://emgithub.com/embed-v2.js?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2Fmathematical_foundations%2F08_ngram%2F08_ngram_generator.py&style=default&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></script>
+<h4>Training: Count N-grams and save model</h4>
+<script src="https://emgithub.com/embed-v2.js?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2Fmathematical_foundations%2F07_ngram%2F07_ngram_train.py&style=default&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></script>
+
+<h4>Prediction: Load model and generate text</h4>
+<script src="https://emgithub.com/embed-v2.js?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2Fmathematical_foundations%2F07_ngram%2F07_ngram_predict.py&style=default&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></script>
