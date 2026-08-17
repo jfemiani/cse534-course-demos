@@ -23,7 +23,7 @@ V = len(vocab)
 print(f"Loaded {len(count)} contexts, vocab size={V}")
 print(f"\nGenerating {NUM_SENTENCES} sentences:\n")
 
-np.random.seed(42)
+rng = np.random.default_rng(None)
 
 for _ in range(NUM_SENTENCES):
     # Start each sentence with padding
@@ -35,7 +35,7 @@ for _ in range(NUM_SENTENCES):
         ctx_counts = count.get(ctx, {})
         probs = np.array([(ctx_counts.get(c, 0) + ALPHA) for c in vocab])
         probs = probs / probs.sum()
-        next_char = np.random.choice(vocab, p=probs)
+        next_char = rng.choice(vocab, p=probs)
         gen += next_char
         if next_char == END:
             break
