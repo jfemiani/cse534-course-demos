@@ -3,31 +3,34 @@ N-Gram Language Model - Training
 Count N-grams from corpus and save model.
 """
 import json
-import numpy as np
 from urllib.request import urlopen
 from rich.progress import track
 
 ORDER = 4  # context length (ORDER=4 means 5-gram)
-ALPHA = 1.0  # add-alpha smoothing
+PAD = "^"  # padding character at start of sequence
+END = "$"  # end of sequence marker
 
 # Fetch corpus
 url = "https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt"
 with urlopen(url) as r:
-    corpus = r.read().decode('utf-8')[:50000]
+    corpus = r.read().decode('utf-8')
 
-vocab = sorted(set(corpus))
-V = len(vocab)
+# Split into lines (sentences)
+lines = [line.strip() for line in corpus.split('\n') if line.strip()]
 
-print(f"ORDER={ORDER}, vocab size={V}, corpus length={len(corpus)}")
+print(f"ORDER={ORDER}, lines={len(lines)}")
 
 # Build count dict: count[ctx_string] = {char: count}
 count = {}
-for i in track(range(len(corpus) - ORDER), description="Counting N-grams"):
-    ctx = corpus[i:i+ORDER]
-    next_char = corpus[i+ORDER]
-    if ctx not in count:
-        count[ctx] = {}
-    count[ctx][next_char] = count[ctx].get(next_char, 0) + 1
+for line in track(lines, description="Counting N-grams"):
+    # Pad start and add end marker
+    seq = PAD * ORDER + line + END
+    for i in range(len(seq) - ORDER):
+        ctx = seq[i:i+ORDER]
+        next_char = seq[i+ORDER]
+        if ctx not in count:
+            count[ctx] = {}
+        count[ctx][next_char] = count[ctx].get(next_char, 0) + 1
 
 print(f"Unique contexts: {len(count)}")
 

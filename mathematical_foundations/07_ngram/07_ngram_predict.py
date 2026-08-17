@@ -7,6 +7,10 @@ import numpy as np
 
 ORDER = 4  # must match training
 ALPHA = 1.0
+PAD = "^"
+END = "$"
+MAX_LEN = 500
+NUM_SENTENCES = 5
 
 # Load counts
 with open("ngram_counts.json") as f:
@@ -17,19 +21,25 @@ vocab = sorted(set(c for ctx in count for c in count[ctx]))
 V = len(vocab)
 
 print(f"Loaded {len(count)} contexts, vocab size={V}")
+print(f"\nGenerating {NUM_SENTENCES} sentences:\n")
 
-# Generate from random seed
-seed = list(count.keys())[0]
-gen = seed
 np.random.seed(42)
 
-for _ in range(500):
-    ctx = gen[-ORDER:]
-    # P(next|ctx) with add-alpha smoothing
-    ctx_counts = count.get(ctx, {})
-    probs = np.array([(ctx_counts.get(c, 0) + ALPHA) for c in vocab])
-    probs = probs / probs.sum()
-    gen += np.random.choice(vocab, p=probs)
-
-print("\nGenerated text:")
-print(gen)
+for _ in range(NUM_SENTENCES):
+    # Start each sentence with padding
+    gen = PAD * ORDER
+    
+    for _ in range(MAX_LEN):
+        ctx = gen[-ORDER:]
+        # P(next|ctx) with add-alpha smoothing
+        ctx_counts = count.get(ctx, {})
+        probs = np.array([(ctx_counts.get(c, 0) + ALPHA) for c in vocab])
+        probs = probs / probs.sum()
+        next_char = np.random.choice(vocab, p=probs)
+        gen += next_char
+        if next_char == END:
+            break
+    
+    # Strip padding and end marker
+    sentence = gen[ORDER:].replace(END, "")
+    print(sentence)
