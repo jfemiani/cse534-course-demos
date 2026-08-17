@@ -3,6 +3,7 @@ N-Gram Language Model
 Train, generate, and evaluate with NLL and perplexity.
 """
 import numpy as np
+from numpy.lib.stride_tricks import sliding_window_view
 from urllib.request import urlopen
 
 ORDER = 4  # context length (ORDER=4 means 5-gram)
@@ -23,14 +24,18 @@ V = len(vocab)
 print(f"ORDER={ORDER} (context length), vocab size={V}, corpus length={len(corpus)}")
 print()
 
-# count[ctx_hash][next_idx] = frequency
+# Extract all (context, next_char) pairs with sliding window
+codes = np.array([char_to_idx[c] for c in corpus])
+windows = sliding_window_view(codes, ORDER+1)
+contexts = [''.join(vocab[i] for i in w[:-1]) for w in windows]
+next_idxs = windows[:, -1]
+
+# Build count dict: count[ctx] = histogram over vocab
 count = {}
-for i in range(len(corpus) - ORDER):
-    ctx = corpus[i:i+ORDER]
-    next_idx = char_to_idx[corpus[i+ORDER]]
+for ctx, idx in zip(contexts, next_idxs):
     if ctx not in count:
-        count[ctx] = np.zeros(V)
-    count[ctx][next_idx] += 1
+        count[ctx] = np.zeros(V, dtype=int)
+    count[ctx][idx] += 1
 
 print(f"Unique contexts: {len(count)}")
 print()
