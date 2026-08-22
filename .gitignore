@@ -1,6 +1,12 @@
 # Generated data files
 mathematical_foundations/07_ngram/ngram_counts.json
 
+# Secrets
+.env
+
+# Downloaded Canvas content (regenerate via download_canvas_pages.py)
+remote_pages/
+
 # Node.js / npm
 node_modules/
 package-lock.json

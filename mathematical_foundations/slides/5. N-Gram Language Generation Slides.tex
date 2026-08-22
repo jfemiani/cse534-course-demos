@@ -339,10 +339,10 @@ e & \textcolor{miamired}{\rule{1.8cm}{0.3cm}} & 8/35
 \textbf{The Theory:}
 
 \begin{itemize}
-    \item<1-> \textbf{Autoregressive:} Output at each step depends on the model's own previous outputs
-    \item<2-> Every generative model needs $P(\text{next} \mid \text{context})$
-    \item<3-> Understanding N-gram math = understanding \textbf{all} language models
-    \item<4-> Same probability foundations power both simple and complex models
+    \item<1-> \textbf{Autoregressive view:} Generation proceeds one step at a time, conditioning on prior context
+    \item<2-> Many generative models rely on $P(\text{next} \mid \text{context})$ or an equivalent conditional target
+    \item<3-> N-grams are a simple, interpretable example of the same probability ideas used in language modeling
+    \item<4-> This helps build intuition for more complex models, even though diffusion, grammars, and transformers use different mechanisms
 \end{itemize}
 \end{frame}
 
