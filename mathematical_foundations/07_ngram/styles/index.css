@@ -1,0 +1,111 @@
+/* Dark theme for N-gram slides */
+.slidev-layout {
+  background-color: #1e1e1e !important;
+  color: #d4d4d4 !important;
+  font-size: 28px !important;
+  padding: 2rem !important;
+}
+
+h1 {
+  color: #941728 !important;
+  border-bottom: 3px solid #941728 !important;
+  padding-bottom: 0.5rem !important;
+}
+
+h2 {
+  color: #941728 !important;
+  margin-top: 1rem !important;
+  font-size: 2.5rem !important;
+  font-weight: bold !important;
+}
+
+code {
+  background-color: #2d2d2d !important;
+  color: #f0f0f0 !important;
+  padding: 0.2rem 0.4rem !important;
+  border-radius: 3px !important;
+}
+
+pre {
+  background-color: #2d2d2d !important;
+  border: 1px solid #444 !important;
+  padding: 1rem !important;
+  border-radius: 5px !important;
+  line-height: 1.6 !important;
+}
+
+pre code {
+  color: #f0f0f0 !important;
+  background: transparent !important;
+  font-family: 'Courier New', monospace !important;
+  white-space: pre !important;
+}
+
+strong {
+  color: #569cd6 !important;
+}
+
+table {
+  background-color: #2d2d2d !important;
+  border-collapse: collapse !important;
+  margin: 1rem 0 !important;
+}
+
+th {
+  background-color: #941728 !important;
+  color: #f0f0f0 !important;
+  padding: 0.5rem !important;
+  border: 1px solid #444 !important;
+}
+
+td {
+  background-color: #2d2d2d !important;
+  color: #d4d4d4 !important;
+  padding: 0.5rem !important;
+  border: 1px solid #444 !important;
+}
+
+.dimmed {
+  opacity: 0.3;
+}
+
+/* Footer styling */
+.slidev-layout footer {
+  color: #d4d4d4 !important;
+}
+
+/* Page number styling */
+.slidev-page-number {
+  color: #d4d4d4 !important;
+}
+
+/* Grid layout spacing */
+.grid p {
+  margin: 0.5rem 0 !important;
+  line-height: 1.4 !important;
+}
+
+.grid strong {
+  display: inline-block !important;
+  margin-bottom: 0.3rem !important;
+}
+
+/* Mermaid diagram centering */
+.mermaid {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  margin: 2rem auto !important;
+}
+
+/* Code block inside grid - no extra indentation */
+.grid pre {
+  margin: 0.5rem 0 !important;
+  padding: 0.5rem !important;
+}
+
+.grid pre code {
+  display: block !important;
+  text-indent: 0 !important;
+  padding-left: 0 !important;
+}

@@ -1,0 +1,45 @@
+# Generated data files
+mathematical_foundations/07_ngram/ngram_counts.json
+
+# Node.js / npm
+node_modules/
+package-lock.json
+.slidev/
+.vercel/
+.output/
+.nuxt/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+*.egg-info/
+dist/
+build/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# LaTeX
+*.aux
+*.log
+*.out
+*.toc
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+*.nav
+*.snm
+*.vrb
+
+# OS
+.DS_Store
+Thumbs.db
