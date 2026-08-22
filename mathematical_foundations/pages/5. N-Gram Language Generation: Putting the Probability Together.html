@@ -71,14 +71,14 @@
 <p>Character-level N-gram model split into training and generation. First run the training script to count N-grams and save the model, then run the prediction script to generate text. Change <code>ORDER</code> to 1, 2, 4, and 8 (corresponding to bigram, trigram, 5-gram, and 9-gram models) to see how context length affects generation quality.</p>
 
 <h4>Training: Count N-grams and save model</h4>
-<script src="https://emgithub.com/embed-v2.js?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2Fmathematical_foundations%2F07_ngram%2F07_ngram_train.py&style=default&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></script>
+<p><iframe style="width: 100%; height: 600px;" title="Training: Count N-grams and save model" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2Fmathematical_foundations%2F07_ngram%2F07_ngram_train.py&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on" loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
 
 <h4>Prediction: Load model and generate text</h4>
-<script src="https://emgithub.com/embed-v2.js?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2Fmathematical_foundations%2F07_ngram%2F07_ngram_predict.py&style=default&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></script>
+<p><iframe style="width: 100%; height: 600px;" title="Prediction: Load model and generate text" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2Fmathematical_foundations%2F07_ngram%2F07_ngram_predict.py&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on" loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
 
 <h4>Prediction with Bayesian Smoothing: Never hits dead ends</h4>
 <p>Compare this version to the basic one above. The smoothed version builds a vocabulary from all observed characters and uses Bayesian smoothing (α = 0.01) to assign small non-zero probabilities to unseen context–character pairs, preventing generation from stopping when it encounters rare contexts.</p>
-<script src="https://emgithub.com/embed-v2.js?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2Fmathematical_foundations%2F07_ngram%2F07_ngram_predict_smoothed.py&style=default&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"></script>
+<p><iframe style="width: 100%; height: 700px;" title="Prediction with Bayesian Smoothing" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2Fmathematical_foundations%2F07_ngram%2F07_ngram_predict_smoothed.py&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on" loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
 
 <h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Additional Resources (Optional)</h2>
 <p><em>Tutorials and Visual Explanations:</em></p>
