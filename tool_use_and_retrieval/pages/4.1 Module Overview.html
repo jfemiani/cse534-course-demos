@@ -1,0 +1,23 @@
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Back to the API, with more moving parts</h2>
+<p>Module 2 covered one request and one reply. This module covers what the model can do when it needs outside help: calling code, deciding for itself when to call more code, and answering questions about a document it never saw during training.</p>
+<p>This version stays close to what the OpenAI API itself now does out of the box, and names the underlying ideas so they transfer to any vendor's API, rather than tying the lesson to one specific framework.</p>
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Key Topics</h2>
+<ul>
+<li>Tool use (function calling): letting the model ask your code to do something, instead of guessing the answer</li>
+<li>The agent loop: the model calling tools repeatedly, on its own, until it decides it has enough to answer</li>
+<li>Retrieval-augmented generation (RAG): chunking a document, embedding the chunks, and pulling in the closest ones at answer time</li>
+<li>Vector search, keyword search, and where each one wins</li>
+<li>AGENTS.md and SKILL.md: instructions a model reads on demand, instead of tools it calls</li>
+</ul>
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Lessons</h2>
+<ul>
+<li>4.2 Tool Use: Function Calling with the Responses API</li>
+<li>4.3 The Agent Loop: Multi-Step Tool Use</li>
+<li>4.4 Chunking and Retrieval (Manual RAG)</li>
+<li>4.5 Retrieval Approaches: Vector vs. Keyword vs. Graph</li>
+<li>4.6 Reusable Agent Instructions: AGENTS.md and SKILL.md</li>
+</ul>
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Activities</h2>
+<p>The discussions, quizzes, and lab carried over from the old LangChain Fundamentals and Vector Databases modules live in this module for now. Some of them ask about LangChain or a specific vector database product by name. Treat those questions as historical until each one is reviewed and updated to match this version of the module.</p>
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Reading</h2>
+<p>This module does not follow a textbook. The APIs it covers changed enough since the last edition of the assigned reading that a fixed chapter would be out of date within a year. Each lesson page links to the current official documentation it is based on instead. Check those links for anything that may have changed since this page was written.</p>

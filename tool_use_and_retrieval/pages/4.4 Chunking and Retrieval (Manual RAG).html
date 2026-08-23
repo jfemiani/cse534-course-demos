@@ -1,0 +1,16 @@
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">A document too big to paste into a prompt</h2>
+<p>A model can only read as much text as fits in its context window. A syllabus, a textbook, or a codebase is usually much bigger than that. The common fix is to split the document into small pieces, called chunks, and only paste in the chunks that actually answer the question being asked.</p>
+<p>Picking which chunks to paste in is the retrieval part of "retrieval-augmented generation." The model's final answer is generated the normal way; what changes is that the prompt now includes a small, relevant slice of a much larger document, chosen automatically.</p>
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">How the chunks get chosen</h2>
+<p>Each chunk is converted into a list of numbers called an embedding, using a model trained on huge amounts of text so that chunks with similar meaning end up with similar numbers. The question gets embedded the same way. Comparing the question's embedding against every chunk's embedding ranks the chunks by how closely they match the question.</p>
+<p>The comparison is the same dot-product idea from the multivariate normal lesson: divide each vector by its length to get a unit vector, and the dot product of two unit vectors, called cosine similarity, is 1.0 when they point the same way and 0 when they are unrelated. The closest chunk, or the closest few, get pasted into the prompt.</p>
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">The demo</h2>
+<p>This demo chunks four short sentences about the course, embeds them, embeds a question, and pastes in whichever chunk scores highest before asking the model to answer.</p>
+<p><iframe style="width: 100%; height: 650px;" title="03_chunking_retrieval.py" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2Ftool_use_and_retrieval%2F03_chunking_retrieval%2F03_chunking_retrieval.py&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on" loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Building this by hand vs. using the built-in tool</h2>
+<p>Writing the chunk-embed-rank pipeline yourself, as above, is useful for seeing what retrieval actually does. For real documents, OpenAI's Responses API includes a file_search tool: upload documents to a hosted vector store, attach that store to the API call, and the chunking, embedding, and ranking happen for you. Prefer the built-in tool once the concept makes sense.</p>
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Reading</h2>
+<ul>
+<li><a href="https://platform.openai.com/docs/guides/embeddings" target="_blank">OpenAI: Embeddings guide</a></li>
+<li><a href="https://platform.openai.com/docs/guides/tools-file-search" target="_blank">OpenAI: File search guide</a></li>
+</ul>

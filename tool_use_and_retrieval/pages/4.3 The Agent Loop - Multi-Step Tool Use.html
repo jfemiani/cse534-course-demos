@@ -1,0 +1,16 @@
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">One tool call is easy. What about three?</h2>
+<p>The last lesson gave the model one tool and asked one question that needed it. Most real questions are not that clean. Answering "when and where can I meet Professor Femiani in person this week?" needs two separate facts: office hours and a room number. The model has to call one tool, read the result, decide it still needs more, call a second tool, and only then write an answer.</p>
+<p>This repeated call-observe-decide cycle has a name in two different communities. OpenAI's documentation calls it the agent loop. The research paper that first described it calls it ReAct, short for Reason and Act (Yao et al., 2022). Both names describe the same thing: the model alternates between deciding what to do and reading what happened, for as many steps as the question needs.</p>
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">The demo</h2>
+<p>This demo gives the model two tools, <code>lookup_office_hours</code> and <code>lookup_room_number</code>, and asks the two-part question above. The loop keeps sending results back and asking again until the model stops requesting tools and writes its final answer. Each step prints what the model asked for and what it got back.</p>
+<p><iframe style="width: 100%; height: 700px;" title="02_agent_loop.py" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2Ftool_use_and_retrieval%2F02_agent_loop%2F02_agent_loop.py&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on" loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">You will not usually write this loop by hand</h2>
+<p>The loop above is written out in full so every step is visible. It trusts the model to stop asking for tools once it has enough information; production code typically adds a maximum step count as a safety net, so a confused model cannot loop forever.</p>
+<p>In practice, OpenAI's Responses API runs this same loop internally whenever you use one of its built-in tools: web search, file search, a code interpreter, or a shell. You describe the tools you want available and the API keeps calling them until it has an answer, without you writing the while loop yourself.</p>
+<p>When a task needs more than one agent working together, handing work off between them, OpenAI also publishes an Agents SDK for that. It sits on top of the same Responses API and is worth knowing exists if a project grows past a single loop like the one on this page.</p>
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Reading</h2>
+<ul>
+<li><a href="https://platform.openai.com/docs/guides/agents" target="_blank">OpenAI: Building agents with the Responses API</a></li>
+<li><a href="https://openai.github.io/openai-agents-python/" target="_blank">OpenAI Agents SDK documentation</a></li>
+<li><a href="https://arxiv.org/abs/2210.03629" target="_blank">Yao et al., "ReAct: Synergizing Reasoning and Acting in Language Models" (2022)</a></li>
+</ul>
