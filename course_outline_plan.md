@@ -24,33 +24,33 @@ Rationale: the old two modules were scoped around the PEGA textbook (LangChain f
 
 This lands right after Mathematical Foundations and returns to the same Responses API groundwork from Module 2, so it should feel like "week one, but deeper" rather than a brand-new framework.
 
-### 4.1 Module Overview 🚧
+### 4.1 Module Overview ✅ (first cut)
 
-### 4.2 Tool Use: Function Calling with the Responses API 🚧
+### 4.2 Tool Use: Function Calling with the Responses API ✅ (first cut)
 - What "tool use" / "function calling" means: the model doesn't run code, it emits a structured request; your code executes it and sends the result back.
 - Minimal demo: one custom function tool (e.g., a simple calculator or "read this local file" tool), single round trip.
 - Contrast with Module 2 demo 6 (structured output): structured output shapes the model's *final* answer; tool calling lets the model *ask for data* mid-conversation.
 - Short aside (optional, don't overbuild): images/PDFs can also be attached as input content, not just returned by tools — one paragraph, one small example, not a full lesson. This repo does not yet have a base64-image demo; add one only if it stays this small.
 
-### 4.3 The Agent Loop: Multi-Step Tool Use 🚧
+### 4.3 The Agent Loop: Multi-Step Tool Use ✅ (first cut)
 - Name the pattern explicitly: this is usually called the **agent loop** (OpenAI's own term for the Responses API's internal behavior) and academically traces back to **ReAct** (Reason + Act), Yao et al. 2022 — thought → action → observation, repeated until the model decides it's done.
 - Demo: drive the loop across 2-3 tool calls (e.g., a "search my notes" tool + a "read file" tool) so students see the model choosing *which* tool and *when* to stop.
 - Explicitly point out: OpenAI's Responses API now runs this loop **for you** when you use built-in tools (web search, file search, code interpreter, shell). Hand-rolling the loop is for understanding; production code should prefer the built-in loop or the Agents SDK.
 - Mention the OpenAI **Agents SDK** (multi-agent orchestration, handoffs, guardrails) as the "if you outgrow a single loop" pointer — not a full lesson, just orientation.
 
-### 4.4 Chunking and Retrieval (Manual RAG) 🚧
+### 4.4 Chunking and Retrieval (Manual RAG) ✅ (first cut)
 - Why context windows force chunking: documents and source code get split into pieces small enough to embed and retrieve individually.
 - Demo: chunk a short text/markdown doc, embed chunks with the OpenAI embeddings endpoint, cosine-similarity search, stuff top-k chunks into the prompt, answer a question grounded in them.
 - Explicitly call out: this manual pipeline is for building intuition. In practice, prefer the Responses API's built-in **file_search** / vector store tool, which does chunking + embedding + retrieval for you.
 
-### 4.5 Retrieval Approaches: Vector vs. Keyword vs. Graph 🚧
+### 4.5 Retrieval Approaches: Vector vs. Keyword vs. Graph ✅ (first cut)
 - Theory/comparison lesson, small or no new demo (can reuse 4.4's chunks and add one keyword-match comparison — e.g., simple term overlap vs. embedding similarity on the same query — to make the contrast concrete).
 - Vector RAG: dense embeddings, semantic similarity, current default.
 - Keyword RAG: exact/lexical match (BM25/TF-IDF-style); still wins for exact terms, IDs, code identifiers.
 - Hybrid retrieval: combine both; increasingly the practical default.
 - **GraphRAG**: mention only as further reading, not taught in depth — it's evolving fast and has real cost/complexity tradeoffs. Point students to Microsoft's GraphRAG project page/paper if curious.
 
-### 4.6 Reusable Agent Instructions: AGENTS.md and SKILL.md 🚧
+### 4.6 Reusable Agent Instructions: AGENTS.md and SKILL.md ✅ (first cut)
 - A different idea from tool use: not code the model calls, but **guidance the model reads** — detailed, task-specific instructions saved to a file with light metadata, loaded when relevant instead of stuffed into every prompt.
 - `AGENTS.md` (or legacy equivalents like `CLAUDE.md`, `.cursorrules`, `.github/copilot-instructions.md`): project-wide, always loaded — "here's how this repo works."
 - `SKILL.md`: a specific capability, loaded on demand based on its description — "here's how to do this one task well." Uses progressive disclosure: name+description always loaded, full body loaded only when triggered, linked scripts/references loaded only if needed.
@@ -102,7 +102,15 @@ This lands right after Mathematical Foundations and returns to the same Response
 - **RAG alternatives/variants**: hybrid vector+keyword retrieval is now common practice; **GraphRAG** (Microsoft) models entities/relationships as a graph and can outperform vector RAG on queries needing broad synthesis across a corpus, at real indexing cost and complexity. Treat as "worth knowing exists," not "worth building."
 - **AGENTS.md / SKILL.md**: `AGENTS.md` (agents.md) has emerged as a cross-tool standard for project-level agent instructions (adopted by Cursor, Claude Code, Copilot, Codex, etc.), replacing tool-specific files like `.cursorrules`/`CLAUDE.md`. `SKILL.md` (see agentskills.io's spec) is the complementary per-capability format with progressive disclosure. Framed as an engineering/tooling convention, not an academic result.
 
-## Open questions / things to verify before writing pages
-- Confirm exact current URLs for OpenAI's function-calling and Responses API guide pages before linking (these move); same for the Agents SDK docs site.
-- Decide whether 4.5's keyword-vs-vector demo is worth a dedicated code file or just a short code snippet inline in the page.
-- Decide whether the AGENTS.md/SKILL.md lesson needs any code demo at all, or is purely conceptual with a real-file walkthrough.
+## Status: first cut complete (this session)
+- Local skeleton built under `tool_use_and_retrieval/` (5 demo folders plus `pages/` with 6 HTML files), committed and pushed.
+- 4.5 got its own dedicated demo file (`04_retrieval_approaches/04_retrieval_approaches.py`) rather than an inline snippet, resolving that open question.
+- 4.6 got a small no-API-cost demo (`05_agent_instructions/05_agent_instructions.py`) that dispatches between two real SKILL.md-style files by keyword overlap with their description, resolving that open question.
+- All 6 pages reviewed by the educational-reviewer subagent; feedback applied (token/chunk vocabulary collision fixed in 4.2, cosine similarity tied back to the multivariate-normal lesson's dot-product material in 4.4, loop safety-net note added to 4.3, self-referential aside softened in 4.6, inside-reference to the old modules removed from 4.1's opening).
+- Checked against the avoid-ai-writing skill's banned-word and pattern list: no hits.
+- Canvas: module 4 renamed to "4. Tool Use, Retrieval, and Agentic Loops"; the 6 new pages uploaded and linked as items 1-6; module 5 deleted after moving its quiz/discussion/lab items into module 4 under a second "Legacy Assessments (under review)" subheader (module 4's original Activities subheader and items were left as-is). The 4 now-superseded old pages (old 4.1, old 4.2, old 5.1, old 5.2) were unpublished and prefixed [Superseded] rather than deleted, for reversibility.
+- Not yet done: reviewing/rewriting the 7 legacy quiz/discussion/lab items so they match the new material instead of LangChain/FAISS/Pinecone specifics; slides for the 6 new lessons.
+
+## Open questions / still open
+- The two Activities subheaders in module 4 (original 3 items plus the newly moved 4 items) could be consolidated into one section later; left separate this session to avoid reordering risk.
+- Legacy quizzes still ask about LangChain and specific vector database products by name - review question by question before removing the "under review" label.
