@@ -33,8 +33,8 @@ print(f"Rotation matrix R (theta = 45 degrees):")
 print(R)
 print()
 
-# Translation vector
-mu = np.array([5.0, 3.0])
+# Translation vector (anti-diagonal, so the shifted cloud stays near the origin)
+mu = np.array([-2.5, 2.5])
 
 print(f"Translation vector mu: {mu}")
 print()

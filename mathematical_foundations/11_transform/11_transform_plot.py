@@ -30,7 +30,7 @@ theta = np.pi / 4
 R = np.array([[np.cos(theta), -np.sin(theta)],
               [np.sin(theta), np.cos(theta)]])
 
-mu = np.array([5.0, 3.0])
+mu = np.array([-2.5, 2.5])  # anti-diagonal translation, so the shifted cloud still fits in view
 
 scaled = (S @ Z.T).T
 rotated = (R @ S @ Z.T).T
@@ -57,8 +57,8 @@ for ax, (points, title) in zip(axes, stages):
     ax.axhline(0, color=theme["fg"], linewidth=0.5, alpha=0.4)
     ax.axvline(0, color=theme["fg"], linewidth=0.5, alpha=0.4)
     ax.set_title(title, fontsize=10)
-    ax.set_xlim(-3, 10)
-    ax.set_ylim(-6, 9)
+    ax.set_xlim(-5, 5)
+    ax.set_ylim(-5, 5)
     ax.set_aspect("equal")
 
 fig.suptitle("Same points, colored by original angle and distance, tracked through each stage", fontsize=11)
