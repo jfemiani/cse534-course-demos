@@ -9,6 +9,14 @@
 <p>All three variants below ask the same letter-counting question and call the same <code>count_letter</code> tool. Each one sets <code>tool_choice="required"</code> (or the Agents SDK equivalent) to force the model to call the tool every time, purely so the walkthrough is reliable and easy to read. This is a teaching shortcut, not something to copy into production code: normally the model decides for itself whether a tool is needed, which means your code must check the response before assuming a function call is present. A response might come back as ordinary text instead, and code that skips that check will crash the first time the model decides it does not need the tool.</p>
 <h3>1a: hand-typed JSON schema</h3>
 <p>The tool's schema is a plain Python dict, and the arguments the model sends back are parsed with <code>json.loads()</code>. This is the bare-metal version: nothing hides how the API's tool format actually looks on the wire.</p>
+<p><strong>What to look for:</strong></p>
+<ul>
+<li>The <code>tools</code> list is a plain dict: <code>name</code>, <code>description</code>, and a JSON Schema <code>parameters</code> object, typed by hand.</li>
+<li><code>response.output</code> is a list of items the model produced &mdash; in general it can hold ordinary text, one function call, or several. <code>response.output[0]</code> is safe to index here only because <code>tool_choice="required"</code> plus a single available tool guarantees the model returns exactly one item, and that item is a function call. Production code without those two guarantees should loop over <code>response.output</code> and check each item's <code>type</code> before assuming it is a function call.</li>
+<li><code>call.arguments</code> comes back as a JSON-formatted string, not a Python object, which is why <code>json.loads()</code> runs before the arguments are used.</li>
+<li><code>count_letter(**args)</code> is the only line in the whole file that actually runs code &mdash; everything before it is the model asking, not answering.</li>
+<li>The second <code>client.responses.create(...)</code> call sends the result back via <code>function_call_output</code>, tagged with the same <code>call_id</code>, so the model knows which request this result answers.</li>
+</ul>
 <p><code># pip install openai</code></p>
 <p><iframe style="width: 100%; height: 550px;" title="01a_function_calling_json.py" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2Ftool_use_and_retrieval%2F01_function_calling%2F01a_function_calling_json.py&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on" loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
 <p><strong>Output:</strong></p>
@@ -17,20 +25,34 @@ Real function returned: 3
 Assistant: The letter &ldquo;r&rdquo; appears 3 times in &ldquo;strawberry.&rdquo;</code></pre>
 <h3>1b: schema generated from a Pydantic model</h3>
 <p>Demo 6 defined its output schema as a Pydantic model. This variant defines a tool's arguments the same way: one small Pydantic class, with the JSON schema the API needs read straight off it via <code>model_json_schema()</code>. The model's arguments come back validated through <code>model_validate_json()</code> instead of merely parsed. Reading the schema off a class beats hand-typing the same fields twice, once in the function's signature and once in a JSON dictionary.</p>
+<p><strong>What to look for:</strong></p>
+<ul>
+<li><code>CountLetterArgs</code> is a Pydantic model declared once; <code>CountLetterArgs.model_json_schema()</code> produces the same <code>parameters</code> dict that 1a typed by hand.</li>
+<li><code>CountLetterArgs.model_validate_json(call.arguments)</code> replaces 1a's <code>json.loads()</code>. This does not just parse the string, it checks the types match the model, so a malformed response raises a clear validation error instead of silently passing bad data to <code>count_letter</code>.</li>
+<li>The rest of the round trip &mdash; the <code>response.output[0]</code> indexing, the <code>function_call_output</code> reply &mdash; is unchanged from 1a. Only how the schema and the arguments are produced has changed.</li>
+</ul>
 <p><code># pip install openai pydantic</code></p>
 <p><iframe style="width: 100%; height: 550px;" title="01b_function_calling_pydantic.py" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2Ftool_use_and_retrieval%2F01_function_calling%2F01b_function_calling_pydantic.py&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on" loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
 <p><strong>Output:</strong></p>
 <pre><code>Model asked to call: count_letter(word='strawberry' letter='r')
 Real function returned: 3
 Assistant: The letter &ldquo;r&rdquo; appears 3 times in &ldquo;strawberry.&rdquo;</code></pre>
-<h3>1c: schema and dispatch generated by the OpenAI Agents SDK</h3>
-<p>1a and 1b both hand-wrote the call/response round trip. The <a href="https://openai.github.io/openai-agents-python/" target="_blank">OpenAI Agents SDK</a> can automate part or all of that: decorate a plain function with <code>@function_tool</code> and it reads the name, description, and JSON schema straight from the function's type hints and docstring, no schema class needed. That decorator alone is enough to hand a tool's schema to the raw Responses API, the same way 1a and 1b did; <code>Agent</code> and <code>Runner</code> are not required just to generate a schema. What <code>Agent</code> and <code>Runner</code> add is the dispatch loop itself: give the tool to an <code>Agent</code> and run it with <code>Runner.run_sync(...)</code>, and the SDK calls the tool and returns the final answer without any manual <code>function_call_output</code> step. That loop is worth reaching for once a single tool call needs to become several, or once several tools need shared bookkeeping, but for a single tool call it is optional convenience, not a requirement.</p>
-<p><code># pip install openai-agents</code></p>
+<h3>1c: schema generated by the OpenAI Agents SDK's @function_tool</h3>
+<p>1a and 1b each produced a schema, then hand-wrote the same call/response round trip. The <a href="https://openai.github.io/openai-agents-python/" target="_blank">OpenAI Agents SDK</a> offers a third way to produce that schema: decorate a plain function with <code>@function_tool</code> and it reads the name, description, and JSON schema straight off the function's type hints and docstring, no schema class needed. This demo keeps the same manual round trip as 1a and 1b on purpose, to show that <code>@function_tool</code> only replaces the schema step. It does not require an <code>Agent</code> or a <code>Runner</code> to work, and this demo deliberately does not use them.</p>
+<p>The Agents SDK's <code>Agent</code> and <code>Runner</code> classes are real, and useful, but they automate something this lesson has not covered yet: a dispatch loop that keeps calling tools on its own until it has enough information to answer. That is the subject of the next lesson, the agent loop. Introducing them here, for a single tool call, would hide the very round trip this lesson exists to show.</p>
+<p><strong>What to look for:</strong></p>
+<ul>
+<li><code>count_letter</code> is a plain function, same as 1a. <code>function_tool(count_letter)</code> wraps it and exposes <code>.name</code>, <code>.description</code>, and <code>.params_json_schema</code> &mdash; the schema, generated, not typed.</li>
+<li>The <code>tools</code> list is built from those three attributes, then handed to <code>client.responses.create(...)</code> exactly as in 1a and 1b. Nothing else about the round trip changes.</li>
+<li><code>count_letter(**args)</code> calls the original plain function directly. The <code>function_tool</code>-wrapped object is not itself callable; it exists to generate the schema, not to run the function.</li>
+</ul>
+<p><strong>The pattern across 1a, 1b, and 1c:</strong> the same schema gets easier to produce as the tooling around it matures &mdash; hand-typed, then read off a Pydantic model, then read straight off a function signature. The next lesson, the agent loop, continues that pattern one step further: once <code>Agent</code> and <code>Runner</code> are introduced there, the entire round trip shown in this lesson &mdash; call the API, notice the function call, run the real function, send the result back &mdash; is handled automatically.</p>
+<p><code># pip install openai openai-agents</code></p>
 <p><iframe style="width: 100%; height: 550px;" title="01c_function_calling_agents_sdk.py" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2Ftool_use_and_retrieval%2F01_function_calling%2F01c_function_calling_agents_sdk.py&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on" loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
 <p><strong>Output:</strong></p>
-<pre><code>Tool call: ResponseFunctionToolCall(arguments='{"word":"strawberry","letter":"r"}', name='count_letter', ...)
-Tool output: 3
-Final answer: 3</code></pre>
+<pre><code>Model asked to call: count_letter({'word': 'strawberry', 'letter': 'r'})
+Real function returned: 3
+Assistant: The letter &ldquo;r&rdquo; appears 3 times in &ldquo;strawberry.&rdquo;</code></pre>
 <h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Reading</h2>
 <ul>
 <li><a href="https://platform.openai.com/docs/guides/function-calling" target="_blank">OpenAI: Function calling guide</a></li>
