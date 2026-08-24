@@ -1,15 +1,56 @@
-<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">A question the model should not guess</h2>
 <p>Ask a language model how many times the letter "r" appears in "strawberry" and it will often get the answer wrong. The model does not read a word one letter at a time. It breaks text into tokens, the same units from the entropy and n-gram lessons, and a token can span several letters at once, so counting individual letters inside one is a strange task for it. Splitting the check off to a small Python function fixes this: the function counts correctly every time, and the model only has to know when to ask for it.</p>
 <p>That handoff is what "tool use" or "function calling" means. The model does not run any code itself. It emits a structured request naming a function and its arguments. Your code runs the real function and sends the result back. The model then uses that result to write its answer.</p>
-<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">How this differs from structured output</h2>
 <p>Demo 6 in Module 2 used structured output: the model's final answer had to fit a schema you defined. Tool use is a different moment in the conversation. The model is not shaping its final answer here; it is asking for information it does not have, before it writes that answer at all.</p>
-<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">The demo</h2>
-<p>This demo defines one tool, <code>count_letter</code>, describes it to the model, and asks the letter-counting question. The model calls the tool instead of guessing; the code runs the real count and sends it back; the model reports the correct number. The code tells the API the tool must be used (<code>tool_choice="required"</code>), so the walkthrough is reliable. Normally the model decides for itself whether a tool is needed.</p>
-<p><iframe style="width: 100%; height: 650px;" title="01_function_calling.py" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2Ftool_use_and_retrieval%2F01_function_calling%2F01_function_calling.py&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on" loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true, theme: "base" });
+</script>
+<div class="mermaid">
+flowchart LR
+    U["User<br/><br/>How many r's<br/>in 'strawberry'?"]
+    A["App"]
+    M["Model"]
+    T["Tool<br/>count_letter"]
+
+    U -->|"question"| A
+    A -->|"question + available tools"| M
+    M -->|"function_call(name, args)"| A
+    A -->|"invoke count_letter(...)"| T
+    T -->|"3"| A
+    A -->|"function_call_output"| M
+    M -->|"final response"| A
+    A -->|"There are 3 r's"| U
+
+    classDef user fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#111827;
+    classDef app fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#111827;
+    classDef model fill:#f3e8ff,stroke:#9333ea,stroke-width:2px,color:#111827;
+    classDef tool fill:#ffedd5,stroke:#ea580c,stroke-width:2px,color:#111827;
+
+    class U user;
+    class A app;
+    class M model;
+    class T tool;
+</div>
+<p>Note the direction of each arrow: the model never touches the tool directly. It only sends a request to the code you control, and your code decides whether and how to run the tool.</p>
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Three ways to define a tool</h2>
+<p>All three variants below ask the same letter-counting question and call the same <code>count_letter</code> tool. The code tells the model the tool must be used (<code>tool_choice="required"</code>, or the Agents SDK equivalent), so the walkthrough is reliable. Normally the model decides for itself whether a tool is needed.</p>
+<h3>1a: hand-typed JSON schema</h3>
+<p>The tool's schema is a plain Python dict, and the arguments the model sends back are parsed with <code>json.loads()</code>. This is the bare-metal version: nothing hides how the API's tool format actually looks on the wire.</p>
+<p><code># pip install openai</code></p>
+<p><iframe style="width: 100%; height: 550px;" title="01a_function_calling_json.py" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2Ftool_use_and_retrieval%2F01_function_calling%2F01a_function_calling_json.py&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on" loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<h3>1b: schema generated from a Pydantic model</h3>
+<p>Demo 6 defined its output schema as a Pydantic model. This variant defines a tool's arguments the same way: one small Pydantic class, with the JSON schema the API needs read straight off it via <code>model_json_schema()</code>. The model's arguments come back validated through <code>model_validate_json()</code> instead of merely parsed. Reading the schema off a class beats hand-typing the same fields twice, once in the function's signature and once in a JSON dictionary.</p>
+<p><code># pip install openai pydantic</code></p>
+<p><iframe style="width: 100%; height: 550px;" title="01b_function_calling_pydantic.py" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2Ftool_use_and_retrieval%2F01_function_calling%2F01b_function_calling_pydantic.py&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on" loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<h3>1c: schema and dispatch generated by the OpenAI Agents SDK</h3>
+<p>1a and 1b both hand-wrote the call/response round trip. The <a href="https://openai.github.io/openai-agents-python/" target="_blank">OpenAI Agents SDK</a> automates both sides: decorate a plain function with <code>@function_tool</code> and it reads the schema straight from the function's type hints and docstring, no schema class needed. Give that tool to an <code>Agent</code> and run it with <code>Runner.run_sync(...)</code>, and the SDK calls the tool and returns the final answer without any manual <code>function_call_output</code> step. This is a real framework layered on top of the Responses API, worth reaching for once a single tool call needs to become several, or once several tools need shared bookkeeping.</p>
+<p><code># pip install openai-agents</code></p>
+<p><iframe style="width: 100%; height: 550px;" title="01c_function_calling_agents_sdk.py" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2Ftool_use_and_retrieval%2F01_function_calling%2F01c_function_calling_agents_sdk.py&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on" loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
 <h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">A quick aside: images and files as input</h2>
 <p>Tool calls are not the only way to give a model information it was not trained on. You can also attach an image or a PDF directly as part of the input, and the model reads it as part of the same request. That is a different mechanism from tool use, worth knowing about, but not the focus of this lesson.</p>
 <h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Reading</h2>
 <ul>
 <li><a href="https://platform.openai.com/docs/guides/function-calling" target="_blank">OpenAI: Function calling guide</a></li>
 <li><a href="https://platform.openai.com/docs/guides/tools" target="_blank">OpenAI: Using tools with the Responses API</a></li>
+<li><a href="https://openai.github.io/openai-agents-python/" target="_blank">OpenAI Agents SDK documentation</a></li>
 </ul>
