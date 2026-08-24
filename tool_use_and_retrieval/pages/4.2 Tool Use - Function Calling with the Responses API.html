@@ -18,7 +18,8 @@
 <li>The second <code>client.responses.create(...)</code> call sends the result back via <code>function_call_output</code>, tagged with the same <code>call_id</code>, so the model knows which request this result answers.</li>
 </ul>
 <p><code># pip install openai</code></p>
-<p><iframe style="width: 100%; height: 550px;" title="01a_function_calling_json.py" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2Ftool_use_and_retrieval%2F01_function_calling%2F01a_function_calling_json.py&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on" loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<p><iframe style="width: 100%; height: 400px;" title="01a_function_calling_json.py (lines 17-64)" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2Ftool_use_and_retrieval%2F01_function_calling%2F01a_function_calling_json.py%23L17-L64&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on" loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<p><a href="https://github.com/jfemiani/cse534-course-demos/blob/master/tool_use_and_retrieval/01_function_calling/01a_function_calling_json.py" target="_blank">Full source on GitHub</a></p>
 <p><strong>Output:</strong></p>
 <pre><code>Model asked to call: count_letter({'word': 'strawberry', 'letter': 'r'})
 Real function returned: 3
@@ -32,7 +33,8 @@ Assistant: The letter &ldquo;r&rdquo; appears 3 times in &ldquo;strawberry.&rdqu
 <li>The rest of the round trip &mdash; the <code>response.output[0]</code> indexing, the <code>function_call_output</code> reply &mdash; is unchanged from 1a. Only how the schema and the arguments are produced has changed.</li>
 </ul>
 <p><code># pip install openai pydantic</code></p>
-<p><iframe style="width: 100%; height: 550px;" title="01b_function_calling_pydantic.py" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2Ftool_use_and_retrieval%2F01_function_calling%2F01b_function_calling_pydantic.py&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on" loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<p><iframe style="width: 100%; height: 400px;" title="01b_function_calling_pydantic.py (lines 17-62)" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2Ftool_use_and_retrieval%2F01_function_calling%2F01b_function_calling_pydantic.py%23L17-L62&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on" loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<p><a href="https://github.com/jfemiani/cse534-course-demos/blob/master/tool_use_and_retrieval/01_function_calling/01b_function_calling_pydantic.py" target="_blank">Full source on GitHub</a></p>
 <p><strong>Output:</strong></p>
 <pre><code>Model asked to call: count_letter(word='strawberry' letter='r')
 Real function returned: 3
@@ -48,7 +50,8 @@ Assistant: The letter &ldquo;r&rdquo; appears 3 times in &ldquo;strawberry.&rdqu
 </ul>
 <p><strong>The pattern across 1a, 1b, and 1c:</strong> the same schema gets easier to produce as the tooling around it matures &mdash; hand-typed, then read off a Pydantic model, then read straight off a function signature. The next lesson, the agent loop, continues that pattern one step further: once <code>Agent</code> and <code>Runner</code> are introduced there, the entire round trip shown in this lesson &mdash; call the API, notice the function call, run the real function, send the result back &mdash; is handled automatically.</p>
 <p><code># pip install openai openai-agents</code></p>
-<p><iframe style="width: 100%; height: 550px;" title="01c_function_calling_agents_sdk.py" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2Ftool_use_and_retrieval%2F01_function_calling%2F01c_function_calling_agents_sdk.py&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on" loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<p><iframe style="width: 100%; height: 400px;" title="01c_function_calling_agents_sdk.py (lines 18-63)" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2Ftool_use_and_retrieval%2F01_function_calling%2F01c_function_calling_agents_sdk.py%23L18-L63&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on" loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<p><a href="https://github.com/jfemiani/cse534-course-demos/blob/master/tool_use_and_retrieval/01_function_calling/01c_function_calling_agents_sdk.py" target="_blank">Full source on GitHub</a></p>
 <p><strong>Output:</strong></p>
 <pre><code>Model asked to call: count_letter({'word': 'strawberry', 'letter': 'r'})
 Real function returned: 3
