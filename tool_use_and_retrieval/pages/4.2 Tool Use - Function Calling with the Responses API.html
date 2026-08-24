@@ -1,36 +1,9 @@
 <p>Ask a language model how many times the letter "r" appears in "strawberry" and it will often get the answer wrong. The model does not read a word one letter at a time. It breaks text into tokens, the same units from the entropy and n-gram lessons, and a token can span several letters at once, so counting individual letters inside one is a strange task for it. Splitting the check off to a small Python function fixes this: the function counts correctly every time, and the model only has to know when to ask for it.</p>
 <p>That handoff is what "tool use" or "function calling" means. The model does not run any code itself. It emits a structured request naming a function and its arguments. Your code runs the real function and sends the result back. The model then uses that result to write its answer.</p>
 <p>Demo 6 in Module 2 used structured output: the model's final answer had to fit a schema you defined. Tool use is a different moment in the conversation. The model is not shaping its final answer here; it is asking for information it does not have, before it writes that answer at all.</p>
-<script type="module">
-  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
-  mermaid.initialize({ startOnLoad: true, theme: "base" });
-</script>
-<div class="mermaid">
-flowchart LR
-    U["User<br/><br/>How many r's<br/>in 'strawberry'?"]
-    A["App"]
-    M["Model"]
-    T["Tool<br/>count_letter"]
-
-    U -->|"question"| A
-    A -->|"question + available tools"| M
-    M -->|"function_call(name, args)"| A
-    A -->|"invoke count_letter(...)"| T
-    T -->|"3"| A
-    A -->|"function_call_output"| M
-    M -->|"final response"| A
-    A -->|"There are 3 r's"| U
-
-    classDef user fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#111827;
-    classDef app fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#111827;
-    classDef model fill:#f3e8ff,stroke:#9333ea,stroke-width:2px,color:#111827;
-    classDef tool fill:#ffedd5,stroke:#ea580c,stroke-width:2px,color:#111827;
-
-    class U user;
-    class A app;
-    class M model;
-    class T tool;
-</div>
+<img src="https://raw.githubusercontent.com/jfemiani/cse534-course-demos/master/tool_use_and_retrieval/01_function_calling/llm_function_calling_diagram.png"
+     alt="Sequence diagram showing how an AI agent handles tool calls: the user asks how many cups of sugar would reach the Moon; the agent sends the question and available tools to the model; the model requests web searches for the Earth–Moon distance and cup height, then requests a Python calculation; the agent executes each tool call, returns the results to the model, and finally gives the user the answer of about 3.8 billion cups."
+     style="display: block; width: 100%; max-width: 760px; margin: 0 auto; border: 1px solid #941728; border-radius: 6px; background: white;" />
 <p>Note the direction of each arrow: the model never touches the tool directly. It only sends a request to the code you control, and your code decides whether and how to run the tool.</p>
 <h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Three ways to define a tool</h2>
 <p>All three variants below ask the same letter-counting question and call the same <code>count_letter</code> tool. The code tells the model the tool must be used (<code>tool_choice="required"</code>, or the Agents SDK equivalent), so the walkthrough is reliable. Normally the model decides for itself whether a tool is needed.</p>
