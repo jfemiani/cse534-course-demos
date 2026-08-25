@@ -17,6 +17,8 @@ Work through these in order. Each one adds a single new idea to the last.
    - [02a_agent_loop_agents_sdk.py](02_agent_loop/02a_agent_loop_agents_sdk.py) — the OpenAI Agents SDK runs the loop for you.
    - [02b_agent_loop_manual.py](02_agent_loop/02b_agent_loop_manual.py) — the same loop, hand-rolled against the plain Responses API, to see the mechanism.
    - [02c_agent_loop_hosted_tools.py](02_agent_loop/02c_agent_loop_hosted_tools.py) — mixes a local `@function_tool` with a hosted (cloud-run) `WebSearchTool()` in one Agent.
+   - [02d_agent_loop_mcp.py](02_agent_loop/02d_agent_loop_mcp.py) — `HostedMCPTool` connected to a real, free MCP server (DeepWiki).
+   - [02e_agent_loop_mcp_raw_jsonrpc.py](02_agent_loop/02e_agent_loop_mcp_raw_jsonrpc.py) — the same MCP server, called with raw JSON-RPC over HTTP, printing every request and response.
 3. [Chunking and retrieval](03_chunking_retrieval) — a small RAG pipeline built by hand: chunk, embed, rank, answer.
 4. [Vector vs. keyword retrieval](04_retrieval_approaches) — the same question, ranked two different ways, with a case where they disagree.
 5. [Agent instructions: SKILL.md dispatch](05_agent_instructions) — how a coding assistant decides which instructions file to read.

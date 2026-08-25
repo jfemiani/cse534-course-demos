@@ -3,3 +3,4 @@ openai-agents
 numpy
 python-dotenv
 pydantic
+httpx
