@@ -131,12 +131,12 @@ c) An arena-style evaluation, because it relies on human preference between two 
 *d) A grid search, because it systematically tries different settings (which retrieval strategy to use) to find the best one, instead of guessing
 ... Correct! Trying several retrieval strategies systematically and measuring each one is exactly what a grid search does, even with just one setting being varied.
 
-Title: Case Study - The Robocall
+Title: Case Study - Likeness Without Consent
 Points: 1
-10. A political robocall uses an AI-generated voice of a candidate telling people not to vote, without disclosing that the audio is AI-generated, and the audio is not obviously synthetic to an ordinary listener. Which concern does this scenario mainly raise?
-... General: Aligns with the outcome on identifying which ethical concern a scenario raises. If you missed this, review 5.3 Ethics and Responsible AI, the case study on the New Hampshire robocall.
+10. A robocall uses an AI-generated voice of a real, identifiable person telling people not to vote, without disclosing that the audio is AI-generated, and the audio is not obviously synthetic to an ordinary listener. Which concern does this scenario mainly raise?
+... General: Aligns with the outcome on identifying which ethical concern a scenario raises. If you missed this, review 5.3 Ethics and Responsible AI, the case study on likeness without consent.
 a) Benchmark contamination, because the message was reused across many phone calls
-... Incorrect. Benchmark contamination is a term from evaluating models against test questions; it does not apply to a political robocall.
+... Incorrect. Benchmark contamination is a term from evaluating models against test questions; it does not apply to this scenario.
 *b) Using a real person's likeness, undisclosed, in a way that could mislead people who cannot tell it is synthetic
 ... Correct! The scenario centers on an undisclosed synthetic likeness used to influence real behavior, without a way for listeners to know it was AI-generated.
 c) Job displacement, because a human voice actor was not hired to record the message
