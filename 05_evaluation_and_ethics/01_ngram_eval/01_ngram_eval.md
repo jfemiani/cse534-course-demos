@@ -9,7 +9,7 @@ between it.
 ## What the demo does
 
 1. Downloads the same Tiny Shakespeare corpus as
-   `mathematical_foundations/07_ngram/07_ngram_train.py`, split into blocks
+   `03_mathematical_foundations/07_ngram/07_ngram_train.py`, split into blocks
    on blank lines.
 2. Holds out the last 10% of blocks. The model never sees these while
    training.

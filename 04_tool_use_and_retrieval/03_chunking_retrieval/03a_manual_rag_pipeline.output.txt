@@ -1,0 +1,3 @@
+Retrieved chunk (score=0.348): CSE 534 meets Tuesdays and Thursdays. Attendance is not graded.
+Assistant: No. Attendance is not graded, so you do not need to sign in.
+

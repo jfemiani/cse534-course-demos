@@ -1,0 +1,235 @@
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">What this lesson adds</h2>
+<p>The first lesson asked about one event at a time, such as <em>X</em> = 4 for a die roll. This lesson asks what happens when <strong>two or more events are considered together</strong>. If we roll two dice, &ldquo;the first die shows 3 <strong>and</strong> the second die shows 5&rdquo; combines two events. In a medical example, let <em>C</em> record whether the patient has the condition and let <em>T</em> record the test result. We can then ask, &ldquo;What is the probability that the patient has the condition (<em>C</em> = 1) <strong>and</strong> the test is positive (<em>T</em> = positive)?&rdquo; This question combines two events.</p>
+<p>A generated word can be broken into several events as well. Let <em>L</em><sub>1</sub> be the first letter, <em>L</em><sub>2</sub> the second letter, and so on. Producing <strong>hello</strong> means that all five of these events occur:</p>
+<p style="text-align: center; font-size: 1.1rem;"><em>L</em><sub>1</sub> = h <strong>AND</strong> <em>L</em><sub>2</sub> = e <strong>AND</strong> <em>L</em><sub>3</sub> = l <strong>AND</strong> <em>L</em><sub>4</sub> = l <strong>AND</strong> <em>L</em><sub>5</sub> = o.</p>
+<p>The probability of that complete combination is a <strong>joint probability</strong>. When the model chooses each next letter using the letters already produced, it uses <strong>conditional probability</strong>: for example, the probability of e given that the first letter was h. The important change from Lesson 1 is not merely that one variable has more possible values; it is that we are asking about several events together.</p>
+<p><iframe class="lti-embed" style="width: 850px; height: 352px; display: inline-block;" title="2. Joint and Conditional and Bayes, Overview" src="https://miamioh.instructure.com/courses/243761/external_tools/retrieve?display=borderless&amp;url=https%3A%2F%2Fmiamioh.instructuremedia.com%2Flti%2Flaunch%3Fcustom_arc_launch_type%3Dlearn_embed%26custom_arc_media_id%3D58897a60-e363-43f3-9bb4-d5f782f1d215-23578%26custom_arc_show_rolling_transcript%3Dtrue%26custom_arc_start_at%3D0%26custom_arc_transcript_downloadable%3Dtrue" width="850" height="352" loading="lazy" allowfullscreen="allowfullscreen" webkitallowfullscreen="webkitallowfullscreen" mozallowfullscreen="mozallowfullscreen" allow="geolocation *; microphone *; camera *; midi *; encrypted-media *; autoplay *; clipboard-write *; display-capture *; fullscreen *" data-studio-resizable="true" data-studio-tray-enabled="true" data-studio-convertible-to-link="true"></iframe></p>
+<p>&nbsp;</p>
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">A complete three-letter example</h2>
+<p>To make the three kinds of probability concrete, suppose a tiny text generator can produce exactly one of the eight three-letter words below. Let <em>L</em><sub>1</sub> be the first letter, <em>L</em><sub>2</sub> the second letter, and <em>L</em><sub>3</sub> the third letter. The probabilities are invented for this example, but they obey an essential rule: the probabilities of all eight possible outputs add to 1.</p>
+<p><strong>Notation policy:</strong> Some texts reserve lowercase <em>p</em> for a probability density. From this point forward, this course will use lowercase <em>p</em> more broadly for both discrete probability mass functions and continuous probability density functions. This is a deliberate convention, not a claim that mass and density are the same thing. Use the variable and its possible values to determine which meaning applies.</p>
+<ul>
+<li>If the variable has separate possibilities&mdash;such as letters, tokens, or categories&mdash;<em>p</em> means <strong>probability mass</strong>. The masses assigned to all possible outcomes sum to 1.</li>
+<li>If the variable can vary continuously&mdash;such as a coordinate or measurement&mdash;<em>p</em> means <strong>probability density</strong>. A density value is not itself a probability; probabilities come from the area under the density over an interval or region.</li>
+</ul>
+<p>Here, <em>L</em><sub>1</sub>, <em>L</em><sub>2</sub>, and <em>L</em><sub>3</sub> take discrete letter values. Therefore, <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline" aria-label="p of l one comma l two comma l three"><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>l</mi><mn>1</mn></msub><mo>,</mo><msub><mi>l</mi><mn>2</mn></msub><mo>,</mo><msub><mi>l</mi><mn>3</mn></msub><mo stretchy="false">)</mo></mrow></math> means the joint probability mass assigned to one particular three-letter combination.</p>
+<table style="border-collapse: collapse; width: 42rem; max-width: 100%; margin: 1rem auto;"><caption style="text-align: left; margin-bottom: 0.4rem;">Joint distribution for the eight possible generated words</caption>
+<thead>
+<tr>
+<th style="padding: 0.4rem; text-align: left; border: 1px solid #c7c7c7;" scope="col">Generated word</th>
+<th style="padding: 0.4rem; text-align: center; border: 1px solid #c7c7c7;" scope="col"><em>L</em><sub>1</sub></th>
+<th style="padding: 0.4rem; text-align: center; border: 1px solid #c7c7c7;" scope="col"><em>L</em><sub>2</sub></th>
+<th style="padding: 0.4rem; text-align: center; border: 1px solid #c7c7c7;" scope="col"><em>L</em><sub>3</sub></th>
+<th style="padding: 0.4rem; text-align: right; border: 1px solid #c7c7c7;" scope="col">Joint probability</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th style="padding: 0.4rem; text-align: left; border: 1px solid #c7c7c7;" scope="row"><code>cat</code></th>
+<td style="padding: 0.4rem; text-align: center; border: 1px solid #c7c7c7;">c</td>
+<td style="padding: 0.4rem; text-align: center; border: 1px solid #c7c7c7;">a</td>
+<td style="padding: 0.4rem; text-align: center; border: 1px solid #c7c7c7;">t</td>
+<td style="padding: 0.4rem; text-align: right; border: 1px solid #c7c7c7;">0.18</td>
+</tr>
+<tr>
+<th style="padding: 0.4rem; text-align: left; border: 1px solid #c7c7c7;" scope="row"><code>cot</code></th>
+<td style="padding: 0.4rem; text-align: center; border: 1px solid #c7c7c7;">c</td>
+<td style="padding: 0.4rem; text-align: center; border: 1px solid #c7c7c7;">o</td>
+<td style="padding: 0.4rem; text-align: center; border: 1px solid #c7c7c7;">t</td>
+<td style="padding: 0.4rem; text-align: right; border: 1px solid #c7c7c7;">0.07</td>
+</tr>
+<tr>
+<th style="padding: 0.4rem; text-align: left; border: 1px solid #c7c7c7;" scope="row"><code>car</code></th>
+<td style="padding: 0.4rem; text-align: center; border: 1px solid #c7c7c7;">c</td>
+<td style="padding: 0.4rem; text-align: center; border: 1px solid #c7c7c7;">a</td>
+<td style="padding: 0.4rem; text-align: center; border: 1px solid #c7c7c7;">r</td>
+<td style="padding: 0.4rem; text-align: right; border: 1px solid #c7c7c7;">0.12</td>
+</tr>
+<tr>
+<th style="padding: 0.4rem; text-align: left; border: 1px solid #c7c7c7;" scope="row"><code>can</code></th>
+<td style="padding: 0.4rem; text-align: center; border: 1px solid #c7c7c7;">c</td>
+<td style="padding: 0.4rem; text-align: center; border: 1px solid #c7c7c7;">a</td>
+<td style="padding: 0.4rem; text-align: center; border: 1px solid #c7c7c7;">n</td>
+<td style="padding: 0.4rem; text-align: right; border: 1px solid #c7c7c7;">0.13</td>
+</tr>
+<tr>
+<th style="padding: 0.4rem; text-align: left; border: 1px solid #c7c7c7;" scope="row"><code>bat</code></th>
+<td style="padding: 0.4rem; text-align: center; border: 1px solid #c7c7c7;">b</td>
+<td style="padding: 0.4rem; text-align: center; border: 1px solid #c7c7c7;">a</td>
+<td style="padding: 0.4rem; text-align: center; border: 1px solid #c7c7c7;">t</td>
+<td style="padding: 0.4rem; text-align: right; border: 1px solid #c7c7c7;">0.16</td>
+</tr>
+<tr>
+<th style="padding: 0.4rem; text-align: left; border: 1px solid #c7c7c7;" scope="row"><code>bar</code></th>
+<td style="padding: 0.4rem; text-align: center; border: 1px solid #c7c7c7;">b</td>
+<td style="padding: 0.4rem; text-align: center; border: 1px solid #c7c7c7;">a</td>
+<td style="padding: 0.4rem; text-align: center; border: 1px solid #c7c7c7;">r</td>
+<td style="padding: 0.4rem; text-align: right; border: 1px solid #c7c7c7;">0.10</td>
+</tr>
+<tr>
+<th style="padding: 0.4rem; text-align: left; border: 1px solid #c7c7c7;" scope="row"><code>bun</code></th>
+<td style="padding: 0.4rem; text-align: center; border: 1px solid #c7c7c7;">b</td>
+<td style="padding: 0.4rem; text-align: center; border: 1px solid #c7c7c7;">u</td>
+<td style="padding: 0.4rem; text-align: center; border: 1px solid #c7c7c7;">n</td>
+<td style="padding: 0.4rem; text-align: right; border: 1px solid #c7c7c7;">0.14</td>
+</tr>
+<tr>
+<th style="padding: 0.4rem; text-align: left; border: 1px solid #c7c7c7;" scope="row"><code>bad</code></th>
+<td style="padding: 0.4rem; text-align: center; border: 1px solid #c7c7c7;">b</td>
+<td style="padding: 0.4rem; text-align: center; border: 1px solid #c7c7c7;">a</td>
+<td style="padding: 0.4rem; text-align: center; border: 1px solid #c7c7c7;">d</td>
+<td style="padding: 0.4rem; text-align: right; border: 1px solid #c7c7c7;">0.10</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<th style="padding: 0.4rem; text-align: right; border: 1px solid #c7c7c7;" colspan="4" scope="row">Total</th>
+<td style="padding: 0.4rem; text-align: right; border: 1px solid #c7c7c7;"><strong>1.00</strong></td>
+</tr>
+</tfoot>
+</table>
+<h3>Read one row as a joint probability</h3>
+<p>The row for <code>cat</code> says that the first letter is c <strong>and</strong> the second letter is a <strong>and</strong> the third letter is t. Its joint probability is 0.18. In event notation, <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline" aria-label="P of L one equals c, L two equals a, and L three equals t, equals zero point one eight"><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>L</mi><mn>1</mn></msub><mo>=</mo><mi mathvariant="normal">c</mi><mo>,</mo><msub><mi>L</mi><mn>2</mn></msub><mo>=</mo><mi mathvariant="normal">a</mi><mo>,</mo><msub><mi>L</mi><mn>3</mn></msub><mo>=</mo><mi mathvariant="normal">t</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0.18</mn></mrow></math>.</p>
+<h3>Find a marginal probability by adding rows</h3>
+<p>A <strong>marginal probability</strong> keeps the letter position we care about and ignores the others. &ldquo;Ignore&rdquo; does not mean discard their probability. It means add the probabilities of every row that has the value we want.</p>
+<table style="border-collapse: collapse; width: 100%; margin: 1rem 0;"><caption style="text-align: left; margin-bottom: 0.4rem;">Two marginal probabilities computed from the joint table</caption>
+<thead>
+<tr>
+<th style="padding: 0.4rem; text-align: left; border: 1px solid #c7c7c7;" scope="col">Question</th>
+<th style="padding: 0.4rem; text-align: left; border: 1px solid #c7c7c7;" scope="col">Rows to add</th>
+<th style="padding: 0.4rem; text-align: left; border: 1px solid #c7c7c7;" scope="col">Calculation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th style="padding: 0.4rem; text-align: left; border: 1px solid #c7c7c7;" scope="row"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline" aria-label="the probability that L one equals c"><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>L</mi><mn>1</mn></msub><mo>=</mo><mi mathvariant="normal">c</mi><mo stretchy="false">)</mo></mrow></math></th>
+<td style="padding: 0.4rem; border: 1px solid #c7c7c7;"><code>cat</code>, <code>cot</code>, <code>car</code>, <code>can</code></td>
+<td style="padding: 0.4rem; border: 1px solid #c7c7c7;"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline" aria-label="zero point one eight plus zero point zero seven plus zero point one two plus zero point one three equals zero point five zero"><mrow><mn>0.18</mn><mo>+</mo><mn>0.07</mn><mo>+</mo><mn>0.12</mn><mo>+</mo><mn>0.13</mn><mo>=</mo><mn>0.50</mn></mrow></math></td>
+</tr>
+<tr>
+<th style="padding: 0.4rem; text-align: left; border: 1px solid #c7c7c7;" scope="row"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline" aria-label="the probability that L two equals a"><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>L</mi><mn>2</mn></msub><mo>=</mo><mi mathvariant="normal">a</mi><mo stretchy="false">)</mo></mrow></math></th>
+<td style="padding: 0.4rem; border: 1px solid #c7c7c7;"><code>cat</code>, <code>car</code>, <code>can</code>, <code>bat</code>, <code>bar</code>, <code>bad</code></td>
+<td style="padding: 0.4rem; border: 1px solid #c7c7c7;"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline" aria-label="the probabilities of all rows whose second letter is a add to zero point seven nine"><mrow><mn>0.18</mn><mo>+</mo><mn>0.12</mn><mo>+</mo><mn>0.13</mn><mo>+</mo><mn>0.16</mn><mo>+</mo><mn>0.10</mn><mo>+</mo><mn>0.10</mn><mo>=</mo><mn>0.79</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<h3>Find a conditional probability by restricting and then dividing</h3>
+<p>A <strong>conditional probability</strong> begins by keeping only the rows that satisfy the condition after the vertical bar. Then divide the probability of the rows that satisfy both parts of the question by the total probability of the retained group.</p>
+<table style="border-collapse: collapse; width: 100%; margin: 1rem 0;"><caption style="text-align: left; margin-bottom: 0.4rem;">Conditional second-letter probabilities computed from the joint table</caption>
+<thead>
+<tr>
+<th style="padding: 0.4rem; text-align: left; border: 1px solid #c7c7c7;" scope="col">Question</th>
+<th style="padding: 0.4rem; text-align: left; border: 1px solid #c7c7c7;" scope="col">Numerator rows</th>
+<th style="padding: 0.4rem; text-align: left; border: 1px solid #c7c7c7;" scope="col">Divide by</th>
+<th style="padding: 0.4rem; text-align: left; border: 1px solid #c7c7c7;" scope="col">Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th style="padding: 0.4rem; text-align: left; border: 1px solid #c7c7c7;" scope="row"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline" aria-label="the probability that L two equals a given L one equals b"><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>L</mi><mn>2</mn></msub><mo>=</mo><mi mathvariant="normal">a</mi><mo>|</mo><msub><mi>L</mi><mn>1</mn></msub><mo>=</mo><mi mathvariant="normal">b</mi><mo stretchy="false">)</mo></mrow></math></th>
+<td style="padding: 0.4rem; border: 1px solid #c7c7c7;"><code>bat</code> + <code>bar</code> + <code>bad</code> = 0.36</td>
+<td style="padding: 0.4rem; border: 1px solid #c7c7c7;"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline" aria-label="the probability that L one equals b"><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>L</mi><mn>1</mn></msub><mo>=</mo><mi mathvariant="normal">b</mi><mo stretchy="false">)</mo></mrow></math> = 0.50</td>
+<td style="padding: 0.4rem; border: 1px solid #c7c7c7;"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline" aria-label="zero point three six divided by zero point five zero equals zero point seven two"><mrow><mfrac><mn>0.36</mn><mn>0.50</mn></mfrac><mo>=</mo><mn>0.72</mn></mrow></math></td>
+</tr>
+<tr>
+<th style="padding: 0.4rem; text-align: left; border: 1px solid #c7c7c7;" scope="row"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline" aria-label="the probability that L two equals u given L one equals b"><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>L</mi><mn>2</mn></msub><mo>=</mo><mi mathvariant="normal">u</mi><mo>|</mo><msub><mi>L</mi><mn>1</mn></msub><mo>=</mo><mi mathvariant="normal">b</mi><mo stretchy="false">)</mo></mrow></math></th>
+<td style="padding: 0.4rem; border: 1px solid #c7c7c7;"><code>bun</code> = 0.14</td>
+<td style="padding: 0.4rem; border: 1px solid #c7c7c7;"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline" aria-label="the probability that L one equals b"><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>L</mi><mn>1</mn></msub><mo>=</mo><mi mathvariant="normal">b</mi><mo stretchy="false">)</mo></mrow></math> = 0.50</td>
+<td style="padding: 0.4rem; border: 1px solid #c7c7c7;"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline" aria-label="zero point one four divided by zero point five zero equals zero point two eight"><mrow><mfrac><mn>0.14</mn><mn>0.50</mn></mfrac><mo>=</mo><mn>0.28</mn></mrow></math></td>
+</tr>
+<tr>
+<th style="padding: 0.4rem; text-align: left; border: 1px solid #c7c7c7;" scope="row"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline" aria-label="the probability that L two equals i given L one equals b"><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>L</mi><mn>2</mn></msub><mo>=</mo><mi mathvariant="normal">i</mi><mo>|</mo><msub><mi>L</mi><mn>1</mn></msub><mo>=</mo><mi mathvariant="normal">b</mi><mo stretchy="false">)</mo></mrow></math></th>
+<td style="padding: 0.4rem; border: 1px solid #c7c7c7;">No retained word has i as its second letter: 0.00</td>
+<td style="padding: 0.4rem; border: 1px solid #c7c7c7;"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline" aria-label="the probability that L one equals b"><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>L</mi><mn>1</mn></msub><mo>=</mo><mi mathvariant="normal">b</mi><mo stretchy="false">)</mo></mrow></math> = 0.50</td>
+<td style="padding: 0.4rem; border: 1px solid #c7c7c7;"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline" aria-label="zero divided by zero point five zero equals zero"><mrow><mfrac><mn>0</mn><mn>0.50</mn></mfrac><mo>=</mo><mn>0</mn></mrow></math></td>
+</tr>
+<tr>
+<th style="padding: 0.4rem; text-align: left; border: 1px solid #c7c7c7;" scope="row"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline" aria-label="the probability that L two equals a given L one equals c"><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>L</mi><mn>2</mn></msub><mo>=</mo><mi mathvariant="normal">a</mi><mo>|</mo><msub><mi>L</mi><mn>1</mn></msub><mo>=</mo><mi mathvariant="normal">c</mi><mo stretchy="false">)</mo></mrow></math></th>
+<td style="padding: 0.4rem; border: 1px solid #c7c7c7;"><code>cat</code> + <code>car</code> + <code>can</code> = 0.43</td>
+<td style="padding: 0.4rem; border: 1px solid #c7c7c7;"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline" aria-label="the probability that L one equals c"><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>L</mi><mn>1</mn></msub><mo>=</mo><mi mathvariant="normal">c</mi><mo stretchy="false">)</mo></mrow></math> = 0.50</td>
+<td style="padding: 0.4rem; border: 1px solid #c7c7c7;"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline" aria-label="zero point four three divided by zero point five zero equals zero point eight six"><mrow><mfrac><mn>0.43</mn><mn>0.50</mn></mfrac><mo>=</mo><mn>0.86</mn></mrow></math></td>
+</tr>
+<tr>
+<th style="padding: 0.4rem; text-align: left; border: 1px solid #c7c7c7;" scope="row"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline" aria-label="the probability that L two equals o given L one equals c"><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>L</mi><mn>2</mn></msub><mo>=</mo><mi mathvariant="normal">o</mi><mo>|</mo><msub><mi>L</mi><mn>1</mn></msub><mo>=</mo><mi mathvariant="normal">c</mi><mo stretchy="false">)</mo></mrow></math></th>
+<td style="padding: 0.4rem; border: 1px solid #c7c7c7;"><code>cot</code> = 0.07</td>
+<td style="padding: 0.4rem; border: 1px solid #c7c7c7;"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline" aria-label="the probability that L one equals c"><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>L</mi><mn>1</mn></msub><mo>=</mo><mi mathvariant="normal">c</mi><mo stretchy="false">)</mo></mrow></math> = 0.50</td>
+<td style="padding: 0.4rem; border: 1px solid #c7c7c7;"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline" aria-label="zero point zero seven divided by zero point five zero equals zero point one four"><mrow><mfrac><mn>0.07</mn><mn>0.50</mn></mfrac><mo>=</mo><mn>0.14</mn></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<p>Within the b group, the conditional probabilities 0.72 and 0.28 add to 1. Within the c group, 0.86 and 0.14 add to 1. Conditioning creates a new probability distribution over the smaller group of possibilities that remain after the condition is known.</p>
+<p>This is the same operation a text generator performs repeatedly. After the model has generated b, it assigns probabilities to possible second letters. The known context can also be an entire prompt: given the prompt <strong>Complete the sentence with one word: Two plus two is &hellip;</strong>, the model assigns probabilities to possible next tokens such as <strong>four</strong>.</p>
+<p>&nbsp;</p>
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">How the calculations work</h2>
+<p>A joint-probability table lists the probability of every combination. In Equation (2.1), lowercase <em>x</em> and <em>y</em> stand for particular values of the two random variables&mdash;for example, two particular tokens. To find a marginal probability, add the entries that share the result you care about. The &sum; symbol is <strong>sigma</strong>; as in Lesson 1, it means &ldquo;add the indicated terms.&rdquo; To find a conditional probability, keep only the group named after &ldquo;given,&rdquo; then calculate the fraction of that group with the result you want.</p>
+<div style="display: flex; align-items: center; margin: 0.75rem 0;">
+<div style="flex: 1 1 auto; min-width: 0; text-align: center; overflow-x: auto;"><math style="font-size: 1.2rem;" xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="Equation 2.1. The joint mass is p of x comma y. The marginal p of x is found by summing p of x comma y over every y. The conditional p of y given x is the joint mass divided by p of x."><mtable columnalign="right left" rowspacing="0.35em"><mtr><mtd><mtext>joint:</mtext></mtd><mtd><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mtd></mtr><mtr><mtd><mtext>marginal:</mtext></mtd><mtd><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><munder><mo>&sum;</mo><mi>y</mi></munder><mi>p</mi><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></mtd></mtr><mtr><mtd><mtext>conditional:</mtext></mtd><mtd><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>y</mi><mo>|</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo></mrow><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mfrac></mrow></mtd></mtr></mtable></math></div>
+<span style="width: 3.5rem; flex: 0 0 3.5rem; text-align: right;" aria-hidden="true">(2.1)</span></div>
+<p>The worked example above used three letter variables. Equation (2.1) uses only two variables, <em>x</em> and <em>y</em>, to keep the general rule compact. The same rule produced the table result <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline" aria-label="the probability that L two equals a given L one equals b"><mrow><mi>p</mi><mo stretchy="false">(</mo><msub><mi>L</mi><mn>2</mn></msub><mo>=</mo><mi mathvariant="normal">a</mi><mo>|</mo><msub><mi>L</mi><mn>1</mn></msub><mo>=</mo><mi mathvariant="normal">b</mi><mo stretchy="false">)</mo></mrow></math> = <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline" aria-label="zero point three six divided by zero point five zero equals zero point seven two"><mrow><mfrac><mn>0.36</mn><mn>0.50</mn></mfrac><mo>=</mo><mn>0.72</mn></mrow></math>: the numerator is the joint probability of the rows satisfying both requirements, and the denominator is the marginal probability of the known condition.</p>
+<p>If you multiply both sides of the conditional-probability formula by <em>p(x)</em>, you get the <strong>product rule</strong>. It gives two equivalent ways to calculate the same joint probability.</p>
+<div style="display: flex; align-items: center; margin: 0.75rem 0;">
+<div style="flex: 1 1 auto; min-width: 0; text-align: center; overflow-x: auto;"><math style="font-size: 1.2rem;" xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="Equation 2.2. The joint mass p of x comma y equals p of y given x times p of x, and also equals p of x given y times p of y."><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false">)</mo><mo>=</mo><mi>p</mi><mo stretchy="false">(</mo><mi>y</mi><mo>|</mo><mi>x</mi><mo stretchy="false">)</mo><mi>p</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi>p</mi><mo stretchy="false">(</mo><mi>x</mi><mo>|</mo><mi>y</mi><mo stretchy="false">)</mo><mi>p</mi><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow></math></div>
+<span style="width: 3.5rem; flex: 0 0 3.5rem; text-align: right;" aria-hidden="true">(2.2)</span></div>
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">What Bayes&rsquo; theorem does</h2>
+<p><strong>Bayes&rsquo; theorem is important because it provides a mathematical framework for learning from evidence.</strong> Here, &ldquo;learning&rdquo; means starting with an existing belief, observing new data, and updating that belief in a consistent way. It does not mean that the new belief must be correct; poor assumptions or misleading data can still lead us astray. Bayes&rsquo; theorem tells us how the evidence should change the probabilities we assign.</p>
+<p>For a concrete example, imagine that two AI systems, Model A and Model B, can generate short answers. You receive an answer but are not told which model produced it. Suppose you know how often Model A uses a particular phrase. After you notice that phrase in the answer you received, you want to ask: <strong>Given that I saw this phrase, how likely is it that Model A generated the answer?</strong> Bayes&rsquo; theorem connects what you knew before seeing the phrase with the evidence supplied by the phrase. In Equation (2.3), <em>h</em> is the hypothesis &ldquo;Model A generated this answer,&rdquo; and <em>e</em> is the evidence &ldquo;the answer contains this phrase.&rdquo;</p>
+<div style="display: flex; align-items: center; margin: 0.75rem 0;">
+<div style="flex: 1 1 auto; min-width: 0; text-align: center; overflow-x: auto;"><math style="font-size: 1.2rem;" xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="Equation 2.3. The probability of hypothesis h given evidence e equals the probability of e given h, multiplied by the prior probability of h, and divided by the total probability of e."><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>h</mi><mo>|</mo><mi>e</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>e</mi><mo>|</mo><mi>h</mi><mo stretchy="false">)</mo><mi>p</mi><mo stretchy="false">(</mo><mi>h</mi><mo stretchy="false">)</mo></mrow><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>e</mi><mo stretchy="false">)</mo></mrow></mfrac></mrow></math></div>
+<span style="width: 3.5rem; flex: 0 0 3.5rem; text-align: right;" aria-hidden="true">(2.3)</span></div>
+<ul>
+<li><strong>Prior:</strong> what you believed about the hypothesis before seeing the new evidence.</li>
+<li><strong>Likelihood:</strong> how probable the evidence would be if the hypothesis were true.</li>
+<li><strong>Evidence:</strong> the total probability of seeing that evidence across all competing possibilities.</li>
+<li><strong>Posterior:</strong> the updated probability of the hypothesis after using the evidence.</li>
+</ul>
+<p>The denominator is not decorative: it accounts for every way the evidence could occur and makes the updated probabilities add to one.</p>
+<h3>Work the Model A example</h3>
+<p>Now calculate the probability instead of stopping at the vocabulary. Imagine 1,000 generated answers. Model A produced 100 of them, while other models produced the remaining 900. The phrase appears in 80 answers from Model A and in 90 answers from the other models.</p>
+<ul>
+<li><strong>Prior:</strong> Model A produced 100 of the 1,000 answers, so <em>p</em>(A) = 100/1000 = 0.10.</li>
+<li><strong>Likelihood:</strong> The phrase appears in 80 of the 100 answers from Model A, so <em>p</em>(phrase | A) = 80/100 = 0.80.</li>
+<li><strong>Evidence:</strong> The phrase appears in 80 + 90 = 170 of all 1,000 answers, so <em>p</em>(phrase) = 170/1000 = 0.17.</li>
+</ul>
+<p>Bayes&rsquo; theorem asks what fraction of the phrase-containing answers came from Model A:</p>
+<div style="display: flex; align-items: center; margin: 0.75rem 0;">
+<div style="flex: 1 1 auto; min-width: 0; text-align: center; overflow-x: auto;"><math style="font-size: 1.2rem;" xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="Equation 2.4. The total probability of seeing the phrase is eighty plus ninety divided by one thousand, which equals zero point one seven. The probability that Model A generated the answer given that the phrase appears equals the probability of the phrase given Model A times the prior probability of Model A, divided by the total probability of the phrase. Substituting the numbers gives zero point eight times zero point one divided by zero point one seven, which is approximately zero point four seven."><mtable columnalign="right left" rowspacing="0.65em"><mtr><mtd><mrow><mi>p</mi><mo stretchy="false">(</mo><mtext>phrase</mtext><mo stretchy="false">)</mo></mrow></mtd><mtd><mrow><mo>=</mo><mfrac><mrow><mn>80</mn><mo>+</mo><mn>90</mn></mrow><mn>1000</mn></mfrac><mo>=</mo><mfrac><mn>170</mn><mn>1000</mn></mfrac><mo>=</mo><mn>0.17</mn></mrow></mtd></mtr><mtr><mtd><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>A</mi><mo>|</mo><mtext>phrase</mtext><mo stretchy="false">)</mo></mrow></mtd><mtd><mrow><mo>=</mo><mfrac><mrow><mi>p</mi><mo stretchy="false">(</mo><mtext>phrase</mtext><mo>|</mo><mi>A</mi><mo stretchy="false">)</mo><mi>p</mi><mo stretchy="false">(</mo><mi>A</mi><mo stretchy="false">)</mo></mrow><mrow><mi>p</mi><mo stretchy="false">(</mo><mtext>phrase</mtext><mo stretchy="false">)</mo></mrow></mfrac></mrow></mtd></mtr><mtr><mtd></mtd><mtd><mrow><mo>=</mo><mfrac><mrow><mn>0.80</mn><mo>&times;</mo><mn>0.10</mn></mrow><mn>0.17</mn></mfrac><mo>=</mo><mfrac><mn>0.08</mn><mn>0.17</mn></mfrac><mo>&asymp;</mo><mn>0.47</mn></mrow></mtd></mtr></mtable></math></div>
+<span style="width: 3.5rem; flex: 0 0 3.5rem; text-align: right;" aria-hidden="true">(2.4)</span></div>
+<p>The posterior probability is therefore about 0.47, or 47%. This is also visible directly in the counts: among the 170 answers containing the phrase, 80 came from Model A, and 80/170 is about 47%.</p>
+<p>Notice why the answer is not 80%. The value 80% is the <strong>likelihood</strong>: the phrase is common when Model A generates an answer. The value 47% is the <strong>posterior</strong>: after seeing the phrase, it is our updated probability that Model A generated this particular answer. Those probabilities answer different questions.</p>
+<p>In generative AI, a conditional model represents a distribution such as &ldquo;possible outputs given this prompt.&rdquo; The prompt supplies known information and changes which outputs are more or less likely.</p>
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Run the demonstration</h2>
+<p><strong>Course code repository:</strong> All reviewed demonstrations are also organized in the <a href="https://github.com/jfemiani/cse534-course-demos/tree/master/03_mathematical_foundations">Mathematical Foundations folder on GitHub</a>. GitHub is usually the easiest place to read the code.</p>
+
+<h3>Demo 4: Autoregressive Word Generation</h3>
+<p>This demonstration shows how joint and conditional probabilities work in autoregressive generation—the same pattern language models use to generate text token by token.</p>
+<p>The program starts with an empty string and generates a five-letter word one letter at a time. At each step, it:</p>
+<ul>
+<li>Shows <strong>P(context)</strong>—the marginal probability of the letters generated so far</li>
+<li>Computes <strong>P(next | context)</strong>—the conditional probability of each possible next letter</li>
+<li>Samples from that conditional distribution</li>
+<li>Shows <strong>P(context + sampled)</strong>—the joint probability after adding the new letter</li>
+</ul>
+<p>The program works from a list of 163 common five-letter English words. Each conditional distribution shows <em>all</em> possible next letters sorted by probability, so you can see the full distribution the model samples from—just like an LLM choosing its next token.</p>
+
+<p><strong>Try one change:</strong> Run the program multiple times. Because the random seed is set to <code>None</code>, each run produces variety—different generated words show different probability distributions. Notice how P(next | context) becomes more peaked (concentrated on fewer letters) as the context grows. Press 'q' to quit early if you want to restart and see a different generation path.</p>
+
+<p><strong>What to observe:</strong> Watch how the conditional probabilities change at each step. After generating 't', for example, the probability of 'h' as the next letter becomes very high because many English words begin with 'th'. This is how context shapes generation in autoregressive models.</p>
+
+<p><strong>Syntax-highlighted view of the reviewed code.</strong> You can also <a href="https://github.com/jfemiani/cse534-course-demos/blob/master/03_mathematical_foundations/04_joint_conditional/04_joint_conditional.py">read the source directly on GitHub</a> or download the <a href="https://github.com/jfemiani/cse534-course-demos/blob/master/03_mathematical_foundations/04_joint_conditional/words.txt">word list file</a>.</p>
+
+<p><iframe style="width: 100%; height: 750px;" title="embedded content" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2F03_mathematical_foundations%2F04_joint_conditional%2F04_joint_conditional.py&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on" loading="lazy" allow="clipboard-write" frameborder="0" scrolling="no"></iframe></p>
+
+<p>You are not submitting this program. The purpose is to see how joint and conditional probabilities combine in the autoregressive generation pattern used by modern language models.</p>
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">If you need another explanation</h2>
+<p><a href="https://miamioh.instructure.com/courses/243761/files/39953055/download?download_frd=1" data-api-endpoint="https://miamioh.instructure.com/api/v1/courses/243761/files/39953055" data-api-returntype="File">Download the explanation and demo-regeneration prompt</a>. Use this optional prompt if you would like another explanation or a worked example using concrete counts. Ask the AI system to show both the probability calculation and a matching example using counts out of 100 or 1,000 generated items, and compare its answer with this page.</p>
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Before you move on</h2>
+<p>Make sure you can:</p>
+<ul>
+<li>read <em>p(y | x)</em> aloud and explain what &ldquo;given&rdquo; changes;</li>
+<li>calculate a marginal probability by adding entries in a joint table;</li>
+<li>calculate a conditional probability by dividing a joint probability by the probability of the known condition;</li>
+<li>name the prior, likelihood, evidence, and posterior in a Bayes calculation;</li>
+<li>use Bayes&rsquo; theorem to calculate <em>p</em>(A | phrase) from the prior, likelihood, and evidence; and</li>
+<li>explain why <em>p</em>(phrase | A) and <em>p</em>(A | phrase) answer different questions.</li>
+</ul>
+<p>The quiz may ask you to calculate a marginal or conditional probability, identify the prior, likelihood, evidence, and posterior, work a Bayes calculation like the Model A example, or explain what the denominator in Bayes&rsquo; theorem accomplishes.</p>

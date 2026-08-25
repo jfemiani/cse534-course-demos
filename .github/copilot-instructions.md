@@ -66,24 +66,36 @@ These HTML files reference this GitHub repo directly for two things:
 
 When a page embeds a demo `.py` file via emgithub, follow this pattern
 (established while revising
-`tool_use_and_retrieval/pages/4.2 Tool Use - Function Calling with the Responses API.html`):
+`04_tool_use_and_retrieval/pages/4.2 Tool Use - Function Calling with the Responses API.html`):
 
-- **Link to the full source first.** Before any embed, add a plain link to
-  the file on GitHub, with the filename as the link text, e.g.:
-  ```html
-  <p><a href="https://github.com/jfemiani/cse534-course-demos/blob/master/tool_use_and_retrieval/01_function_calling/01a_function_calling_json.py" target="_blank">01a_function_calling_json.py (full source on GitHub)</a></p>
-  ```
+- **Introduce the source with a sentence, never a bare link line.** Before
+  the first embed, write a sentence that both points at the full file and
+  tells the reader what's about to happen, e.g. "The code below is
+  available in full on GitHub at
+  [`01a_function_calling_json.py`](...); we'll walk through the parts that
+  matter." A link sitting alone on its own line, with no lead-in sentence
+  (e.g. just `01a_function_calling_json.py (full source on GitHub)`), reads
+  as an abrupt drop-in and must not be used.
 - **Show several small, selective snippets, not the whole file.** Pick out
   the lines relevant to a specific idea (the function definition, the
   schema, the request/dispatch, sending the result back) as separate
   embeds, each with its own line range, instead of one embed covering
   nearly the whole file. Never lump two unrelated concepts (e.g. a class
-  definition and an unrelated function) into a single line range.
+  definition and an unrelated function) into a single line range. Skip
+  boilerplate: imports, argument-parsing, print formatting, and any pattern
+  any working programmer would already recognize don't need their own
+  embed or their own explanation — spend the reader's attention on the
+  lines that carry the lesson's actual idea.
+- **Never embed a snippet's leading module docstring.** Course demo files
+  open with a `"""..."""` docstring pointing at the companion `.md` file;
+  it duplicates what the surrounding page prose already says. Start line
+  ranges at the first import or the first line of real code, not at line 1
+  of the file.
 - **Line ranges use `#L<start>-L<end>` inside the encoded `target=` URL**,
   not appended after it:
   ```html
   <iframe
-    src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2Ftool_use_and_retrieval%2F01_function_calling%2F01a_function_calling_json.py%23L17-L19&style=codepen-embed&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"
+    src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2F04_tool_use_and_retrieval%2F01_function_calling%2F01a_function_calling_json.py%23L17-L19&style=codepen-embed&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on"
     style="width: min(100%, 750px); height: 120px; border: 0;"
     frameborder="0">
   </iframe>
@@ -101,6 +113,23 @@ When a page embeds a demo `.py` file via emgithub, follow this pattern
   that are just "ordinary code, nothing special" (e.g. the real function
   itself) need only a one-line caption; snippets central to the lesson
   (e.g. the tool schema) deserve more discussion.
+- **Every snippet needs prose that earns its place, not just a caption.**
+  A one-line caption is a minimum, not a target: explain *why* the code is
+  written this way, what the reader should notice in it, and — if the
+  logic is at all tricky (a normalization step, a fallback branch, an
+  off-by-one in a range) — what it actually does and why. If you cannot
+  say anything beyond "here is the code," the snippet is boilerplate and
+  should be cut per the point above, not embedded with a filler caption.
+- **Run every demo and show its output on the page.** Before a demo goes
+  on a Canvas page, run it (e.g. `conda run -n cse434 dotenv run --
+  python3 <script>.py`) and save the captured stdout as
+  `<script_name>.output.txt` next to the `.py` file. Show that output on
+  the page as a `<pre>` block (or a hand-built HTML table when the output
+  is naturally tabular) — either once immediately after the full set of
+  code snippets, or split alongside the snippet it corresponds to when a
+  demo is broken into multiple embeds. Never claim or imply a demo
+  produced a result without having actually run it and captured that
+  output.
 
 ## Slides
 
@@ -114,7 +143,7 @@ picking a format for a new deck.
 
 Convention: `modulename/NN_topic/NN_topic.py`, one runnable script per
 concept, small enough to read in one sitting (see
-`prompt_engineering_api/01_hello` through `06_structured_output` for the
+`02_prompt_engineering_api/01_hello` through `06_structured_output` for the
 target scale).
 
 - **No `PROMPT.md` files.** Create a Markdown with the prompt named after the demo -- e.g. 06_structured_output.py would have 06_structured_output.md. This documents what
@@ -122,7 +151,7 @@ target scale).
   assistant can be asked to update the code if the API has changed. That
   Markdown file *is* the regeneration prompt.  We do not want to use PROMPT.md because we may have several variants of the same demo, and we want to keep the prompt with the code it documents.
 - **Exception — multi-variant lessons.** When a lesson has several
-  side-by-side variants of the same demo (see `tool_use_and_retrieval/01_function_calling`'s
+  side-by-side variants of the same demo (see `04_tool_use_and_retrieval/01_function_calling`'s
   `01a_/01b_/01c_...py`).  The full concept/endpoint/regeneration-prompt content lives in the `.md` file.
 - Each demo `.py` file starts with a `# pip install ...`  comment (if needed) naming its
   extra dependencies, so a reader can tell what to install without opening
@@ -133,7 +162,7 @@ target scale).
 - Preserve the teaching scenario when editing an existing demo; instructors
   run these live. Prefer minimal, surgical edits over rewrites unless asked
   to redesign the demo.
-- As of the `tool_use_and_retrieval` module: for any demo involving tool
+- As of the `04_tool_use_and_retrieval` module: for any demo involving tool
   calls or a multi-step loop, default to the **OpenAI Agents SDK**
   (`Agent`, `Runner`, `@function_tool`). Only write a hand-rolled
   `client.responses.create` loop when the explicit teaching goal is to show

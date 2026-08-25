@@ -1,0 +1,66 @@
+
+1. Fixed-size, 6 lines per chunk (5 chunks):
+  --- chunk 0 ---
+  """A tiny grade-book module, used only as chunking material."""
+
+
+  def letter_grade(score: float) -> str:
+      """Convert a numeric score to a letter grade."""
+      if score >= 90:
+  --- chunk 1 ---
+          return "A"
+      if score >= 80:
+          return "B"
+      if score >= 70:
+          return "C"
+      return "F"
+  --- chunk 2 ---
+
+
+  def class_average(scores: list[float]) -> float:
+      """Return the mean of a list of scores, or 0.0 if empty."""
+      if not scores:
+          return 0.0
+  --- chunk 3 ---
+      return sum(scores) / len(scores)
+
+
+  class GradeBook:
+      """Tracks scores for one class section."""
+
+  --- chunk 4 ---
+      def __init__(self, section: str) -> None:
+          self.section = section
+          self.scores: list[float] = []
+
+      def record(self, score: float) -> None:
+          self.scores.append(score)
+
+2. AST-aware, one function/class per chunk (3 chunks):
+  --- chunk 0 ---
+  def letter_grade(score: float) -> str:
+      """Convert a numeric score to a letter grade."""
+      if score >= 90:
+          return "A"
+      if score >= 80:
+          return "B"
+      if score >= 70:
+          return "C"
+      return "F"
+  --- chunk 1 ---
+  def class_average(scores: list[float]) -> float:
+      """Return the mean of a list of scores, or 0.0 if empty."""
+      if not scores:
+          return 0.0
+      return sum(scores) / len(scores)
+  --- chunk 2 ---
+  class GradeBook:
+      """Tracks scores for one class section."""
+
+      def __init__(self, section: str) -> None:
+          self.section = section
+          self.scores: list[float] = []
+
+      def record(self, score: float) -> None:
+          self.scores.append(score)
+

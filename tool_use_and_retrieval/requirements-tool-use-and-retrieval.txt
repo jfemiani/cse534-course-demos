@@ -1,6 +1,0 @@
-openai>=1.50
-openai-agents
-numpy
-python-dotenv
-pydantic
-httpx

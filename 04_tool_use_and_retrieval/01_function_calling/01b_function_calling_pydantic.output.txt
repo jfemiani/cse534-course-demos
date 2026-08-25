@@ -1,0 +1,3 @@
+Model asked to call: count_letter(word='strawberry' letter='r')
+Real function returned: 3
+Assistant: The letter **“r”** appears **3 times** in **“strawberry.”**

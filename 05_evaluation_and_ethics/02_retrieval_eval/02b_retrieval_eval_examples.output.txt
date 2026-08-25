@@ -1,0 +1,25 @@
+--- CHERRY (best margin) ---
+question:           When can I stop by without an appointment?
+correct document:   'Office hours are Tuesdays 2-4pm in Laws Hall 205, no appointment needed.'
+top-ranked document: 'Office hours are Tuesdays 2-4pm in Laws Hall 205, no appointment needed.'
+margin (correct score - best wrong score): +0.272
+correct document's rank by vector score: 1 of 6
+a hit at K=2: True
+
+--- APPLE (median margin) ---
+question:           What is the assignment code for LAB-4071?
+correct document:   'Lab 4 submissions use assignment code LAB-4071 in Canvas.'
+top-ranked document: 'Lab 4 submissions use assignment code LAB-4071 in Canvas.'
+margin (correct score - best wrong score): +0.039
+correct document's rank by vector score: 1 of 6
+a hit at K=2: True
+
+--- LEMON (worst margin) ---
+question:           Do I need to sign in to class?
+correct document:   'CSE 534 meets Tuesdays and Thursdays. Attendance is not graded.'
+top-ranked document: 'Lab 4 submissions use assignment code LAB-4071 in Canvas.'
+margin (correct score - best wrong score): -0.025
+correct document's rank by vector score: 3 of 6
+a hit at K=2: False
+
+

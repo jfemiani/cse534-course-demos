@@ -1,0 +1,197 @@
+Quiz title: Tool Use, Retrieval, and Agentic Loops Quiz
+Quiz description: This quiz covers Module 4's learning outcomes.
+
+    Learning outcomes:
+
+    - Explain what actually happens when a model "calls a tool," and how tool calling differs from asking a model for structured output.
+    - Describe the multi-step agent loop (also known as ReAct) and why some frameworks can run it for you.
+    - Explain why documents get chunked before retrieval, and what cosine similarity measures between a question and a chunk.
+    - Explain what retrieval-augmented generation is, and what it means to "ground" a model's answer in retrieved documents.
+    - Compare vector search and keyword search, and identify when each has a real advantage.
+    - Explain what a reranking pass adds to a retrieval pipeline and why it runs in two stages.
+    - Describe what a vector store keeps besides raw embeddings, and how a hosted vector store fits into a production retrieval pipeline.
+    - Distinguish AGENTS.md from SKILL.md, including how a SKILL.md loads only its short description by default and its full instructions only when a task matches.
+shuffle answers: true
+show correct answers: false
+
+Title: What a Tool Call Actually Is
+Points: 1
+1. When a model "calls a tool," what actually happens?
+... General: Aligns with the outcome on what a tool call actually is. If you missed this, review 4.2 Tool Use - Function Calling with the Responses API and the 01_function_calling demos.
+a) The model executes the function itself, inside its own runtime
+... Incorrect. The model has no runtime to execute code in; it can only describe what it wants called.
+*b) The model returns a structured request naming a function and its arguments, and your code runs the real function
+... Correct! Tool calling is the model asking for outside help; your code decides whether and how to run it.
+c) The request runs automatically on OpenAI's servers, and your program never sees the function call
+... Incorrect. That describes a hosted tool like web search, not an ordinary function tool your program defines and dispatches.
+d) The system on your machine matches the function name and calls it without you writing any dispatch code
+... Incorrect. Your program still has to map the returned name to the real function and call it; nothing runs without that step.
+
+Title: Tool Calling vs. Structured Output
+Points: 1
+2. How does tool calling differ from asking a model to produce structured output (a fixed schema for its final answer)?
+... General: Aligns with the outcome on distinguishing tool calls from structured output. If you missed this, review 4.2 Tool Use - Function Calling with the Responses API.
+*a) Structured output shapes the model's final answer; tool calling lets the model ask for information before it writes that answer
+... Correct! Structured output constrains the answer's format; tool calling is a mid-conversation request for outside help.
+b) Structured output and tool calling both request outside help mid-conversation, but it is tool calling, not structured output, that gets validated against a schema
+... Incorrect. Structured output is what gets validated against a schema; tool calling requests information rather than producing the final schema-checked answer.
+c) Tool calling needs a schema written by hand, while structured output can be generated automatically from a data model
+... Incorrect. Both features can use a hand-typed schema or one generated from a data model; that is not what separates them.
+d) Structured output typically needs a second round trip to the model, while tool calling finishes in a single request
+... Incorrect. It is tool calling that usually needs a second request to send the result back; structured output does not.
+
+Title: Naming the Multi-Step Loop
+Points: 1
+3. What is the "agent loop," and what is its older academic name?
+... General: Aligns with the outcome on describing the agent loop. If you missed this, review 4.3 The Agent Loop - Multi-Step Tool Use and the 02_agent_loop demos.
+a) A single tool call immediately followed by the model's final answer, known in the literature as one-shot prompting
+... Incorrect. A single call-and-answer exchange is the simpler case that comes before this pattern; the agent loop specifically repeats.
+b) A background process that retrains the model between conversations, sometimes called online fine-tuning
+... Incorrect. The agent loop happens within a single conversation; it does not involve retraining the model.
+*c) The model repeatedly calling tools and deciding whether to call again until it has enough to answer, known academically as ReAct
+... Correct! Yao et al. (2022) described this same reason-act-observe cycle as ReAct.
+d) A caching system that reuses previous answers to identical questions, sometimes called memoized inference
+... Incorrect. That describes a caching strategy, not the call-observe-decide cycle this pattern names.
+
+Title: Why You Don't Always Have to Write the Loop Yourself
+Points: 1
+4. Why is it useful that some tool-calling frameworks and built-in tools can run the agent loop for you?
+... General: Aligns with the outcome on why frameworks can automate the agent loop. If you missed this, review 4.3 The Agent Loop - Multi-Step Tool Use and the 02a_agent_loop_agents_sdk demo.
+a) A hand-written loop is restricted to a single tool call for the whole conversation, unlike an automated one
+... Incorrect. A hand-written loop can call as many tools as it is coded to check for; that is not the limitation being solved.
+b) Writing the tool-calling loop by hand causes the underlying model to produce less accurate answers overall
+... Incorrect. Answer accuracy comes from the model and the tools in use, not from who writes the surrounding loop.
+c) A conversation can register at most one tool no matter whether the loop is hand-written or automated
+... Incorrect. Nothing about the loop limits how many tools can be made available at once in either case.
+*d) The same steps, check the response, run the tool, send back the result, repeat, recur every time, so a library can automate them for you
+... Correct! Those steps are mechanical and repetitive, which is exactly the kind of thing worth automating once you understand it.
+
+Title: Why Documents Get Chunked
+Points: 1
+5. Why does retrieval-augmented generation split a document into chunks before answering a question about it?
+... General: Aligns with the outcome on why documents are chunked for retrieval. If you missed this, review 4.4 Chunking and Retrieval (Manual RAG) and the 03a_manual_rag_pipeline demo.
+a) So that only the chunks containing rare or unusual words get searched, skipping the rest of the document
+... Incorrect. Chunking is not about which words appear; every chunk is compared to the question, not just ones with rare words.
+*b) Because a model's context window limits how much text it can read at once, so only the relevant slice gets pasted into the prompt
+... Correct! Chunking lets a large document be searched piece by piece so only the relevant part needs to fit in the prompt.
+c) So that each chunk can be stored as a separate file on disk instead of one large document
+... Incorrect. Chunking is about what gets pasted into the prompt, not about how files are organized on disk.
+d) Because generating embeddings only works reliably on text shorter than a single sentence
+... Incorrect. Embeddings can be generated for text of many lengths; chunking is driven by the context-window limit, not an embedding restriction.
+
+Title: How Chunks Get Ranked by Similarity
+Points: 1
+6. What does comparing a question's embedding against each chunk's embedding, using cosine similarity, actually measure?
+... General: Aligns with the outcome on what cosine similarity measures. If you missed this, review 4.4 Chunking and Retrieval (Manual RAG) and the 03a_manual_rag_pipeline demo.
+*a) How closely two pieces of text point in a similar direction within embedding space
+... Correct! Cosine similarity is the dot product of unit vectors, and embeddings place similar-meaning text in similar directions.
+b) The number of identical words shared between the question and the chunk
+... Incorrect. That describes keyword matching; cosine similarity compares embedding vectors, not word overlap.
+c) The exact length, in characters, of each chunk compared against the question
+... Incorrect. Cosine similarity compares vector direction, not the length of the original text.
+d) Whether the chunk and the question were generated by the same writing style or author
+... Incorrect. Embeddings capture meaning from the text itself, not authorship or writing style.
+
+Title: What Retrieval-Augmented Generation Actually Does
+Points: 1
+7. What does retrieval-augmented generation (RAG) actually do, as covered in this module?
+... General: Aligns with the outcome on explaining what RAG is and what it means to ground a model's answer. If you missed this, review 4.4 Chunking and Retrieval (Manual RAG).
+a) Fine-tunes the language model on whichever documents are relevant to the question
+... Incorrect. RAG does not retrain or fine-tune the model; the model's weights never change.
+b) Retrieves relevant documents, then lets the person asking the question write the final answer
+... Incorrect. The language model still generates the final answer; RAG only changes what gets pasted into its prompt.
+c) Replaces the language model with a plain document search engine, skipping generation entirely
+... Incorrect. RAG still uses a language model to generate the final answer; search alone is not RAG.
+*d) Retrieves the most relevant chunks for the question and pastes them into the prompt before the model answers
+... Correct! Retrieve first, generate second, with retrieved chunks as context, is exactly the RAG pattern.
+
+Title: What "Grounding" Means in RAG
+Points: 1
+8. In RAG, what does it mean to "ground" a model's answer?
+... General: Aligns with the outcome on explaining what it means to ground a model's answer in retrieved documents. If you missed this, review 4.4 Chunking and Retrieval (Manual RAG).
+*a) Giving the model real, retrieved documents to base its answer on, instead of relying only on what it already "knows"
+... Correct! Grounding means the model's answer is tied to actual retrieved text, not just its own training-time knowledge.
+b) Running an extra training pass on the retrieved documents before the model answers
+... Incorrect. Grounding happens at answer time, through the prompt; it does not involve any extra training step.
+c) Restricting the model to the exact wording found in the retrieved documents, with no paraphrasing allowed
+... Incorrect. Grounding means the answer is based on retrieved documents; it does not forbid the model from paraphrasing them.
+d) Verifying the model's answer against a separate fact-checking model after it responds
+... Incorrect. Grounding happens before the answer is generated, by supplying context; it is not a separate after-the-fact check.
+
+Title: Where Vector Search Struggles
+Points: 1
+9. A question asks specifically about product code `LAB-4071`, but a vector search also ranks the unrelated `LAB-3042` almost as high. Why does this happen?
+... General: Aligns with the outcome on where vector search struggles. If you missed this, review 4.5 Retrieval Approaches - Vector vs Keyword and the 04a_vector_vs_keyword demo.
+a) The embedding model was trained on too little data to tell short codes apart
+... Incorrect. This is a general limitation of matching by meaning, not a sign of an undertrained model.
+b) The retrieval system adds a small random offset to every score to break ties, which can favor the wrong document
+... Incorrect. Cosine similarity is a fixed calculation on the embeddings; nothing in the pipeline adds randomness to the score.
+*c) Embeddings capture meaning and general similarity, not exact spelling, so two similarly formatted codes can look nearly identical to the model
+... Correct! Vector search is strong at paraphrase and meaning but weak at distinguishing near-identical exact strings.
+d) Cosine similarity cannot be computed reliably once a chunk contains a number
+... Incorrect. Cosine similarity works on any embedded text; the issue is what embeddings capture, not what they can be computed on.
+
+Title: When Keyword Search Wins
+Points: 1
+10. Based on the comparison between vector and keyword search, when does keyword search have a real advantage?
+... General: Aligns with the outcome on comparing vector and keyword retrieval. If you missed this, review 4.5 Retrieval Approaches - Vector vs Keyword and the 04a_vector_vs_keyword demo.
+a) When the question is long and phrased using many different synonyms for the same idea
+... Incorrect. That situation favors vector search, which captures meaning across paraphrases.
+b) When there is no question at all, only a document that needs to be summarized
+... Incorrect. Neither vector nor keyword search is about summarizing without a query; both rank chunks against a question.
+c) When the document collection is very small, containing fewer than ten documents total
+... Incorrect. Corpus size is not what determines whether keyword or vector search wins; the type of query does.
+*d) When the question needs an exact identifier, such as a product code, function name, or error message
+... Correct! Keyword search checks for the exact string, so it reliably distinguishes near-identical exact terms that confuse embeddings.
+
+Title: Why Reranking Runs on Only a Shortlist
+Points: 1
+11. Why does reranking run the more accurate cross-encoder model on only a short list of candidates instead of on the entire document collection?
+... General: Aligns with the outcome on what reranking adds to a retrieval pipeline. If you missed this, review 4.5 Retrieval Approaches - Vector vs Keyword, the section on reranking and query rewriting, and the 04b_reranking demo.
+a) The initial search step exists so that keyword search and vector search can vote on which chunks to keep before the cross-encoder runs
+... Incorrect. Reranking does not involve a voting step between keyword and vector search; the first pass is a single ranked search, of either kind.
+*b) The cross-encoder scores the question and each candidate together and is far more accurate, but too slow to run against an entire collection, so it reranks only the first search's shortlist
+... Correct! This fast-then-precise, two-stage pattern is exactly why reranking runs after an initial search rather than instead of it.
+c) A cross-encoder needs chunks to already be converted into embeddings by the first search before it can process them
+... Incorrect. A cross-encoder reads the raw question and chunk text directly; it does not depend on embeddings from the first pass.
+d) The preliminary search step collects extra training examples the cross-encoder needs before it can score anything
+... Incorrect. The cross-encoder is trained beforehand, separately from any particular search; the first pass narrows candidates, it does not generate training data.
+
+Title: What a Vector Store Holds Beyond Raw Embeddings
+Points: 1
+12. Besides the embedding vector itself, what does a vector store used for retrieval, such as the one behind OpenAI's hosted file_search tool, commonly keep for each entry?
+... General: Aligns with the outcome on what a vector store keeps and how a hosted vector store fits into a production retrieval pipeline. If you missed this, review 4.5 Retrieval Approaches - Vector vs Keyword, the section on retrieval in production, and the 04d_hosted_file_search demo.
+a) A cached copy of every previous question ever asked against that store
+... Incorrect. A vector store does not log or replay old questions; it stores document data, not query history.
+*b) The original text and metadata, such as a filename, so a match can be traced back to its source
+... Correct! A vector store keeps source text and metadata like filenames so a retrieved match can be attributed to a real document, the same filename and score the hosted retrieval demo prints.
+c) A separate copy of the model's weights, so it can answer questions without an API call
+... Incorrect. A vector store holds document data for retrieval; it does not contain a copy of the model itself.
+d) The exact similarity threshold that will be used for every future query against that store
+... Incorrect. Similarity scores are computed per query, not fixed in advance and stored for every future search.
+
+Title: AGENTS.md vs. SKILL.md
+Points: 1
+13. What is the key difference between what AGENTS.md and SKILL.md are each for?
+... General: Aligns with the outcome on distinguishing AGENTS.md from SKILL.md. If you missed this, review 4.6 Reusable Agent Instructions - AGENTS.md and SKILL.md and the 05_agent_instructions demo.
+*a) AGENTS.md holds project-wide guidance loaded every time the assistant works in that project; SKILL.md holds instructions for one task, loaded only when it matches the current task
+... Correct! AGENTS.md is the project's "who"; SKILL.md is the "how" for one specific kind of task.
+b) AGENTS.md is for one specific task, while SKILL.md covers an entire project
+... Incorrect. This reverses the actual roles of the two files.
+c) AGENTS.md and SKILL.md are two different file formats for storing the exact same content
+... Incorrect. They serve different scopes, whole project versus one capability, not just different formats for identical content.
+d) AGENTS.md is meant for the assistant to read, while SKILL.md mainly documents behavior for other human developers
+... Incorrect. Both files are meant to be read by the assistant; the difference is scope and when each is loaded.
+
+Title: Loading a SKILL.md's Full Instructions
+Points: 1
+14. Based on how a SKILL.md file gets used, when does an assistant load a skill's full instructions rather than just its short description?
+... General: Aligns with the outcome on how SKILL.md loads on demand. If you missed this, review 4.6 Reusable Agent Instructions - AGENTS.md and SKILL.md and the 05_agent_instructions demo.
+a) The full instructions load once, at the very start of every conversation, the same way AGENTS.md does
+... Incorrect. That is how AGENTS.md behaves; a SKILL.md's full body is not loaded up front for every conversation.
+b) Every skill's full instructions load together up front, so the assistant can compare them side by side before choosing one
+... Incorrect. Only each skill's short description is compared up front; full bodies are not loaded during that comparison.
+*c) Only after the assistant compares every skill's short description against the current task and decides one description matches
+... Correct! The short name and description are always available; the full instructions load only once a skill is judged to fit the task at hand.
+d) Only after a human developer manually opens the skill file and pastes its contents into the conversation
+... Incorrect. The assistant decides which skill to load on its own; no manual file-opening step is involved.

@@ -1,0 +1,156 @@
+
+chdir(/usr/share/vim)
+fchdir() to previous dir
+sourcing "$VIM/vimrc"
+chdir(/usr/share/vim/vim82)
+fchdir() to previous dir
+line 8: sourcing "/usr/share/vim/vim82/debian.vim"
+finished sourcing /usr/share/vim/vim82/debian.vim
+continuing in /usr/share/vim/vimrc
+chdir(/usr/share/vim/vim82/syntax)
+fchdir() to previous dir
+line 25: sourcing "/usr/share/vim/vim82/syntax/syntax.vim"
+chdir(/usr/share/vim/vim82/syntax)
+fchdir() to previous dir
+line 19: sourcing "/usr/share/vim/vim82/syntax/synload.vim"
+chdir(/usr/share/vim/vim82/syntax)
+fchdir() to previous dir
+line 21: sourcing "/usr/share/vim/vim82/syntax/syncolor.vim"
+chdir(/usr/share/vim/vim82/colors/lists)
+fchdir() to previous dir
+line 53: sourcing "/usr/share/vim/vim82/colors/lists/default.vim"
+finished sourcing /usr/share/vim/vim82/colors/lists/default.vim
+continuing in /usr/share/vim/vim82/syntax/syncolor.vim
+finished sourcing /usr/share/vim/vim82/syntax/syncolor.vim
+continuing in /usr/share/vim/vim82/syntax/synload.vim
+finished sourcing /usr/share/vim/vim82/syntax/synload.vim
+continuing in /usr/share/vim/vim82/syntax/syntax.vim
+chdir(/usr/share/vim/vim82)
+fchdir() to previous dir
+line 25: sourcing "/usr/share/vim/vim82/filetype.vim"
+not found in 'runtimepath': "ftdetect/*.vim"
+finished sourcing /usr/share/vim/vim82/filetype.vim
+continuing in /usr/share/vim/vim82/syntax/syntax.vim
+Executing FileType Autocommands for "*"
+autocommand exe "set syntax=" . expand("<amatch>")
+
+Executing Syntax Autocommands for "*"
+autocommand call s:SynSet()
+
+Executing BufRead Autocommands for "*"
+autocommand if !did_filetype() && expand("<amatch>") !~ g:ft_ignore_pat | runtime! scripts.vim | endif
+
+chdir(/usr/share/vim/vim82)
+fchdir() to previous dir
+line 0: sourcing "/usr/share/vim/vim82/scripts.vim"
+finished sourcing /usr/share/vim/vim82/scripts.vim
+continuing in BufRead Autocommands for "*"
+Executing BufRead Autocommands for "*"
+autocommand if !did_filetype() && expand("<amatch>") !~ g:ft_ignore_pat    && (getline(1) =~ '^#' || getline(2) =~ '^#' || getline(3) =~ '^#'^I|| getline(4) =~ '^#' || getline(5) =~ '^#') |   setf FALLBACK conf | endif
+
+finished sourcing /usr/share/vim/vim82/syntax/syntax.vim
+continuing in /usr/share/vim/vimrc
+finished sourcing $VIM/vimrc
+chdir(/home/femianjc)
+fchdir() to previous dir
+sourcing "$HOME/.vimrc"
+chdir(/usr/share/vim/vim82/syntax)
+fchdir() to previous dir
+line 1: sourcing "/usr/share/vim/vim82/syntax/syntax.vim"
+chdir(/usr/share/vim/vim82/syntax)
+fchdir() to previous dir
+line 15: sourcing "/usr/share/vim/vim82/syntax/nosyntax.vim"
+Executing BufEnter Autocommands for "*"
+autocommand syn clear
+
+autocommand if exists("b:current_syntax") | unlet b:current_syntax | endif
+
+finished sourcing /usr/share/vim/vim82/syntax/nosyntax.vim
+continuing in /usr/share/vim/vim82/syntax/syntax.vim
+chdir(/usr/share/vim/vim82/syntax)
+fchdir() to previous dir
+line 19: sourcing "/usr/share/vim/vim82/syntax/synload.vim"
+chdir(/usr/share/vim/vim82/syntax)
+fchdir() to previous dir
+line 21: sourcing "/usr/share/vim/vim82/syntax/syncolor.vim"
+finished sourcing /usr/share/vim/vim82/syntax/syncolor.vim
+continuing in /usr/share/vim/vim82/syntax/synload.vim
+finished sourcing /usr/share/vim/vim82/syntax/synload.vim
+continuing in /usr/share/vim/vim82/syntax/syntax.vim
+Executing FileType Autocommands for "*"
+autocommand exe "set syntax=" . expand("<amatch>")
+
+Executing Syntax Autocommands for "*"
+autocommand call s:SynSet()
+
+finished sourcing /usr/share/vim/vim82/syntax/syntax.vim
+continuing in /home/femianjc/.vimrc
+finished sourcing $HOME/.vimrc
+not found in 'packpath': "pack/*/start/*"
+chdir(/usr/share/vim/vim82/plugin)
+fchdir() to previous dir
+sourcing "/usr/share/vim/vim82/plugin/getscriptPlugin.vim"
+finished sourcing /usr/share/vim/vim82/plugin/getscriptPlugin.vim
+chdir(/usr/share/vim/vim82/plugin)
+fchdir() to previous dir
+sourcing "/usr/share/vim/vim82/plugin/gzip.vim"
+finished sourcing /usr/share/vim/vim82/plugin/gzip.vim
+chdir(/usr/share/vim/vim82/plugin)
+fchdir() to previous dir
+sourcing "/usr/share/vim/vim82/plugin/logiPat.vim"
+finished sourcing /usr/share/vim/vim82/plugin/logiPat.vim
+chdir(/usr/share/vim/vim82/plugin)
+fchdir() to previous dir
+sourcing "/usr/share/vim/vim82/plugin/manpager.vim"
+finished sourcing /usr/share/vim/vim82/plugin/manpager.vim
+chdir(/usr/share/vim/vim82/plugin)
+fchdir() to previous dir
+sourcing "/usr/share/vim/vim82/plugin/matchparen.vim"
+finished sourcing /usr/share/vim/vim82/plugin/matchparen.vim
+chdir(/usr/share/vim/vim82/plugin)
+fchdir() to previous dir
+sourcing "/usr/share/vim/vim82/plugin/netrwPlugin.vim"
+finished sourcing /usr/share/vim/vim82/plugin/netrwPlugin.vim
+chdir(/usr/share/vim/vim82/plugin)
+fchdir() to previous dir
+sourcing "/usr/share/vim/vim82/plugin/rrhelper.vim"
+finished sourcing /usr/share/vim/vim82/plugin/rrhelper.vim
+chdir(/usr/share/vim/vim82/plugin)
+fchdir() to previous dir
+sourcing "/usr/share/vim/vim82/plugin/spellfile.vim"
+finished sourcing /usr/share/vim/vim82/plugin/spellfile.vim
+chdir(/usr/share/vim/vim82/plugin)
+fchdir() to previous dir
+sourcing "/usr/share/vim/vim82/plugin/tarPlugin.vim"
+finished sourcing /usr/share/vim/vim82/plugin/tarPlugin.vim
+chdir(/usr/share/vim/vim82/plugin)
+fchdir() to previous dir
+sourcing "/usr/share/vim/vim82/plugin/tohtml.vim"
+finished sourcing /usr/share/vim/vim82/plugin/tohtml.vim
+chdir(/usr/share/vim/vim82/plugin)
+fchdir() to previous dir
+sourcing "/usr/share/vim/vim82/plugin/vimballPlugin.vim"
+finished sourcing /usr/share/vim/vim82/plugin/vimballPlugin.vim
+chdir(/usr/share/vim/vim82/plugin)
+fchdir() to previous dir
+sourcing "/usr/share/vim/vim82/plugin/zipPlugin.vim"
+finished sourcing /usr/share/vim/vim82/plugin/zipPlugin.vim
+not found in 'packpath': "pack/*/start/*"
+not found in 'runtimepath': "plugin/**/*.vim"
+Reading viminfo file "/home/femianjc/.viminfo" info oldfiles
+Executing BufEnter Autocommands for "*"
+autocommand sil call s:LocalBrowse(expand("<amatch>"))
+
+Executing VimEnter Autocommands for "*"
+autocommand sil call s:VimEnter(expand("<amatch>"))
+
+chdir(/home/femianjc/Courses/CSE534-live/cse534-course-demos/03_mathematical_foundations/02_bernoulli)
+Executing CursorMoved Autocommands for "*"
+autocommand call s:Highlight_Matching_Pair()
+
+chdir(/usr/share/vim/vim82/syntax)
+fchdir() to previous dir
+sourcing "/usr/share/vim/vim82/syntax/syncolor.vim"
+finished sourcing /usr/share/vim/vim82/syntax/syncolor.vim
+
+Writing viminfo file "/home/femianjc/.viminfo"

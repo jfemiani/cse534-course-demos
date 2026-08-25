@@ -1,12 +1,11 @@
-<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Two kinds of evaluation</h2>
-<p>Module 3 built a small language model and gave you a way to measure surprise. Module 4 gave you tool use and retrieval. This lesson asks the question you should ask about anything you build: is it any good?</p>
+<p>Module 3 built a small (trivial!) language model using n-grams and gave you a way to measure surprise. Module 4 gave you ways to customize an LLM through custom instructions, tool use and retrieval. This lesson asks the question you should ask about anything you build: is it any good?</p>
 <p>That question splits into two. Sometimes you want to measure a model's raw ability. That is a <strong>benchmark</strong>. Sometimes you want to measure a choice you made while building something on top of a model, such as which retrieval strategy to use. That is an <strong>ablation study</strong> or a <strong>grid search</strong>. Both count as evaluation. This lesson covers both, starting with something you already built.</p>
 
 <h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Evaluating a model you already built</h2>
 <p>Lesson 3.4 defined cross-entropy: the average surprise a model feels when it sees real data. A model that is never surprised has low cross-entropy. A model that keeps getting caught off guard has high cross-entropy.</p>
 <p>Lesson 3.5 built an n-gram model. It predicts the next character from the last few characters it has seen. That context length is called the model's <strong>order</strong>. Until now, you only watched it generate text. This demo does something different. It holds out some text the model never trained on. Then it measures cross-entropy on that held-out text instead.</p>
-<p>Cross-entropy is measured in bits, which is not the most intuitive unit. A second, more readable number is <strong>perplexity</strong>. This lesson uses the convention perplexity = 2 raised to the cross-entropy, when cross-entropy is measured in bits. (If you see cross-entropy reported in nats instead of bits, the matching formula is perplexity = e raised to the cross-entropy. Either convention is standard. State which one you are using.) A perplexity of 8 means the model is, on average, about as unsure as if it were guessing uniformly among 8 equally likely next characters.</p>
-<p>The demo below trains the n-gram model three times, once for each of three orders. Each time, it reports cross-entropy and perplexity on the same held-out text. Varying one setting and comparing the results is already a small <strong>grid search</strong>: order is the one parameter being swept.</p>
+<p>Cross-entropy is measured in bits, which is not the most intuitive unit. A second, more readable number is <strong>perplexity</strong>. This lesson uses the convention perplexity = 2 raised to the cross-entropy, when cross-entropy is measured in bits. (If you see cross-entropy reported in nats instead of bits, the matching formula is perplexity = e raised to the cross-entropy. Either convention is standard, and equivilent as long as the base of the logarithm and the exponent match.) A perplexity of 8 means the model is, on average, about as unsure as if it were guessing uniformly among 8 equally likely next characters.</p>
+<p>The demo below trains the n-gram model three times, once for each of three orders. Each time, it reports cross-entropy and perplexity on the same held-out text. Varying one setting and comparing the results is already a small controlled comparison: order is the one parameter being swept, and nothing else changes between runs. Later in this lesson, that same idea gets a name: a <strong>grid search</strong>.</p>
 <p><a href="https://github.com/jfemiani/cse534-course-demos/blob/master/05_evaluation_and_ethics/01_ngram_eval/01_ngram_eval.py" target="_blank">01_ngram_eval.py (full source on GitHub)</a></p>
 <p><iframe style="width: 100%; height: 700px;" title="01_ngram_eval.py: cross-entropy and perplexity on held-out text, swept over context length" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2F05_evaluation_and_ethics%2F01_ngram_eval%2F01_ngram_eval.py&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on" loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
 <p>Here is one run of that demo, trained and evaluated on the same public-domain text used in lesson 3.5:</p>
@@ -55,9 +54,19 @@
 <p>Benchmarks measure a model. Most of the time, you are not evaluating a whole model. You are evaluating a choice you made while building something on top of one. Two ideas cover almost every version of this.</p>
 <p>An <strong>ablation study</strong> removes or changes one piece of a system. Then it re-measures the result, to find out what that piece was actually contributing. Maybe you added a sentence to a prompt because you thought it helped. An ablation study means running the system with and without that sentence. Then you check whether the results actually changed.</p>
 <p>A <strong>grid search</strong> tries combinations of settings systematically, to find the best combination instead of guessing one. The n-gram demo above already did this with one setting: order. A grid search can sweep more than one setting at once, checking every combination.</p>
-<p>Here is a second worked example, pulled from module 4. Which retrieval strategy actually works best for a small collection of documents: vector search, keyword search, or a hybrid of the two? Instead of guessing, this demo builds a small labeled test set: six questions, each paired with the one document that answers it. It measures <strong>hit-rate</strong>: how often the correct document showed up in the top results.</p>
-<p><a href="https://github.com/jfemiani/cse534-course-demos/blob/master/05_evaluation_and_ethics/02_retrieval_eval/02_retrieval_eval.py" target="_blank">02_retrieval_eval.py (full source on GitHub)</a></p>
-<p><iframe style="width: 100%; height: 700px;" title="02_retrieval_eval.py: hit-rate for vector, keyword, and hybrid retrieval" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2F05_evaluation_and_ethics%2F02_retrieval_eval%2F02_retrieval_eval.py&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on" loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<p>Here is a second worked example, pulled from module 4. Which retrieval strategy actually works best for a small collection of documents: vector search, keyword search, or a hybrid of the two? Instead of guessing, this demo builds a small labeled test set: six questions, each paired with the one document that answers it. It measures <strong>hit-rate</strong>: how often the correct document showed up in the top results. The code below is available in full on GitHub at <a href="https://github.com/jfemiani/cse534-course-demos/blob/master/05_evaluation_and_ethics/02_retrieval_eval/02a_retrieval_eval_hitrate.py" target="_blank"><code>02a_retrieval_eval_hitrate.py</code></a>; we'll walk through the parts that matter.</p>
+<p>The documents and questions are the test set itself, so getting them right matters more than any code around them. Each question names the exact index of the one document that should answer it, which is what turns "does this look about right" into something you can actually count.</p>
+<p><iframe
+  src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2F05_evaluation_and_ethics%2F02_retrieval_eval%2F02a_retrieval_eval_hitrate.py%23L14-L31&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on"
+  style="width: min(100%, 750px); height: 420px; border: 0;"
+  title="02a_retrieval_eval_hitrate.py: the labeled documents and test questions"
+  loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<p>The scoring loop is where the three strategies actually get compared: the same question is scored against every document three separate ways, and a strategy earns a hit only when the correct document lands in its own top two.</p>
+<p><iframe
+  src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2F05_evaluation_and_ethics%2F02_retrieval_eval%2F02a_retrieval_eval_hitrate.py%23L60-L69&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on"
+  style="width: min(100%, 750px); height: 260px; border: 0;"
+  title="02a_retrieval_eval_hitrate.py: scoring vector, keyword, and hybrid strategies on every question"
+  loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
 <p>One run of that demo produced this:</p>
 <table style="border-collapse: collapse; width: 100%;">
 <thead>
@@ -73,6 +82,74 @@
 </tbody>
 </table>
 <p>Two of the six test questions ask about near-identical assignment codes. Lesson 4.5 used this same kind of question to show where plain keyword search wins. Measuring hit-rate directly, instead of assuming vector search always wins, is the whole point. "Which retrieval strategy is actually better for my agent" is a question you can answer with a small table like this one. It does not have to be a guess.</p>
+
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Cherries, apples, and lemons: what a hit-rate hides</h2>
+<p>A hit-rate of 0.83 tells you vector search won on this test set. It does not tell you what that win actually looked like question by question. A second demo picks out three individual examples instead of one aggregate number: the best margin, the median margin, and the worst margin, by how far ahead the correct document's score was over the best-scoring wrong document. Borrowing produce-market language for it: the <strong>cherry</strong> is the best case, the <strong>apple</strong> is a fair, typical case, and the <strong>lemon</strong> is the worst case. The code is available in full on GitHub at <a href="https://github.com/jfemiani/cse534-course-demos/blob/master/05_evaluation_and_ethics/02_retrieval_eval/02b_retrieval_eval_examples.py" target="_blank"><code>02b_retrieval_eval_examples.py</code></a>; the two parts worth reading closely are the margin calculation and the selection itself.</p>
+<p>The margin is what turns "hit or miss" into a number you can sort by: a large positive margin means the correct document won by a wide gap, and a negative margin means vector search actually liked a wrong document better.</p>
+<p><iframe
+  src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2F05_evaluation_and_ethics%2F02_retrieval_eval%2F02b_retrieval_eval_examples.py%23L47-L58&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on"
+  style="width: min(100%, 750px); height: 320px; border: 0;"
+  title="02b_retrieval_eval_examples.py: computing each question's margin"
+  loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<p>Sorting by margin is what makes cherry, apple, and lemon well-defined instead of a judgment call: the top of the sorted list, the middle, and the bottom.</p>
+<p><iframe
+  src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2F05_evaluation_and_ethics%2F02_retrieval_eval%2F02b_retrieval_eval_examples.py%23L60-L63&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on"
+  style="width: min(100%, 750px); height: 160px; border: 0;"
+  title="02b_retrieval_eval_examples.py: picking the cherry, apple, and lemon"
+  loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<p>One run of that demo produced this:</p>
+<table style="border-collapse: collapse; width: 100%;">
+<thead>
+<tr style="background-color: #f2f2f2;">
+<th style="border: 1px solid #ccc; padding: 6px; text-align: left;">example</th>
+<th style="border: 1px solid #ccc; padding: 6px; text-align: left;">question</th>
+<th style="border: 1px solid #ccc; padding: 6px; text-align: left;">vector search's top pick</th>
+<th style="border: 1px solid #ccc; padding: 6px; text-align: right;">margin</th>
+<th style="border: 1px solid #ccc; padding: 6px; text-align: right;">hit at K=2?</th>
+</tr>
+</thead>
+<tbody>
+<tr><td style="border: 1px solid #ccc; padding: 6px;"><strong>cherry</strong></td><td style="border: 1px solid #ccc; padding: 6px;">"When can I stop by without an appointment?"</td><td style="border: 1px solid #ccc; padding: 6px;">office hours document (correct)</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">+0.272</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">yes</td></tr>
+<tr><td style="border: 1px solid #ccc; padding: 6px;"><strong>apple</strong></td><td style="border: 1px solid #ccc; padding: 6px;">"What is the assignment code for LAB-4071?"</td><td style="border: 1px solid #ccc; padding: 6px;">LAB-4071 document (correct)</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">+0.039</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">yes</td></tr>
+<tr><td style="border: 1px solid #ccc; padding: 6px;"><strong>lemon</strong></td><td style="border: 1px solid #ccc; padding: 6px;">"Do I need to sign in to class?"</td><td style="border: 1px solid #ccc; padding: 6px;">LAB-4071 document (wrong; correct one ranked 3rd)</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">&minus;0.025</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">no</td></tr>
+</tbody>
+</table>
+<p>The cherry is a clean win: the correct document is close to a paraphrase of the question. The apple still wins, but barely — this is closer to what most of the "hits" behind that 0.83 actually looked like than the cherry is. The lemon is the one genuine miss behind that same 0.83: for a plain question about attendance, vector search's top pick was a sentence about a lab assignment code, and the sentence that actually answers the question ranked third. No person reading both sentences would make that mistake. This is what the section title means by "a hit-rate hides individual examples": the number said 0.83, and 0.83 is true, but it does not tell you that vector search failed here in a way a human would find obviously wrong. A measurement can be accurate and still do a poor job matching human judgment.</p>
+<p>Notice the temptation sitting right here: it would have been easy to only show the cherry above, and this page would still be telling the truth, in the narrow sense that the cherry really did happen. That is <strong>cherry-picking</strong> — reporting your best example instead of a representative one — and it is a real risk in your own reports, not just a hypothetical one. It is worth developing the habit of asking, of your own results and of anyone else's: "is this the typical case, or is this the cherry?" A demo, a blog post, or a paper that shows only glowing examples earns exactly that suspicion.</p>
+
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">A zoo of automatic metrics</h2>
+<p>Hit-rate and perplexity are two metrics out of a much larger set that shows up constantly in papers and leaderboards. The most common one for scoring generated text against a reference answer is <strong>BLEU</strong>, borrowed from machine translation. BLEU counts overlapping runs of words between a candidate and a reference; it has no idea what the words mean. The code below is available in full on GitHub at <a href="https://github.com/jfemiani/cse534-course-demos/blob/master/05_evaluation_and_ethics/03_bleu_score/03_bleu_score.py" target="_blank"><code>03_bleu_score.py</code></a>; the part worth reading is the scoring loop itself.</p>
+<p>The three candidates are chosen to expose exactly what BLEU cannot see: a correct paraphrase that shares almost no words with the reference, and a factually wrong sentence that shares almost every word.</p>
+<p><iframe
+  src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2F05_evaluation_and_ethics%2F03_bleu_score%2F03_bleu_score.py%23L8-L20&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on"
+  style="width: min(100%, 750px); height: 480px; border: 0;"
+  title="03_bleu_score.py: scoring three candidates against one reference"
+  loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<p>One run of that demo produced this:</p>
+<table style="border-collapse: collapse; width: 100%;">
+<thead>
+<tr style="background-color: #f2f2f2;">
+<th style="border: 1px solid #ccc; padding: 6px; text-align: left;">candidate</th>
+<th style="border: 1px solid #ccc; padding: 6px; text-align: right;">BLEU &uarr;</th>
+</tr>
+</thead>
+<tbody>
+<tr><td style="border: 1px solid #ccc; padding: 6px;">exact match</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;"><strong>1.000</strong></td></tr>
+<tr><td style="border: 1px solid #ccc; padding: 6px;">wrong room, high overlap</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;"><em>0.919</em></td></tr>
+<tr><td style="border: 1px solid #ccc; padding: 6px;">good paraphrase, low overlap</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">0.078</td></tr>
+</tbody>
+</table>
+<p>Read that middle row carefully: a sentence with the wrong room number scores nearly as high as an exact match, while a correct paraphrase scores far lower than either. BLEU rewarded the wrong answer over the right one, for the same reason the lemon above happened: a metric can be precisely defined and consistently computed while still measuring something other than "is this actually a good answer." This is not a reason to distrust every metric equally, but it is a reason to know which metric you are reading and what it can and cannot see before treating its number as the last word.</p>
+<p>BLEU is one entry in a larger zoo, each trading off cost, speed, and how closely it tracks human judgment:</p>
+<ul>
+<li><strong>ROUGE</strong> scores n-gram and longest-common-subsequence <em>recall</em> instead of precision. Standard for summarization, where the question is closer to "did the summary keep the important parts" than "did it use the exact same words."</li>
+<li><strong>METEOR</strong> matches synonyms and word stems instead of requiring an exact string match, specifically to reduce the paraphrase problem the table above shows.</li>
+<li><strong>Exact match / F1</strong> is standard for extractive question answering (e.g. the SQuAD benchmark), where the answer is a short span of text pulled directly from a document rather than a free-form generated sentence.</li>
+<li><strong>BERTScore</strong> replaces word overlap with embedding similarity between candidate and reference tokens, so a correct paraphrase scores well instead of being penalized the way it is here.</li>
+<li><strong>LLM-as-judge</strong> replaces the formula entirely: a separate, usually stronger, model reads the candidate and reference and scores or ranks the answer. It tracks human judgment more closely than word-overlap metrics, at the cost of being slower, more expensive, and dependent on whichever model is doing the judging.</li>
+</ul>
+<p>No single metric here is "the" right one. Knowing which metric a paper or leaderboard reports, and what that metric is blind to, matters as much as the number itself.</p>
+
 
 <h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Tools that do this for you</h2>
 <p>You will not build every evaluation pipeline by hand. A few tools exist specifically for this, and this list will change faster than this page can track, so treat these as starting points to search from rather than a fixed recommendation.</p>

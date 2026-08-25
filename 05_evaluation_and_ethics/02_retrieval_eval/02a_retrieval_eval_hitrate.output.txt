@@ -1,0 +1,6 @@
+Hit-rate@2 on 6 test questions (higher is better)
+
+vector     0.83 <- best
+keyword    0.50
+hybrid     0.83 <- best
+

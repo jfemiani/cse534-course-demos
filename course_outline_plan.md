@@ -173,7 +173,7 @@ evaluation first, since the lesson order was also reversed (see below).
 - **Agents-SDK-first policy (decided this session, applies going forward):** for any demo that calls tools or runs a multi-step loop, default to the OpenAI Agents SDK (`Agent`, `Runner`, `@function_tool`). Only write a hand-rolled `client.responses.create` / Chat Completions version when the explicit teaching goal is to show the underlying mechanism the SDK is automating — and in that case, label it clearly as the "manual" or "under the hood" variant, not the default. This does not apply to demos that don't involve tool-calling loops (e.g. `03_chunking_retrieval`, `04_retrieval_approaches` — plain embeddings calls, no agent loop to automate).
 - **Evergreen vs. fast-moving split**: HTML pages get the durable material only — concepts, tradeoffs, named patterns (agent loop, ReAct, vector/keyword/graph retrieval, AGENTS.md/SKILL.md). API specifics (exact parameter names, SDK method names) stay in the code + docstrings, and pages link out to current docs rather than reproducing details likely to drift within a year or two.
 - Each page should link to the current official docs it's based on (OpenAI first; Anthropic/Google Gemini equivalents where a useful comparison exists) so students can check for drift themselves.
-- Demo sizing target: same scale as `prompt_engineering_api/01_hello` through `06_structured_output` — one clear idea per file, no more than needed to see it work.
+- Demo sizing target: same scale as `02_prompt_engineering_api/01_hello` through `06_structured_output` — one clear idea per file, no more than needed to see it work.
 - Each demo `.py` file starts with a `# pip install ...` comment naming its extra dependencies, so students can tell what to install without opening the requirements file.
 
 ## Research notes (what's changed since this course was last taught)
@@ -185,7 +185,7 @@ evaluation first, since the lesson order was also reversed (see below).
 - **AGENTS.md / SKILL.md**: `AGENTS.md` (agents.md) has emerged as a cross-tool standard for project-level agent instructions (adopted by Cursor, Claude Code, Copilot, Codex, etc.), replacing tool-specific files like `.cursorrules`/`CLAUDE.md`. `SKILL.md` (see agentskills.io's spec) is the complementary per-capability format with progressive disclosure. Framed as an engineering/tooling convention, not an academic result.
 
 ## Status: first cut complete (this session)
-- Local skeleton built under `tool_use_and_retrieval/` (5 demo folders plus `pages/` with 6 HTML files), committed and pushed.
+- Local skeleton built under `04_tool_use_and_retrieval/` (5 demo folders plus `pages/` with 6 HTML files), committed and pushed.
 - 4.5 got its own dedicated demo file (`04_retrieval_approaches/04_retrieval_approaches.py`) rather than an inline snippet, resolving that open question.
 - 4.6 got a small no-API-cost demo (`05_agent_instructions/05_agent_instructions.py`) that dispatches between two real SKILL.md-style files by keyword overlap with their description, resolving that open question.
 - All 6 pages reviewed by the educational-reviewer subagent; feedback applied (token/chunk vocabulary collision fixed in 4.2, cosine similarity tied back to the multivariate-normal lesson's dot-product material in 4.4, loop safety-net note added to 4.3, self-referential aside softened in 4.6, inside-reference to the old modules removed from 4.1's opening).

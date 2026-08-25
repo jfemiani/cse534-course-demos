@@ -26,7 +26,7 @@ Both pages and slides use the **same numbering and naming** to maintain consiste
 ### 1. Introduction to Generative AI and its Applications
 _(Canvas only - no local demos)_
 
-### 2. [Prompt Engineering and API Integration](prompt_engineering_api)
+### 2. [Prompt Engineering and API Integration](02_prompt_engineering_api)
 Six introductory demonstrations covering API requests, chat, streaming, Rich terminal formatting, and structured output.
 
 **Demos**:
@@ -37,7 +37,7 @@ Six introductory demonstrations covering API requests, chat, streaming, Rich ter
 - `05_rich_chat/` - Rich-formatted chat
 - `06_structured_output/` - Structured JSON responses
 
-### 3. [Mathematical Foundations](mathematical_foundations)
+### 3. [Mathematical Foundations](03_mathematical_foundations)
 Probability, entropy, language models, and statistical foundations for AI.
 
 **Demos**:
