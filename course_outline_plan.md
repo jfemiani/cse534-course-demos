@@ -99,9 +99,18 @@ evaluation first, since the lesson order was also reversed (see below).
   different kind of measurement from a correctness benchmark.
 - Covers benchmark contamination, citing Xu et al. 2024 (arXiv:2406.04244)
   as a real survey of the problem, and LiveBench as one response to it.
-- Second worked ablation: a new demo (`02_retrieval_eval`) measures
-  hit-rate for vector, keyword, and hybrid retrieval on a small labeled
-  test set built from the module 4 chunking/retrieval demos.
+- Second worked ablation: a demo pair (`02a_retrieval_eval_hitrate`,
+  `02b_retrieval_eval_examples`) measures hit-rate for vector, keyword, and
+  hybrid retrieval on a small labeled test set built from the module 4
+  chunking/retrieval demos, then looks past the aggregate number at the
+  best, median, and worst individual example (cherry, apple, lemon) to
+  show that a hit-rate can hide a case where retrieval fails in a way a
+  human would find obvious — and warns against only ever showing the
+  cherry.
+- Introduces the zoo of automatic text-generation metrics (BLEU, ROUGE,
+  METEOR, exact-match/F1, BERTScore, LLM-as-judge), with a new demo
+  (`03_bleu_score`) showing BLEU reward a factually wrong, high-overlap
+  answer over a correct paraphrase.
 - Closes with links to OpenAI Evals, Anthropic's evaluation docs, and
   promptfoo/Langfuse as tools that automate this instead of hand-building
   it every time.
