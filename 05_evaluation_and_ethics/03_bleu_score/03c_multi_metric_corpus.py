@@ -1,6 +1,6 @@
-"""Demo: Table 1's n-gram order sweep, extended with BLEU, ROUGE-L, METEOR,
-and BERTScore computed over real held-out text, instead of three
-hand-picked toy sentences.
+"""Demo: Table 1's n-gram order sweep, scored with BLEU, ROUGE-L, METEOR,
+and BERTScore (via nltk, rouge-score, and bert-score) over generated
+continuations of real held-out text.
 
 See 03c_multi_metric_corpus.md for the full explanation.
 Reuses the same corpus, split, and training logic as 01_ngram_eval.py.
@@ -12,10 +12,10 @@ from collections import Counter
 from urllib.request import urlopen
 
 import nltk
-import torch
+from bert_score import BERTScorer
 from nltk.translate.bleu_score import SmoothingFunction, sentence_bleu
 from nltk.translate.meteor_score import meteor_score
-from transformers import AutoModel, AutoTokenizer
+from rouge_score import rouge_scorer
 
 nltk.download("wordnet", quiet=True)
 nltk.download("omw-1.4", quiet=True)
@@ -34,8 +34,8 @@ BEST_ORDER = 3  # the order Table 1 already found best by cross-entropy
 RANDOM_SEED = 42
 
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
-tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-model = AutoModel.from_pretrained(MODEL_NAME).eval()
+rouge = rouge_scorer.RougeScorer(["rougeL"], use_stemmer=True)
+bert_scorer = BERTScorer(model_type=MODEL_NAME, num_layers=6, lang="en", rescale_with_baseline=False)
 
 
 def load_blocks() -> list[str]:
@@ -101,16 +101,7 @@ def bleu(reference: str, candidate: str) -> float:
 
 
 def rouge_l(reference: str, candidate: str) -> float:
-    ref_words, cand_words = reference.lower().split(), candidate.lower().split()
-    if not ref_words or not cand_words:
-        return 0.0
-    dp = [[0] * (len(cand_words) + 1) for _ in range(len(ref_words) + 1)]
-    for i, r in enumerate(ref_words, 1):
-        for j, c in enumerate(cand_words, 1):
-            dp[i][j] = dp[i - 1][j - 1] + 1 if r == c else max(dp[i - 1][j], dp[i][j - 1])
-    lcs = dp[len(ref_words)][len(cand_words)]
-    precision, recall = lcs / len(cand_words), lcs / len(ref_words)
-    return 0.0 if precision + recall == 0 else 2 * precision * recall / (precision + recall)
+    return rouge.score(reference, candidate)["rougeL"].fmeasure
 
 
 def meteor(reference: str, candidate: str) -> float:
@@ -120,23 +111,9 @@ def meteor(reference: str, candidate: str) -> float:
     return meteor_score([ref_tokens], cand_tokens)
 
 
-def token_embeddings(text: str) -> torch.Tensor | None:
-    encoded = tokenizer(text, return_tensors="pt")
-    with torch.no_grad():
-        hidden = model(**encoded).last_hidden_state[0]
-    mask = torch.tensor([tok not in tokenizer.all_special_ids for tok in encoded["input_ids"][0]])
-    embeddings = hidden[mask]
-    return torch.nn.functional.normalize(embeddings, dim=-1) if embeddings.shape[0] else None
-
-
 def bertscore(reference: str, candidate: str) -> float:
-    ref_emb, cand_emb = token_embeddings(reference), token_embeddings(candidate)
-    if ref_emb is None or cand_emb is None:
-        return 0.0
-    similarity = cand_emb @ ref_emb.T
-    precision = similarity.max(dim=1).values.mean().item()
-    recall = similarity.max(dim=0).values.mean().item()
-    return 0.0 if precision + recall == 0 else 2 * precision * recall / (precision + recall)
+    _, _, f1 = bert_scorer.score([candidate], [reference])
+    return f1.item()
 
 
 blocks = load_blocks()

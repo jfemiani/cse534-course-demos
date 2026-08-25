@@ -5,3 +5,5 @@ python-dotenv
 nltk
 torch
 transformers
+rouge-score
+bert-score
