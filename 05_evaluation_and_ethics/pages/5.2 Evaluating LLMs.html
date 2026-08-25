@@ -1,0 +1,94 @@
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Two kinds of evaluation</h2>
+<p>Module 3 built a small language model and gave you a way to measure surprise. Module 4 gave you tool use and retrieval. This lesson asks the question you should ask about anything you build: is it any good?</p>
+<p>That question splits into two. Sometimes you want to measure a model's raw ability. That is a <strong>benchmark</strong>. Sometimes you want to measure a choice you made while building something on top of a model, such as which retrieval strategy to use. That is an <strong>ablation study</strong> or a <strong>grid search</strong>. Both count as evaluation. This lesson covers both, starting with something you already built.</p>
+
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Evaluating a model you already built</h2>
+<p>Lesson 3.4 defined cross-entropy: the average surprise a model feels when it sees real data. A model that is never surprised has low cross-entropy. A model that keeps getting caught off guard has high cross-entropy.</p>
+<p>Lesson 3.5 built an n-gram model. It predicts the next character from the last few characters it has seen. That context length is called the model's <strong>order</strong>. Until now, you only watched it generate text. This demo does something different. It holds out some text the model never trained on. Then it measures cross-entropy on that held-out text instead.</p>
+<p>Cross-entropy is measured in bits, which is not the most intuitive unit. A second, more readable number is <strong>perplexity</strong>. This lesson uses the convention perplexity = 2 raised to the cross-entropy, when cross-entropy is measured in bits. (If you see cross-entropy reported in nats instead of bits, the matching formula is perplexity = e raised to the cross-entropy. Either convention is standard. State which one you are using.) A perplexity of 8 means the model is, on average, about as unsure as if it were guessing uniformly among 8 equally likely next characters.</p>
+<p>The demo below trains the n-gram model three times, once for each of three orders. Each time, it reports cross-entropy and perplexity on the same held-out text. Varying one setting and comparing the results is already a small <strong>grid search</strong>: order is the one parameter being swept.</p>
+<p><a href="https://github.com/jfemiani/cse534-course-demos/blob/master/05_evaluation_and_ethics/01_ngram_eval/01_ngram_eval.py" target="_blank">01_ngram_eval.py (full source on GitHub)</a></p>
+<p><iframe style="width: 100%; height: 700px;" title="01_ngram_eval.py: cross-entropy and perplexity on held-out text, swept over context length" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2F05_evaluation_and_ethics%2F01_ngram_eval%2F01_ngram_eval.py&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on" loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<p>Here is one run of that demo, trained and evaluated on the same public-domain text used in lesson 3.5:</p>
+<table style="border-collapse: collapse; width: 100%;">
+<thead>
+<tr style="background-color: #f2f2f2;">
+<th style="border: 1px solid #ccc; padding: 6px; text-align: left;">order</th>
+<th style="border: 1px solid #ccc; padding: 6px; text-align: right;">contexts seen</th>
+<th style="border: 1px solid #ccc; padding: 6px; text-align: right;">miss rate on held-out text</th>
+<th style="border: 1px solid #ccc; padding: 6px; text-align: right;">cross-entropy (bits) &darr;</th>
+<th style="border: 1px solid #ccc; padding: 6px; text-align: right;">perplexity &darr;</th>
+</tr>
+</thead>
+<tbody>
+<tr><td style="border: 1px solid #ccc; padding: 6px;">2</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">1,408</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">1.8%</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;"><strong>3.009</strong></td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;"><strong>8.05</strong></td></tr>
+<tr><td style="border: 1px solid #ccc; padding: 6px;">4</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">48,846</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">10.5%</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;"><em>3.082</em></td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;"><em>8.47</em></td></tr>
+<tr><td style="border: 1px solid #ccc; padding: 6px;">8</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">548,803</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">61.4%</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">8.517</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">366.28</td></tr>
+</tbody>
+</table>
+<p>Read the "miss rate" column first. It says how often the held-out text contained a context the model never saw during training. At order 2, almost every two-character context has already shown up during training, so the miss rate stays low. At order 8, most eight-character contexts in new text are new to the model, so the miss rate climbs past 60%. When the model misses, it falls back to a small floor probability instead of a confident guess. That fallback is expensive. A wrong guess made with high confidence produces a large surprise. That is exactly the point lesson 3.4 made about surprise and rare events. This is why order 8's perplexity is so much worse here, even though it "knows more" in the sense of having memorized far more contexts. A short context generalizes. A long context memorizes, and text it has not memorized breaks it.</p>
+
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Reading a results table like a researcher</h2>
+<p>The table above already uses two conventions you will see in almost every AI paper. Look at the column headers again. The down arrow (&darr;) next to cross-entropy and perplexity means lower is better for that column. An up arrow (&uarr;) would mean the opposite: higher is better. You will usually see accuracy or a benchmark score reported that way. A reader should never have to guess which direction is good; the arrow says it directly.</p>
+<p>Now look at the numbers themselves. The best value in a column is bolded. The second-best is italicized. This lets a reader scan a large table full of numbers and immediately spot the winner in each column. They do not have to read every cell.</p>
+<p>Here is the limitation this convention hides. A single run, like the one in the table above, is one sample. If you retrained the order-2 and order-4 models with a different train/held-out split, the two perplexity numbers might swap places, because they are close. Checking whether a small difference is a real improvement, or just noise, means running a large model many times. That is often too expensive to actually do. That is why a lot of published tables report a single run's numbers with no error bars at all. Treat a difference of a point or two on a benchmark table as informative, but not as proof that one model is truly better than another. This is a real limitation of how the field reports results, not a trick question.</p>
+
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Benchmarks for large, frontier models</h2>
+<p>The n-gram model above is small enough to evaluate by hand. The large models you use through an API are evaluated with standardized tests called benchmarks. A few benchmark families come up constantly. You should recognize their names, even though this page will not give you specific scores. Scores from large models change every few months. Any number printed here would be out of date within a year.</p>
+<ul>
+<li><strong>MMLU and MMLU-Pro</strong> test broad academic knowledge across many subjects, from history to physics.</li>
+<li><strong>GSM8K and AIME</strong> test math, from grade-school word problems to olympiad-level competition problems.</li>
+<li><strong>HumanEval and SWE-bench</strong> test code. HumanEval checks whether a model can write a short function correctly. SWE-bench checks whether a model can fix a real bug in a real open-source codebase.</li>
+<li><strong>GPQA</strong> tests graduate-level science questions, written to be hard to answer by search alone.</li>
+</ul>
+<p>Rather than memorize numbers, look them up yourself when you need them. <a href="https://www.swebench.com/" target="_blank" rel="noopener">SWE-bench's leaderboards</a> are a live example of a benchmark leaderboard you can check right now. Searching "MMLU leaderboard" or "livebench" will turn up other current comparisons. A table printed on this page would already be stale by the time you read it.</p>
+
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">A different kind of leaderboard: head-to-head human judgment</h2>
+<p><a href="https://lmarena.ai" target="_blank" rel="noopener">LMArena</a> (formerly known as LMSYS Chatbot Arena) measures something a benchmark cannot. A person is shown two anonymous answers to the same prompt, side by side, with no model names attached. The person picks the answer they prefer, or calls it a tie. Votes accumulate into a rating using the same Elo system used to rank chess players.</p>
+<p>Notice what this measures. Compare it to what MMLU or GSM8K measure. Those benchmarks check whether an answer is factually or formally correct. LMArena checks whether people liked the answer better. That is a different question. A model can rank differently on the two kinds of leaderboard. Being correct and being preferred are not the same thing.</p>
+
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Benchmarks go stale</h2>
+<p>A benchmark's questions eventually end up online. Once that happens, those questions can get scraped into the training data of the next model. If that happens, a high score on the benchmark might mean the model memorized the answer, not that it solved the problem. This is called <strong>benchmark contamination</strong>. It is a documented, studied problem, not a rumor. See Xu et al., <a href="https://arxiv.org/abs/2406.04244" target="_blank" rel="noopener">"Benchmark Data Contamination of Large Language Models: A Survey"</a> (2024) for a real, citable overview of how this happens and how researchers try to detect it.</p>
+<p>One response to this problem is to keep rotating in new questions instead of keeping a benchmark fixed forever. <a href="https://livebench.ai" target="_blank" rel="noopener">LiveBench</a> is built this way. The idea is that a benchmark's newest questions have not had time to leak into anyone's training data yet.</p>
+
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Evaluating your own work: ablation studies and grid search</h2>
+<p>Benchmarks measure a model. Most of the time, you are not evaluating a whole model. You are evaluating a choice you made while building something on top of one. Two ideas cover almost every version of this.</p>
+<p>An <strong>ablation study</strong> removes or changes one piece of a system. Then it re-measures the result, to find out what that piece was actually contributing. Maybe you added a sentence to a prompt because you thought it helped. An ablation study means running the system with and without that sentence. Then you check whether the results actually changed.</p>
+<p>A <strong>grid search</strong> tries combinations of settings systematically, to find the best combination instead of guessing one. The n-gram demo above already did this with one setting: order. A grid search can sweep more than one setting at once, checking every combination.</p>
+<p>Here is a second worked example, pulled from module 4. Which retrieval strategy actually works best for a small collection of documents: vector search, keyword search, or a hybrid of the two? Instead of guessing, this demo builds a small labeled test set: six questions, each paired with the one document that answers it. It measures <strong>hit-rate</strong>: how often the correct document showed up in the top results.</p>
+<p><a href="https://github.com/jfemiani/cse534-course-demos/blob/master/05_evaluation_and_ethics/02_retrieval_eval/02_retrieval_eval.py" target="_blank">02_retrieval_eval.py (full source on GitHub)</a></p>
+<p><iframe style="width: 100%; height: 700px;" title="02_retrieval_eval.py: hit-rate for vector, keyword, and hybrid retrieval" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2F05_evaluation_and_ethics%2F02_retrieval_eval%2F02_retrieval_eval.py&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on" loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<p>One run of that demo produced this:</p>
+<table style="border-collapse: collapse; width: 100%;">
+<thead>
+<tr style="background-color: #f2f2f2;">
+<th style="border: 1px solid #ccc; padding: 6px; text-align: left;">strategy</th>
+<th style="border: 1px solid #ccc; padding: 6px; text-align: right;">hit-rate@2 &uarr;</th>
+</tr>
+</thead>
+<tbody>
+<tr><td style="border: 1px solid #ccc; padding: 6px;">vector</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;"><strong>0.83</strong></td></tr>
+<tr><td style="border: 1px solid #ccc; padding: 6px;">hybrid</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;"><strong>0.83</strong></td></tr>
+<tr><td style="border: 1px solid #ccc; padding: 6px;">keyword</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">0.50</td></tr>
+</tbody>
+</table>
+<p>Two of the six test questions ask about near-identical assignment codes. Lesson 4.5 used this same kind of question to show where plain keyword search wins. Measuring hit-rate directly, instead of assuming vector search always wins, is the whole point. "Which retrieval strategy is actually better for my agent" is a question you can answer with a small table like this one. It does not have to be a guess.</p>
+
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Tools that do this for you</h2>
+<p>You will not build every evaluation pipeline by hand. A few tools exist specifically for this, and this list will change faster than this page can track, so treat these as starting points to search from rather than a fixed recommendation.</p>
+<ul>
+<li><a href="https://platform.openai.com/docs/guides/evals" target="_blank" rel="noopener">OpenAI Evals</a> is a framework for defining test cases and running them against a model automatically.</li>
+<li>Anthropic publishes its own <a href="https://docs.anthropic.com/en/docs/test-and-evaluate/develop-tests" target="_blank" rel="noopener">guidance on building evaluations</a>, including tooling built into the Anthropic Console.</li>
+<li><a href="https://www.promptfoo.dev/" target="_blank" rel="noopener">promptfoo</a> is a widely used open-source tool for testing and comparing prompts and models side by side. Tools like <a href="https://langfuse.com/" target="_blank" rel="noopener">Langfuse</a> add tracing on top of that, so you can see exactly what a multi-step agent did before it produced a given answer.</li>
+</ul>
+
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Reading</h2>
+<ul>
+<li><a href="https://www.swebench.com/" target="_blank" rel="noopener">SWE-bench leaderboards</a></li>
+<li><a href="https://lmarena.ai" target="_blank" rel="noopener">LMArena</a></li>
+<li><a href="https://livebench.ai" target="_blank" rel="noopener">LiveBench</a></li>
+<li>Xu et al., <a href="https://arxiv.org/abs/2406.04244" target="_blank" rel="noopener">"Benchmark Data Contamination of Large Language Models: A Survey"</a> (2024)</li>
+<li><a href="https://platform.openai.com/docs/guides/evals" target="_blank" rel="noopener">OpenAI Evals documentation</a></li>
+<li><a href="https://docs.anthropic.com/en/docs/test-and-evaluate/develop-tests" target="_blank" rel="noopener">Anthropic: developing test cases and evaluations</a></li>
+<li><a href="https://www.promptfoo.dev/" target="_blank" rel="noopener">promptfoo documentation</a></li>
+</ul>

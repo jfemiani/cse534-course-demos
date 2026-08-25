@@ -1,0 +1,171 @@
+Quiz title: Evaluation, Ethics, and Responsible AI Quiz
+Quiz description: This quiz covers Module 5's learning outcomes.
+
+    Learning outcomes:
+
+    - Explain what cross-entropy and perplexity measure on held-out text, and state which convention (bits or nats) is being used to convert between them.
+    - Explain what an order-N n-gram model's "miss rate" indicates, and why a longer context can perform worse on new text than a shorter one.
+    - Read a results table using the arrow (higher/lower is better) and bold-best/italic-second-best conventions.
+    - Explain why a single-run benchmark result may not reflect a statistically significant difference.
+    - Distinguish what a benchmark like MMLU or GSM8K measures from what a head-to-head arena like LMArena measures.
+    - Explain benchmark contamination and why some benchmarks are built to rotate in new questions over time.
+    - Distinguish an ablation study from a grid search, and identify which one a described evaluation is doing.
+    - Given a scenario involving AI and a person's work, likeness, or communication, identify which ethical concern the scenario mainly raises.
+shuffle answers: true
+show correct answers: false
+
+Title: What Cross-Entropy Measures on Held-Out Text
+Points: 1
+1. In the n-gram evaluation demo, what does computing cross-entropy on held-out text actually measure?
+... General: Aligns with the outcome on explaining what cross-entropy and perplexity measure on held-out text. If you missed this, review 5.2 Evaluating LLMs and the 01_ngram_eval demo.
+a) How many characters of held-out text the model can reproduce exactly from memory
+... Incorrect. Cross-entropy does not check for exact reproduction; it measures average surprise at the real next character.
+*b) How surprised the model is, on average, by the real next character in text it never trained on
+... Correct! Cross-entropy is the average surprise the model feels when it sees data it was not trained on.
+c) The percentage of held-out characters that were also present somewhere in the training text
+... Incorrect. That describes a kind of overlap check, not cross-entropy, which is about predicted probability, not character overlap.
+d) How many unique contexts the model learned during training
+... Incorrect. That is a count of learned contexts, a separate number the demo also reports, not what cross-entropy measures.
+
+Title: Converting Cross-Entropy to Perplexity
+Points: 1
+2. The n-gram evaluation demo reports cross-entropy in bits per character. Which formula correctly converts that into perplexity?
+... General: Aligns with the outcome on stating which convention is used to convert cross-entropy to perplexity. If you missed this, review 5.2 Evaluating LLMs and the 01_ngram_eval demo.
+*a) perplexity = 2 raised to the cross-entropy
+... Correct! When cross-entropy is measured in bits, perplexity is 2 raised to that value; with nats, it would instead be e raised to the cross-entropy.
+b) perplexity = cross-entropy multiplied by 2
+... Incorrect. Perplexity is not a simple multiple of cross-entropy; it is an exponential of it.
+c) perplexity = cross-entropy divided by the number of held-out characters
+... Incorrect. Cross-entropy is already an average per character; dividing it again does not produce perplexity.
+d) perplexity = the square root of the cross-entropy
+... Incorrect. Perplexity is not a square root of cross-entropy; it is 2 (or e) raised to the cross-entropy value.
+
+Title: Why a Longer Context Can Perform Worse
+Points: 1
+3. In the n-gram evaluation demo, the order-8 model had a much higher miss rate on held-out text than the order-2 model, and a much worse perplexity. Why?
+... General: Aligns with the outcome on explaining why a longer context can perform worse on new text than a shorter one. If you missed this, review 5.2 Evaluating LLMs and the 01_ngram_eval demo.
+a) The order-8 model was trained on fewer blocks of text than the order-2 model
+... Incorrect. Both models trained on exactly the same training blocks; only the context length differed.
+b) The order-8 model requires more computing power than the demo's floor probability setting allows
+... Incorrect. Computing power is not the issue here; the miss rate reflects how often a context was never seen in training, not a resource limit.
+c) The order-2 model was evaluated on easier held-out text than the order-8 model
+... Incorrect. Both models were evaluated on exactly the same held-out text; only the order differed.
+*d) Most 8-character contexts in new text were never seen in training, so the model often falls back to a low, confident-sounding guess that turns out wrong
+... Correct! A longer context memorizes specific sequences well, but most long contexts in new text were never seen, and a wrong fallback guess is punished heavily by cross-entropy.
+
+Title: Reading the Arrow and Bold-Best Conventions
+Points: 1
+4. A table reports "perplexity &darr;" in its header, with one value in the column bolded and another italicized. What does this tell a reader?
+... General: Aligns with the outcome on reading a results table using arrow and bold/italic conventions. If you missed this, review 5.2 Evaluating LLMs, the section on reading a results table like a researcher.
+a) The bolded value is the most recent measurement, and the italicized value is the oldest
+... Incorrect. Bold and italic mark rank (best and second-best), not recency.
+b) The arrow shows which row the table's author personally recommends
+... Incorrect. The arrow states which direction is better for that column, not a personal recommendation.
+*c) Lower values are better in that column, the bolded value is the best result, and the italicized value is the second-best
+... Correct! A down arrow means lower is better, bold marks the best value in the column, and italics mark the second-best.
+d) Higher values are better in that column, and bold marks every value above the column average
+... Incorrect. A down arrow means lower is better, not higher, and bold marks only the single best value, not every above-average one.
+
+Title: Why a Single Benchmark Run Can Be Misleading
+Points: 1
+5. Why does a difference of a point or two between two models on a published benchmark table deserve caution, even when one model's number is clearly listed as better?
+... General: Aligns with the outcome on explaining why a single-run result may not reflect a statistically significant difference. If you missed this, review 5.2 Evaluating LLMs, the section on reading a results table like a researcher.
+*a) Many published tables show only a single run, and running a model many times to check whether a small difference is real, rather than noise, is often too expensive to do
+... Correct! Repeated runs to check statistical significance are often too costly, so a lot of published numbers reflect one run, and small gaps may not be reliable.
+b) Benchmark tables are not allowed to report ties, so small differences get exaggerated on purpose
+... Incorrect. Nothing about table formatting forces small real differences to be exaggerated; the caution is about run-to-run variation, not a formatting rule.
+c) Benchmark scores are rounded before publication, so the true difference is always larger than what is printed
+... Incorrect. Rounding is not the reason for this caution; the issue is that a single run does not show whether a small gap is consistent or just noise.
+d) Only open-source models report a single run; proprietary models always report an average over many runs
+... Incorrect. Whether a model is open-source or proprietary does not determine how many runs its reported benchmark score is based on.
+
+Title: What a Benchmark Measures vs. What an Arena Measures
+Points: 1
+6. How does a benchmark like MMLU or GSM8K differ from a head-to-head arena like LMArena?
+... General: Aligns with the outcome on distinguishing what a benchmark measures from what a head-to-head arena measures. If you missed this, review 5.2 Evaluating LLMs, the section on a different kind of leaderboard.
+a) MMLU and GSM8K are scored by human judges, while LMArena is scored automatically by another model
+... Incorrect. This reverses the actual setup: MMLU and GSM8K are scored automatically against known answers, while LMArena relies on human judges.
+b) MMLU and GSM8K only test image-generating models, while LMArena only tests text-generating models
+... Incorrect. MMLU and GSM8K test text-based academic and math questions; neither is specific to image generation, and this is not the real distinction between the two.
+c) LMArena and MMLU test the exact same thing, just using different vocabulary for the same score
+... Incorrect. They measure genuinely different things: factual/formal correctness versus human preference, not the same score under different names.
+*d) MMLU and GSM8K check whether an answer is factually or formally correct, while LMArena measures which answer people preferred, without checking correctness
+... Correct! A benchmark like MMLU or GSM8K checks correctness against a known answer; an arena like LMArena only records which answer people liked better.
+
+Title: Naming Benchmark Contamination
+Points: 1
+7. What is "benchmark contamination," and what is one way researchers try to reduce its effect on newer benchmarks?
+... General: Aligns with the outcome on explaining benchmark contamination and why some benchmarks rotate in new questions. If you missed this, review 5.2 Evaluating LLMs, the section on benchmarks going stale.
+a) A benchmark's questions being written in more than one language, addressed by translating all questions into English before scoring
+... Incorrect. Contamination is not about language; it is about benchmark questions ending up in a model's training data.
+b) A benchmark being too difficult for any current model to pass, addressed by lowering the passing score
+... Incorrect. That describes benchmark difficulty, not contamination, which specifically concerns questions leaking into training data.
+*c) A benchmark's questions leaking into a later model's training data so a high score may reflect memorization, addressed by rotating in new questions over time, as LiveBench does
+... Correct! Once a benchmark's questions are online long enough, they can be scraped into training data, so newer benchmarks like LiveBench rotate in fresh questions to stay meaningful.
+d) A benchmark being run on outdated hardware, addressed by re-running it on newer GPUs
+... Incorrect. Contamination has nothing to do with hardware; it concerns whether the model has already seen the benchmark's questions during training.
+
+Title: Ablation Study or Grid Search?
+Points: 1
+8. A team removes one sentence from their system's prompt, keeping everything else the same, and re-measures performance to see whether that sentence was actually helping. What is this an example of?
+... General: Aligns with the outcome on distinguishing an ablation study from a grid search. If you missed this, review 5.2 Evaluating LLMs, the section on ablation studies and grid search.
+*a) An ablation study, because it removes one piece of the system to find out what that piece was contributing
+... Correct! Removing or changing one piece and re-measuring to isolate its contribution is exactly what an ablation study does.
+b) A grid search, because it tests one setting at a time
+... Incorrect. A grid search systematically tries combinations of settings to find the best one; removing a single piece to see its effect is not a grid search.
+c) A benchmark, because it produces a single comparable score
+... Incorrect. A benchmark evaluates a whole model against a standardized test; this scenario evaluates one design choice within a system the team built.
+d) Reranking, because it changes the order of the system's output
+... Incorrect. Reranking is a retrieval technique from module 4, unrelated to testing whether one prompt sentence was helping.
+
+Title: Ablation Study or Grid Search, Applied to Retrieval
+Points: 1
+9. The 02_retrieval_eval demo measures hit-rate for vector search, keyword search, and hybrid search on the same labeled test questions, to see which one works best for this document collection. What is this an example of?
+... General: Aligns with the outcome on distinguishing an ablation study from a grid search. If you missed this, review 5.2 Evaluating LLMs and the 02_retrieval_eval demo.
+a) An ablation study, because it removes the language model entirely from the pipeline
+... Incorrect. The demo does not remove the language model from anything; it compares different retrieval strategies, all feeding the same kind of pipeline.
+b) Benchmark contamination, because the test questions might already be known to the retrieval system
+... Incorrect. Benchmark contamination refers to a model's training data overlapping with benchmark questions; that is not what this demo is checking.
+c) An arena-style evaluation, because it relies on human preference between two anonymous answers
+... Incorrect. This demo measures hit-rate against a known correct answer; it does not involve human judges comparing anonymous outputs.
+*d) A grid search, because it systematically tries different settings (which retrieval strategy to use) to find the best one, instead of guessing
+... Correct! Trying several retrieval strategies systematically and measuring each one is exactly what a grid search does, even with just one setting being varied.
+
+Title: Case Study - The Robocall
+Points: 1
+10. A political robocall uses an AI-generated voice of a candidate telling people not to vote, without disclosing that the audio is AI-generated, and the audio is not obviously synthetic to an ordinary listener. Which concern does this scenario mainly raise?
+... General: Aligns with the outcome on identifying which ethical concern a scenario raises. If you missed this, review 5.3 Ethics and Responsible AI, the case study on the New Hampshire robocall.
+a) Benchmark contamination, because the message was reused across many phone calls
+... Incorrect. Benchmark contamination is a term from evaluating models against test questions; it does not apply to a political robocall.
+*b) Using a real person's likeness, undisclosed, in a way that could mislead people who cannot tell it is synthetic
+... Correct! The scenario centers on an undisclosed synthetic likeness used to influence real behavior, without a way for listeners to know it was AI-generated.
+c) Job displacement, because a human voice actor was not hired to record the message
+... Incorrect. Nothing in the scenario is about employment for voice actors; the central issue is the undisclosed, potentially misleading use of a real person's likeness.
+d) Ablation study design, because only one version of the message was tested
+... Incorrect. Ablation studies are a technical evaluation method from lesson 5.2; this scenario is about a real-world ethical concern, not a study design choice.
+
+Title: Case Study - The Personal Message
+Points: 1
+11. A student asks AI to write their grandmother's eulogy because they are too overwhelmed with grief to write it themselves, and delivers it without mentioning AI was involved. Which consideration is most relevant to this scenario, as framed in lesson 5.3?
+... General: Aligns with the outcome on identifying which ethical concern a scenario raises. If you missed this, review 5.3 Ethics and Responsible AI, the case study on personal messages.
+a) Whether the eulogy contains factually incorrect statements about the person who died
+... Incorrect. Factual accuracy is not the concern lesson 5.3 raises about this kind of scenario; the question is about what is lost when a personal message isn't written by the person delivering it.
+b) Whether the AI system used enough training data to generalize well to eulogies
+... Incorrect. Model generalization is a technical evaluation topic from lesson 5.2, not the ethical question this scenario raises.
+*c) Whether something personal is lost when words meant to carry a personal moment are written by AI instead of the person delivering them
+... Correct! Lesson 5.3 frames this exact scenario as an open question about what, if anything, is lost when AI writes a personal message even if the words are just as good.
+d) Whether the student violated a benchmark's terms of use by generating text with AI
+... Incorrect. Benchmarks and their terms of use are unrelated to a personal, non-benchmark use of AI like this one.
+
+Title: Case Study - The Pipeline Problem
+Points: 1
+12. A company starts using AI to do most of the code-review and bug-fixing tasks that used to go to newly hired programmers, while senior engineers use AI to become faster at their own work. Which open question does this scenario raise, as framed in lesson 5.3?
+... General: Aligns with the outcome on identifying which ethical concern a scenario raises. If you missed this, review 5.3 Ethics and Responsible AI, the section on the pipeline problem.
+*a) Where the next generation of senior engineers will come from, if AI increasingly does the tasks that used to build that experience
+... Correct! Lesson 5.3 raises exactly this open question: if junior-level tasks are increasingly automated, it is unclear where future senior-level judgment will be built.
+b) Whether the company's AI system passes MMLU at a high enough score to be trusted
+... Incorrect. MMLU is a broad knowledge benchmark from lesson 5.2; it is not what this scenario is asking about.
+c) Whether keyword search or vector search retrieves better code examples for the AI to learn from
+... Incorrect. Keyword versus vector search is a retrieval topic from module 4, unrelated to this scenario about career pipelines.
+d) Whether the AI-assisted code should be evaluated with an ablation study before deployment
+... Incorrect. An ablation study is a technical evaluation method; it does not address the open question this scenario raises about how new engineers gain experience.

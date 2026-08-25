@@ -43,12 +43,15 @@ This lands right after Mathematical Foundations and returns to the same Response
 - Demo: chunk a short text/markdown doc, embed chunks with the OpenAI embeddings endpoint, cosine-similarity search, stuff top-k chunks into the prompt, answer a question grounded in them.
 - Explicitly call out: this manual pipeline is for building intuition. In practice, prefer the Responses API's built-in **file_search** / vector store tool, which does chunking + embedding + retrieval for you.
 
-### 4.5 Retrieval Approaches: Vector vs. Keyword vs. Graph ✅ (first cut)
-- Theory/comparison lesson, small or no new demo (can reuse 4.4's chunks and add one keyword-match comparison — e.g., simple term overlap vs. embedding similarity on the same query — to make the contrast concrete).
+### 4.5 Retrieval Approaches: Vector vs. Keyword ✅ (revised)
+- Dropped GraphRAG entirely — title, content, and reading link. Not worth the engineering-cost caveat for a technique this course doesn't teach or demo.
 - Vector RAG: dense embeddings, semantic similarity, current default.
-- Keyword RAG: exact/lexical match (BM25/TF-IDF-style); still wins for exact terms, IDs, code identifiers.
+- Keyword RAG: exact/lexical match; still wins for exact terms, IDs, code identifiers.
 - Hybrid retrieval: combine both; increasingly the practical default.
-- **GraphRAG**: mention only as further reading, not taught in depth — it's evolving fast and has real cost/complexity tradeoffs. Point students to Microsoft's GraphRAG project page/paper if curious.
+- Reranking and query rewriting (HyDE) now each have a real demo (`04b_reranking.py`, `04c_hyde.py`), not just prose.
+- Added a "retrieval in production" section: hosted `file_search`/vector stores vs. dedicated vector databases (Pinecone, Weaviate, Chroma, pgvector) — answers "what would I actually use for a folder of documents," and is where Pinecone/vector databases now get named explicitly.
+- New demo `04d_hosted_file_search.py`: uploads a small folder of sample files to a hosted vector store and asks a question through the `file_search` tool, printing which file matched — the realistic answer to "I have a folder of docs and want to ask questions."
+- Page reordered: no leading header, concept sections first, all four demos grouped in one "The demos" section placed last, right before Reading.
 
 ### 4.6 Reusable Agent Instructions: AGENTS.md and SKILL.md ✅ (first cut)
 - A different idea from tool use: not code the model calls, but **guidance the model reads** — detailed, task-specific instructions saved to a file with light metadata, loaded when relevant instead of stuffed into every prompt.
@@ -59,13 +62,87 @@ This lands right after Mathematical Foundations and returns to the same Response
 
 ---
 
+## Module 5 (built this session — was mislabeled "6" on Canvas)
+
+**Working title: "Evaluation, Ethics, and Responsible AI"**
+
+Rationale: the module numbering note below was stale. When old modules 4
+and 5 were merged into the new Module 4 ("Tool Use, Retrieval, and Agentic
+Loops") and the old module 5 was deleted, every later module should have
+shifted up by one position. The Canvas module that used to be "6. Ethics,
+Evaluation, and Responsible AI" kept its old internal `position` value (8)
+and its old display number ("6.") even after the merge freed up position 7.
+Fixed this session: the module's Canvas `position` field was corrected
+from 8 to 7 via the Canvas API (`module.edit(module={'position': 7})`),
+and its name was updated to "5. Evaluation, Ethics, and Responsible AI" —
+evaluation first, since the lesson order was also reversed (see below).
+
+### 5.1 Module Overview ✅ (first cut)
+
+### 5.2 Evaluating LLMs ✅ (first cut)
+- Two threads under one "evaluation" umbrella: evaluating a model's raw
+  capability (benchmarks) and evaluating your own design choices when
+  building on top of a model (ablation studies, grid search).
+- Reuses the module 3 n-gram model and cross-entropy lesson: a new demo
+  (`01_ngram_eval`) holds out text, sweeps context length (order 2/4/8),
+  and reports cross-entropy and perplexity — the course's first concrete
+  grid search, and a real illustration of why a longer context can
+  generalize worse to new text.
+- Covers reading a results table like a research paper (arrow convention,
+  bold-best/italic-second-best, and the real limitation that a lot of
+  published tables are a single run with no significance testing).
+- Names real benchmark families (MMLU/MMLU-Pro, GSM8K/AIME, HumanEval/
+  SWE-bench, GPQA) without hardcoding scores, and links out to live
+  leaderboards (SWE-bench, and "MMLU leaderboard"/"livebench" as search
+  starting points) instead.
+- Covers LMArena (human head-to-head preference, Elo-style rating) as a
+  different kind of measurement from a correctness benchmark.
+- Covers benchmark contamination, citing Xu et al. 2024 (arXiv:2406.04244)
+  as a real survey of the problem, and LiveBench as one response to it.
+- Second worked ablation: a new demo (`02_retrieval_eval`) measures
+  hit-rate for vector, keyword, and hybrid retrieval on a small labeled
+  test set built from the module 4 chunking/retrieval demos.
+- Closes with links to OpenAI Evals, Anthropic's evaluation docs, and
+  promptfoo/Langfuse as tools that automate this instead of hand-building
+  it every time.
+
+### 5.3 Ethics and Responsible AI ✅ (first cut)
+- Hard constraint followed throughout: every section poses an open
+  question and does not answer it. No verdicts on what is or isn't
+  ethical anywhere on this page.
+- Covers the visible costs (data center electricity/water use, job
+  displacement), using AI to build a skill vs. to skip learning one, and
+  "the pipeline problem" (where future senior engineers' judgment comes
+  from if AI increasingly does junior-level work).
+- Case studies, each posed as a question: AI-written personal messages,
+  real likenesses used without consent, the real and documented January
+  2024 New Hampshire AI-robocall incident, and video's higher believability
+  compared to faked text or images.
+- Explicitly points students to the new discussion assignment and quiz as
+  where these questions get worked through, not the page itself.
+
+### Activities (new this session)
+- New discussion assignment (`05_evaluation_and_ethics/discussion/`): an
+  open-ended prompt built around three of the ethics case studies above.
+  Students pick one, take a position, and respond to a classmate.
+- New quiz (`05_evaluation_and_ethics/quizzes/`), text2qti format, validated
+  with `text2qti` and exported to a zip alongside the `.txt` source. The
+  evaluation-lesson questions are ordinary fact/concept questions. The
+  ethics questions are situational-judgment questions that test whether a
+  student can identify which concern a scenario raises, not what the
+  "right" ethical answer is — no question asserts a moral verdict.
+- The pre-existing "Discussion: AI Evaluation in the Wild" discussion and
+  "Lab 5: AI Evaluation Methods" assignment were left as-is; they already
+  fit the evaluation lesson and were out of scope for this session.
+
+---
+
 ## Later modules (unchanged for now)
 
-6. Ethics Evaluation Responsible AI
-7. Tutorial 1: Advanced Prompting Tools Explorer
-8. Trigrams Simplest Generation
-9. Exam 1
-10. RNNs, LSTMs, Transformers, VAEs, GANs, Diffusion, etc. (unchanged)
+6. Tutorial 1: Advanced Prompting Tools Explorer
+7. Trigrams Simplest Generation
+8. Exam 1
+9. RNNs, LSTMs, Transformers, VAEs, GANs, Diffusion, etc. (unchanged)
 
 ---
 
