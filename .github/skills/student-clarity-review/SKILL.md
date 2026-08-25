@@ -1,6 +1,6 @@
 ---
 name: student-clarity-review
-description: 'Use when: a lesson paragraph/page "starts strong but gets hard to read", reads as rambling, narrates a table/result instead of engaging the reader, needs a jargon/concept transition made explicit instead of buried, or strings too many ideas into one sentence instead of letting points land separately. Diagnoses WHY prose is hard to follow via register-shift and argument-chaining analysis, and rewrites narrating prose into Socratic questions, explicit callouts, or short landed statements. Triggers: "why is this hard to read", "this is rambling", "make this more Socratic", "this reads like telling the student the answer", "the transition is sneaky/buried", "you keep chaining ideas together", "too many em dashes". Also self-check this after generating any explanatory paragraph, since chaining and em-dash overuse are a known failure mode of this assistant, not just something to fix on request. Complements avoid-ai-writing (formatting/vocabulary tells) with structural chaining and paragraph-level flow. NOT for whole-document pedagogy review (use educational-reviewer agent) — this skill is for diagnosing and fixing ONE paragraph or transition at a time.
+description: 'Use when: a lesson paragraph/page "starts strong but gets hard to read", reads as rambling, narrates a table/result instead of engaging the reader, needs a jargon/concept transition made explicit instead of buried, strings too many ideas into one sentence instead of letting points land separately, or drifts into true-but-off-thesis detail that makes the reader lose track of the point. Diagnoses WHY prose is hard to follow via register-shift, argument-chaining, and point-drift analysis, and rewrites narrating prose into Socratic questions, explicit callouts, or short landed statements. Triggers: "why is this hard to read", "this is rambling", "make this more Socratic", "this reads like telling the student the answer", "the transition is sneaky/buried", "you keep chaining ideas together", "too many em dashes", "so what/why does this matter/I forgot the topic". Also self-check this after generating any explanatory paragraph, since chaining, point drift, and em-dash overuse are known failure modes of this assistant, not just something to fix on request. Complements avoid-ai-writing (formatting/vocabulary tells) with structural chaining and paragraph-level flow. NOT for whole-document pedagogy review (use educational-reviewer agent) — this skill is for diagnosing and fixing ONE paragraph or transition at a time.
 ---
 
 # Student Clarity Review
@@ -67,6 +67,22 @@ Common shift patterns to check for, in rough order of how much load they add:
   single averaged numbers shown in Table 1 cannot" resolves both the ellipsis and the
   stacking, and additionally puts the true subject of the sentence (the examples doing
   the showing) first instead of burying it inside a possessive.
+- **Point drift**: a sentence is true, well-written, and individually clear, but does
+  not serve the paragraph's actual thesis. Every sentence in isolation can pass a
+  register check and still leave the reader unable to say what the paragraph was
+  arguing, because the paragraph accumulated *facts about the topic* instead of
+  *reasons for its claim*. The tell is a reader reaction like "so what, why does this
+  matter, what are we even talking about" rather than "this sentence is hard to
+  parse." Example (an actual draft on this page): a paragraph whose thesis was
+  "intrinsic evaluation measures whether a model follows the true distribution"
+  detoured into "cross-entropy is, up to a constant, the same quantity as KL
+  divergence" and "nothing is generated and no reference is needed to compute it" —
+  both true, both well-formed sentences, neither one advancing or explaining the
+  thesis. The fix is not rephrasing those sentences; it is asking, for every sentence,
+  "does this serve the stated claim, or is it just a true fact about the same topic?"
+  and cutting or relocating anything that fails that test, even if it is accurate and
+  interesting. When in doubt, state the paragraph's one-sentence thesis first, then
+  check each subsequent sentence directly against it.
 
 ### Procedure
 
@@ -75,7 +91,10 @@ Common shift patterns to check for, in rough order of how much load they add:
    citation, parenthetical aside, generic conclusion.
 2. Flag every point where the register changes with no transition sentence bridging
    it.
-3. Report back: which sentence is the pivot where it "gets hard," and which specific
+3. Separately, name the paragraph's one-sentence thesis and check every sentence
+   against it — flag any sentence that is true and on-topic but does not serve that
+   thesis (point drift), even if no register shift is present.
+4. Report back: which sentence is the pivot where it "gets hard," and which specific
    pattern (from the list above, or a new one) explains the jump. Don't just say
    "it's dense" — name the mechanism.
 4. Only rewrite if asked. Diagnosis and rewrite are separate requests; some users just
@@ -191,5 +210,7 @@ just the specific numbers.
 - [ ] Genuine concept/task switches get their own explicit sentence, not a buried clause
 - [ ] No sentence chains claim + justification + hedge + consequence together (Part 3)
 - [ ] Em-dash count checked only after chaining is fixed, not as a substitute for it
+- [ ] Every sentence serves the paragraph's stated thesis, not just true-and-related
+      facts about the topic (point drift) — true and well-written is not the bar
 - [ ] Re-read the surrounding paragraphs after a rewrite — a fixed paragraph can still
       read badly if the one before/after it assumed the old phrasing
