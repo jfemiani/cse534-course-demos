@@ -115,7 +115,6 @@
 <tr><td style="border: 1px solid #ccc; padding: 6px;"><strong>BERTScore</strong></td><td style="border: 1px solid #ccc; padding: 6px;"><code>bert_score</code></td><td style="border: 1px solid #ccc; padding: 6px;">embedding similarity instead of word overlap</td><td style="border: 1px solid #ccc; padding: 6px;">rewarding correct paraphrases that share few words</td></tr>
 </tbody>
 </table>
-<p>In code, each one is a single library call, and the full implementation is on GitHub at <a href="https://github.com/jfemiani/cse534-course-demos/blob/master/05_evaluation_and_ethics/03_bleu_score/03c_multi_metric_corpus.py" target="_blank"><code>03c_multi_metric_corpus.py</code></a> if you want to see the calls yourself.</p>
 <p>Running all four on the order sweep from Table 1 tests them on real generated text instead of a couple of hand-picked sentences: for each order, a fixed sample of held-out blocks is split into a 20-character prompt and the 40 real characters that follow it, and the model generates its own 40-character continuation. One run, sampling 30 held-out blocks per order, produced this:</p>
 <table style="border-collapse: collapse; width: 100%;">
 <caption style="caption-side: top; text-align: left; font-weight: bold; padding: 4px 0;">Table 3: Table 1's order sweep, with BLEU, ROUGE-L, METEOR, and BERTScore on generated continuations of real held-out text</caption>
