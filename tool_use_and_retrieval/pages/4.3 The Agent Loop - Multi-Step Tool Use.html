@@ -80,7 +80,27 @@ Final answer: The Agents SDK&rsquo;s `Runner` is essentially a turn-based orches
   "id": 1,
   "result": {
     "tools": [
-      {"name": "ask_question", ...},
+      {
+        "name": "ask_question",
+        "description": "Ask any question about a GitHub repository and get an AI-powered, context-grounded response.",
+        "inputSchema": {
+          "properties": {
+            "repoName": {
+              "anyOf": [
+                {"type": "string"},
+                {"items": {"type": "string"}, "type": "array"}
+              ],
+              "description": "GitHub repository or list of repositories (max 10) in owner/repo format."
+            },
+            "question": {
+              "description": "The question to ask about the repository.",
+              "type": "string"
+            }
+          },
+          "required": ["repoName", "question"],
+          "type": "object"
+        }
+      },
       {"name": "read_wiki_contents", ...},
       {"name": "read_wiki_structure", ...}
     ]
