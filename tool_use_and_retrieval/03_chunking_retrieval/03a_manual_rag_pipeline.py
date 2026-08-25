@@ -1,21 +1,6 @@
-"""Demo: the smallest visible RAG pipeline - chunk, embed, retrieve, answer.
+"""Demo 3a: the smallest visible RAG pipeline - chunk, embed, retrieve, answer.
 
-Concept: retrieval-augmented generation (RAG), built by hand so every step
-is visible: split source text into chunks, embed each chunk, embed the
-question, rank chunks by cosine similarity, and paste the closest chunk into
-the prompt before asking the model to answer.
-
-This manual pipeline is for building intuition. In production, prefer the
-Responses API's built-in file_search tool, a hosted vector store that
-chunks, embeds, and retrieves documents for you.
-
-Endpoints: OpenAI Embeddings API (client.embeddings.create,
-text-embedding-3-small) and the Responses API (client.responses.create).
-
-If OpenAI changes these APIs, ask an LLM assistant: "Update this script to
-match the current OpenAI embeddings and Responses API. Keep the same four
-document chunks, the cosine-similarity ranking, and the single retrieved
-chunk pasted into the final prompt."
+See 03a_manual_rag_pipeline.md for the full explanation.
 """
 
 import os

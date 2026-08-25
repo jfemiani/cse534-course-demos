@@ -19,7 +19,10 @@ Work through these in order. Each one adds a single new idea to the last.
    - [02c_agent_loop_hosted_tools.py](02_agent_loop/02c_agent_loop_hosted_tools.py) — mixes a local `@function_tool` with a hosted (cloud-run) `WebSearchTool()` in one Agent.
    - [02d_agent_loop_mcp.py](02_agent_loop/02d_agent_loop_mcp.py) — `HostedMCPTool` connected to a real, free MCP server (DeepWiki).
    - [02e_agent_loop_mcp_raw_jsonrpc.py](02_agent_loop/02e_agent_loop_mcp_raw_jsonrpc.py) — the same MCP server, called with raw JSON-RPC over HTTP, printing every request and response.
-3. [Chunking and retrieval](03_chunking_retrieval) — a small RAG pipeline built by hand: chunk, embed, rank, answer.
+3. [Chunking and retrieval](03_chunking_retrieval) — a small RAG pipeline built by hand: chunk, embed, rank, answer. Three variants, same folder:
+   - [03a_manual_rag_pipeline.py](03_chunking_retrieval/03a_manual_rag_pipeline.py) — the pipeline itself: chunk, embed, rank, answer, using four hand-picked chunks.
+   - [03b_chunking_strategies_text.py](03_chunking_retrieval/03b_chunking_strategies_text.py) — the harder problem 03a skips: fixed-size, fixed-size-with-overlap, and recursive/structure-aware chunking of ordinary text, compared side by side.
+   - [03c_chunking_strategies_code.py](03_chunking_retrieval/03c_chunking_strategies_code.py) — the same problem for source code: fixed-line chunking vs. AST-aware chunking that never splits a function or class.
 4. [Vector vs. keyword retrieval](04_retrieval_approaches) — the same question, ranked two different ways, with a case where they disagree.
 5. [Agent instructions: SKILL.md dispatch](05_agent_instructions) — how a coding assistant decides which instructions file to read.
 
@@ -28,10 +31,10 @@ names the concept it teaches and the API it depends on. If an API changes,
 ask an LLM assistant to update the file using that docstring as the brief;
 it is written to be a complete regeneration prompt on its own.
 
-Lesson 1 and Lesson 2 are the exceptions: each has side-by-side variants,
-so each variant's `.py` docstring is a one-line pointer to a companion
-`.md` file of the same name (e.g. `01a_function_calling_json.py` ->
-`01a_function_calling_json.md`), which carries the full concept,
+Lesson 1, Lesson 2, and Lesson 3 are the exceptions: each has side-by-side
+variants, so each variant's `.py` docstring is a one-line pointer to a
+companion `.md` file of the same name (e.g. `01a_function_calling_json.py`
+-> `01a_function_calling_json.md`), which carries the full concept,
 endpoint, and regeneration-prompt content instead.
 
 Starting with Lesson 2, the OpenAI Agents SDK is the default way these

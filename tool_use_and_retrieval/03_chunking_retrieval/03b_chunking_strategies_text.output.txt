@@ -1,0 +1,35 @@
+
+1. Fixed-size, no overlap (7 chunks):
+  [0] 'CSE 534 meets Tuesdays and Thursdays from 3:00pm to 4:20pm. Attendance is not graded, but '
+  [1] 'the material moves quickly and each lecture builds on the last one, so missing a session u'
+  [2] 'sually costs more time than it saves.\n\nExam 1 covers mathematical foundations: probability'
+  [3] ', entropy, and the normal distribution. It is closed-book, but a one-page formula sheet is'
+  [4] ' allowed and must be handed in with the exam.\n\nLabs are submitted through Canvas as a sing'
+  [5] 'le Python file, due by 11:59pm on the posted date. Late labs lose ten percent per day and '
+  [6] 'are not accepted after one week.'
+
+2. Fixed-size, 20-char overlap (9 chunks):
+  [0] 'CSE 534 meets Tuesdays and Thursdays from 3:00pm to 4:20pm. Attendance is not graded, but '
+  [1] ' is not graded, but the material moves quickly and each lecture builds on the last one, so'
+  [2] ' on the last one, so missing a session usually costs more time than it saves.\n\nExam 1 cove'
+  [3] ' saves.\n\nExam 1 covers mathematical foundations: probability, entropy, and the normal dist'
+  [4] ' and the normal distribution. It is closed-book, but a one-page formula sheet is allowed a'
+  [5] 'a sheet is allowed and must be handed in with the exam.\n\nLabs are submitted through Canvas'
+  [6] 'itted through Canvas as a single Python file, due by 11:59pm on the posted date. Late labs'
+  [7] 'sted date. Late labs lose ten percent per day and are not accepted after one week.'
+  [8] 'er one week.'
+
+3. Recursive / structure-aware (8 chunks):
+  [0] 'CSE 534 meets Tuesdays and Thursdays from 3:00pm to 4:20pm'
+  [1] 'Attendance is not graded, but the material moves quickly and each lecture builds on the'
+  [2] 'last one, so missing a session usually costs more time than it saves.'
+  [3] 'Exam 1 covers mathematical foundations: probability, entropy, and the normal distribution'
+  [4] 'It is closed-book, but a one-page formula sheet is allowed and must be handed in with the'
+  [5] 'exam.'
+  [6] 'Labs are submitted through Canvas as a single Python file, due by 11:59pm on the posted'
+  [7] 'date. Late labs lose ten percent per day and are not accepted after one week.'
+
+Look at chunk [1] in strategy 1: it starts mid-sentence, splitting 'from 3:00pm to 4:20pm' from the fact it depends on. Strategy 3 never does that, because it only cuts where a paragraph or sentence already ends.
+
+OpenAI's file_search tool defaults to a fixed-size strategy much like strategy 2 above: 800-token chunks with 400 tokens of overlap. You can override both numbers with a 'static' chunking_strategy when you upload a file, but the tool does not offer paragraph- or sentence-aware cutting - that is still something you would build yourself, the way strategy 3 does here.
+

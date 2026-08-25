@@ -1,0 +1,70 @@
+
+1. Fixed-size, 6 lines per chunk (5 chunks):
+  --- chunk 0 ---
+  """A tiny grade-book module, used only as chunking material."""
+
+
+  def letter_grade(score: float) -> str:
+      """Convert a numeric score to a letter grade."""
+      if score >= 90:
+  --- chunk 1 ---
+          return "A"
+      if score >= 80:
+          return "B"
+      if score >= 70:
+          return "C"
+      return "F"
+  --- chunk 2 ---
+
+
+  def class_average(scores: list[float]) -> float:
+      """Return the mean of a list of scores, or 0.0 if empty."""
+      if not scores:
+          return 0.0
+  --- chunk 3 ---
+      return sum(scores) / len(scores)
+
+
+  class GradeBook:
+      """Tracks scores for one class section."""
+
+  --- chunk 4 ---
+      def __init__(self, section: str) -> None:
+          self.section = section
+          self.scores: list[float] = []
+
+      def record(self, score: float) -> None:
+          self.scores.append(score)
+
+2. AST-aware, one function/class per chunk (3 chunks):
+  --- chunk 0 ---
+  def letter_grade(score: float) -> str:
+      """Convert a numeric score to a letter grade."""
+      if score >= 90:
+          return "A"
+      if score >= 80:
+          return "B"
+      if score >= 70:
+          return "C"
+      return "F"
+  --- chunk 1 ---
+  def class_average(scores: list[float]) -> float:
+      """Return the mean of a list of scores, or 0.0 if empty."""
+      if not scores:
+          return 0.0
+      return sum(scores) / len(scores)
+  --- chunk 2 ---
+  class GradeBook:
+      """Tracks scores for one class section."""
+
+      def __init__(self, section: str) -> None:
+          self.section = section
+          self.scores: list[float] = []
+
+      def record(self, score: float) -> None:
+          self.scores.append(score)
+
+In strategy 1, look at chunk 2 and chunk 3: `class_average`'s signature, docstring, and empty-list check end up in chunk 2, while its final `return` statement lands alone in chunk 3. Either half on its own would embed and retrieve poorly. Strategy 2 never splits a function or class, because it cuts on the source's own syntax tree instead of a line count.
+
+OpenAI's file_search auto-chunking strategy has no idea a .py file is code; it applies the same token-count-and-overlap rule it would use on a novel. For a codebase, an AST-aware pass like strategy 2 - or a purpose-built code splitter such as LangChain's RecursiveCharacterTextSplitter.from_language(Language.PYTHON) - should happen before the files ever reach an embedding call.
+
