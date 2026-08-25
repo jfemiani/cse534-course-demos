@@ -1,0 +1,80 @@
+6499 training blocks, 723 held-out blocks, judging 10 generated continuations per order
+
+order  contexts  miss rate  cross-ent  perplexity  judge: correct  judge: quality
+    2      1408      1.79%      3.009        8.05            0.0%            0.00
+    3     11347      4.66%      2.791        6.92            0.0%            0.80
+    4     48846     10.49%      3.082        8.47           10.0%            0.80
+    5    132958     20.65%      4.005       16.06            0.0%            1.00
+    6    261305     33.90%      5.394       42.05            0.0%            0.80
+    7    406576     48.13%      6.984      126.57            0.0%            0.80
+    8    548803     61.35%      8.517      366.28            0.0%            0.50
+
+order=3 generated continuations, sorted by judge quality (higher is better)
+
+--- CHERRIES (highest quality) ---
+correct: False   quality: 1/5   reason: The continuation is incoherent: “I to his hear of lovely” is not grammatical or plausible Shakespearean phrasing, and “thereford” is not a real word in this context. It does not sensibly continue Petruchio’s line.
+  prompt:     'PETRUCHIO:\nNay, I to'
+  candidate:  ' his hear of lovely,\nAnd by thereford:\nA'
+  reference:  'ld you your son was well beloved in Padu'
+correct: False   quality: 1/5   reason: The continuation is incoherent: “Pardon, or you noble / ofter lie” is not grammatical Shakespearean phrasing, and fragments such as “ofter,” “truch,” and “I w” are malformed or incomplete. It does not plausibly continue Katharina’s speech.
+  prompt:     'KATHARINA:\nPardon, o'
+  candidate:  'r you noble\nofter lie.$   Grey truch I w'
+  reference:  'ld father, my mistaking eyes,\nThat have '
+correct: False   quality: 1/5   reason: The candidate is largely incoherent: phrases such as “if I hat it,” “no lady mise,” and “think strance” contain malformed or misused words and do not form plausible Shakespearean syntax. It is not a credible continuation of “I cannot,” unlike the grammatical reference “tell; expect they are busied...”
+  prompt:     'BIONDELLO:\nI cannot '
+  candidate:  'if I hat it no lady mise think strance i'
+  reference:  'tell; expect they are busied about a\ncou'
+correct: False   quality: 1/5   reason: The continuation is largely nonsensical: “The poore teach” is ungrammatical, and “conters” and “closs” do not form plausible words or Shakespearean phrasing. It does not coherently continue Petruchio’s line.
+  prompt:     'PETRUCHIO:\nThe poore'
+  candidate:  ' teach\nIs not conters, closs, and,\nAnd b'
+  reference:  'st service is repaid with thanks;\nAnd so'
+correct: False   quality: 1/5   reason: The candidate does not plausibly complete “If he be cre…”. It produces malformed or nonsensical text (“creat shou,” “naturn’d”) and lacks coherent Shakespearean grammar or meaning, unlike the natural completion “credulous and trust my tale…”.
+  prompt:     'TRANIO:\nIf he be cre'
+  candidate:  "at shou have me.\nAs my naturn'd myself a"
+  reference:  "dulous and trust my tale,\nI'll make him "
+
+--- APPLES (median) ---
+correct: False   quality: 1/5   reason: The continuation produces the nonword “impuded” and the phrase “soon their own comes” is grammatically and semantically incoherent. It is not plausible Shakespearean phrasing.
+  prompt:     'Pedant:\nAlas! sir, i'
+  candidate:  'mpuded soon their own comes, if thou fac'
+  reference:  't is worse for me than so;\nFor I have bi'
+correct: False   quality: 1/5   reason: The continuation produces “I prithee, goody,” which is awkward in context, followed by largely incoherent phrasing (“O’er you do ther in that withe sped”). Although a few tokens are real or archaic-looking words, it does not form a plausible Shakespearean sentence.
+  prompt:     'CURTIS:\nI prithee, g'
+  candidate:  "oody\nO'er you do ther in that withe sped"
+  reference:  'ood Grumio, tell me, how goes the world?'
+correct: False   quality: 1/5   reason: The continuation is incoherent: “I to his hear of lovely” is not grammatical or plausible Shakespearean phrasing, and “thereford” is not a real word in this context. It does not sensibly continue Petruchio’s line.
+  prompt:     'PETRUCHIO:\nNay, I to'
+  candidate:  ' his hear of lovely,\nAnd by thereford:\nA'
+  reference:  'ld you your son was well beloved in Padu'
+correct: False   quality: 1/5   reason: The continuation is incoherent: “Pardon, or you noble / ofter lie” is not grammatical Shakespearean phrasing, and fragments such as “ofter,” “truch,” and “I w” are malformed or incomplete. It does not plausibly continue Katharina’s speech.
+  prompt:     'KATHARINA:\nPardon, o'
+  candidate:  'r you noble\nofter lie.$   Grey truch I w'
+  reference:  'ld father, my mistaking eyes,\nThat have '
+correct: False   quality: 1/5   reason: The candidate is largely incoherent: phrases such as “if I hat it,” “no lady mise,” and “think strance” contain malformed or misused words and do not form plausible Shakespearean syntax. It is not a credible continuation of “I cannot,” unlike the grammatical reference “tell; expect they are busied...”
+  prompt:     'BIONDELLO:\nI cannot '
+  candidate:  'if I hat it no lady mise think strance i'
+  reference:  'tell; expect they are busied about a\ncou'
+
+--- LEMONS (lowest quality) ---
+correct: False   quality: 0/5   reason: The candidate is not a plausible continuation. “All things of Norfolly, sentle thesee gaspirate!” is grammatically incoherent and contains apparent nonwords or corruptions (“Norfolly,” “sentle,” “thesee,” “gaspirate”), unlike plausible Shakespearean phrasing.
+  prompt:     'GONZALO:\nAll things '
+  candidate:  'of Norfolly, sentle thesee gaspirate!\nYo'
+  reference:  'in common nature should produce\nWithout '
+correct: False   quality: 0/5   reason: The candidate is largely gibberish, with fragments such as “y vail,” “rever tarth,” and “nor on hig” that do not form coherent English or plausible Shakespearean phrasing. It is not a plausible continuation of “Come forth.”
+  prompt:     'PROSPERO:\nCome forth'
+  candidate:  'y vail now rever tarth\nOf thy nor on hig'
+  reference:  ", I say! there's other business for thee"
+correct: False   quality: 1/5   reason: The continuation produces nonsensical text: “Methinks our Rich ind” is not a coherent phrase, and fragments such as “chan” and “fountraito” are not plausible words or Shakespearean phrasing. It does not form a grammatical continuation.
+  prompt:     'GONZALO:\nMethinks ou'
+  candidate:  "r Rich ind:\nHe's chan of this fountraito"
+  reference:  'r garments are now as fresh as when we\np'
+correct: False   quality: 1/5   reason: The continuation produces the nonword “impuded” and the phrase “soon their own comes” is grammatically and semantically incoherent. It is not plausible Shakespearean phrasing.
+  prompt:     'Pedant:\nAlas! sir, i'
+  candidate:  'mpuded soon their own comes, if thou fac'
+  reference:  't is worse for me than so;\nFor I have bi'
+correct: False   quality: 1/5   reason: The continuation produces “I prithee, goody,” which is awkward in context, followed by largely incoherent phrasing (“O’er you do ther in that withe sped”). Although a few tokens are real or archaic-looking words, it does not form a plausible Shakespearean sentence.
+  prompt:     'CURTIS:\nI prithee, g'
+  candidate:  "oody\nO'er you do ther in that withe sped"
+  reference:  'ood Grumio, tell me, how goes the world?'
+
+

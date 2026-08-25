@@ -1,0 +1,78 @@
+6499 training blocks, 723 held-out blocks, 359 long enough to generate from, sampling 30
+
+order  contexts  miss rate  cross-ent  perplexity    BLEU  ROUGE-L  METEOR  BERTScore
+    2      1408      1.79%      3.009        8.05   0.005    0.023   0.013      0.201
+    3     11347      4.66%      2.791        6.92   0.009    0.046   0.028      0.201
+    4     48846     10.49%      3.082        8.47   0.009    0.052   0.026      0.199
+    5    132958     20.65%      4.005       16.06   0.009    0.049   0.026      0.198
+    6    261305     33.90%      5.394       42.05   0.009    0.050   0.032      0.189
+    7    406576     48.13%      6.984      126.57   0.010    0.062   0.034      0.181
+    8    548803     61.35%      8.517      366.28   0.009    0.055   0.027      0.164
+
+order=3 generated continuations, sorted by BERTScore (higher is better)
+
+--- CHERRIES (highest BERTScore) ---
+BERTScore: 0.229
+  prompt:     'CALIBAN:\nYou taught '
+  candidate:  'loved will in meanst props\nyou we withe '
+  reference:  "me language; and my profit on't\nIs, I kn"
+BERTScore: 0.235
+  prompt:     'BIONDELLO:\nHis daugh'
+  candidate:  't you that I crue; and sould thing pity '
+  reference:  'ter is to be brought by you to the suppe'
+BERTScore: 0.295
+  prompt:     'TRANIO:\nMistress Bia'
+  candidate:  "ntle of You man lantion's all path we ne"
+  reference:  "nca, bless you with such grace\nAs 'longe"
+BERTScore: 0.340
+  prompt:     'ARIEL:\nNot a soul\nBu'
+  candidate:  "t and oldied in that ther's do, chame; t"
+  reference:  "t felt a fever of the mad and play'd\nSom"
+BERTScore: 0.456
+  prompt:     'FERDINAND:\nYes, fait'
+  candidate:  'he duke men and quin; novatier,\nLest\nMy '
+  reference:  'h, and all his lords; the Duke of Milan\n'
+
+--- APPLES (median) ---
+BERTScore: 0.187
+  prompt:     'PETRUCHIO:\nNay, I to'
+  candidate:  ' apprel.$   Grembrave you priver event w'
+  reference:  'ld you your son was well beloved in Padu'
+BERTScore: 0.191
+  prompt:     "ADRIAN:\n'Widow Dido'"
+  candidate:  't a killare fame, of Laure thin you gory'
+  reference:  ' said you? you make me study of that:\nsh'
+BERTScore: 0.191
+  prompt:     'KATHARINA:\nI will be'
+  candidate:  '\nputate both that weak of my for said me'
+  reference:  ' angry: what hast thou to do?\nFather, be'
+BERTScore: 0.193
+  prompt:     'CURTIS:\nI prithee, g'
+  candidate:  "et have our ho, by cold\nBid 'Twas know m"
+  reference:  'ood Grumio, tell me, how goes the world?'
+BERTScore: 0.193
+  prompt:     'GRUMIO:\nA cold world'
+  candidate:  '. Writ, endlong sould you care forgot an'
+  reference:  ', Curtis, in every office but thine; and'
+
+--- LEMONS (lowest BERTScore) ---
+BERTScore: 0.134
+  prompt:     'KATHARINA:\nForward, '
+  candidate:  'his reath Tybalt true\nWhose\nUnless bushi'
+  reference:  'I pray, since we have come so far,\nAnd b'
+BERTScore: 0.148
+  prompt:     'BIONDELLO:\nThen thus'
+  candidate:  " what I'll blooks ble the with thy like "
+  reference:  '. Baptista is safe, talking with the\ndec'
+BERTScore: 0.149
+  prompt:     'GRUMIO:\nWhy, therefo'
+  candidate:  'r come here help Montain, the of this tu'
+  reference:  're fire; for I have caught extreme cold.'
+BERTScore: 0.149
+  prompt:     'MIRANDA:\nWhy speaks '
+  candidate:  'to that awhit year Sign like too?$   Gre'
+  reference:  'my father so ungently? This\nIs the third'
+BERTScore: 0.155
+  prompt:     'BIONDELLO:\nI cannot '
+  candidate:  'you, shred it in\nher,\nOr serves.\nI womac'
+  reference:  'tell; expect they are busied about a\ncou'

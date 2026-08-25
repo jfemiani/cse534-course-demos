@@ -110,11 +110,23 @@ evaluation first, since the lesson order was also reversed (see below).
   metrics are computed without adding new packages to the shared
   environment (`nltk` for BLEU/METEOR, a hand-written longest-common-
   subsequence for ROUGE-L, and a hand-written greedy cosine-similarity
-  match over `transformers`/`torch` embeddings for BERTScore).
+  match over `transformers`/`torch` embeddings for BERTScore). A third
+  demo (`03c_multi_metric_corpus`) reruns all four metrics at the scale of
+  the order sweep itself: for each order, it generates a continuation of
+  real held-out text and scores it against the true continuation, showing
+  that the order cross-entropy already favors (order 3) does not also win
+  on generation-quality metrics — a real instance of exposure bias, the
+  gap between an easy teacher-forced training signal and the harder
+  free-running generation task.
 - Gives LLM-as-judge its own section (`04_llm_judge`): a model judges the
   same three BLEU candidates directly and fully reverses BLEU's ranking,
   catching the wrong-room answer and crediting the correct paraphrase —
-  paired with the cost/reliability tradeoff of judging with a model.
+  paired with the cost/reliability tradeoff of judging with a model. A
+  companion demo (`04b_llm_judge_corpus`) reuses `03c`'s exact generation
+  setup and asks the same kind of judge to rate the generated
+  continuations at every order (70 real API calls total), confirming from
+  an independent direction that free-running generation stays weak
+  regardless of order.
 - Covers evaluating your own work: ablation studies (framed as working
   backwards from a baseline-then-educated-guesses build process, to prove
   each kept change mattered) and grid search (framed around combinatorial
