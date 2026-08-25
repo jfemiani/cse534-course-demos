@@ -47,5 +47,6 @@ None. Pure Python standard library — no API calls.
 ## Regeneration prompt
 
 If asked to change this demo, keep the same three strategies, the same
-syllabus excerpt, and the printed comparison that shows a fixed-size cut
-landing inside a sentence.
+syllabus excerpt, and the printed chunks that show a fixed-size cut landing
+inside a sentence. The explanation of what to notice in the output belongs
+on the Canvas page, not in a trailing `print()` in this script.

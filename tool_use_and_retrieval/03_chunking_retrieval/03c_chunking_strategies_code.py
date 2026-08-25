@@ -73,18 +73,3 @@ def show(label: str, chunks: list[str]) -> None:
 LINES_PER_CHUNK = 6
 show("1. Fixed-size, 6 lines per chunk", fixed_line_chunks(SAMPLE_CODE, LINES_PER_CHUNK))
 show("2. AST-aware, one function/class per chunk", ast_aware_chunks(SAMPLE_CODE))
-
-print(
-    "\nIn strategy 1, look at chunk 2 and chunk 3: `class_average`'s "
-    "signature, docstring, and empty-list check end up in chunk 2, while "
-    "its final `return` statement lands alone in chunk 3. Either half on "
-    "its own would embed and retrieve poorly. Strategy 2 never splits a "
-    "function or class, because it cuts on the source's own syntax tree "
-    "instead of a line count.\n"
-    "\nOpenAI's file_search auto-chunking strategy has no idea a .py file is "
-    "code; it applies the same token-count-and-overlap rule it would use on "
-    "a novel. For a codebase, an AST-aware pass like strategy 2 - or a "
-    "purpose-built code splitter such as LangChain's "
-    "RecursiveCharacterTextSplitter.from_language(Language.PYTHON) - should "
-    "happen before the files ever reach an embedding call."
-)

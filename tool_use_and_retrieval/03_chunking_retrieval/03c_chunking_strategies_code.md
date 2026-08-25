@@ -41,5 +41,7 @@ None. Pure Python standard library — no API calls.
 
 If asked to change this demo, keep the same sample module (two functions and
 a class), the fixed-line strategy, the AST-based strategy using
-`ast.get_source_segment`, and the printed comparison that shows a fixed-line
-cut landing inside a function body.
+`ast.get_source_segment`, and the printed chunks that show a fixed-line cut
+landing inside a function body. The explanation of what to notice in the
+output belongs on the Canvas page, not in a trailing `print()` in this
+script.

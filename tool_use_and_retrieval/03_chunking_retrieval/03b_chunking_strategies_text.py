@@ -87,16 +87,3 @@ show(
     fixed_size_chunks_with_overlap(SYLLABUS_EXCERPT, CHUNK_SIZE, overlap=20),
 )
 show("3. Recursive / structure-aware", recursive_chunks(SYLLABUS_EXCERPT, CHUNK_SIZE))
-
-print(
-    "\nLook at chunk [1] in strategy 1: it starts mid-sentence, splitting "
-    "'from 3:00pm to 4:20pm' from the fact it depends on. Strategy 3 never "
-    "does that, because it only cuts where a paragraph or sentence already "
-    "ends.\n"
-    "\nOpenAI's file_search tool defaults to a fixed-size strategy much like "
-    "strategy 2 above: 800-token chunks with 400 tokens of overlap. You can "
-    "override both numbers with a 'static' chunking_strategy when you "
-    "upload a file, but the tool does not offer paragraph- or "
-    "sentence-aware cutting - that is still something you would build "
-    "yourself, the way strategy 3 does here."
-)
