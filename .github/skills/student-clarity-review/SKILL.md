@@ -88,6 +88,32 @@ Common shift patterns to check for, in rough order of how much load they add:
   "evaluation"), and move any parenthetical to sit immediately next to the word it
   modifies. "Most evaluations that you will actually run day to day are extrinsic"
   is the corrected form.
+- **Premature specificity in a forward pointer**: a sentence that previews upcoming
+  content packs in details the reader cannot yet anchor to anything ("scored once
+  intrinsically... and again by four extrinsic metrics that require the model to
+  actually generate something first"). A count ("four"), a method label
+  ("intrinsically"), and a condition ("require... generate something first") are all
+  handed to the reader before the thing they describe exists on the page, so they sit
+  in memory as unverifiable claims to hold onto rather than facts to use. This is
+  compounded when the very next element on the page (a table, a worked example) shows
+  those same specifics concretely — the sentence is pre-narrating something that
+  narrates itself better on its own. The tell is a reaction like "why is this giving
+  me so much detail about what's coming, am I supposed to remember all this?" Fix by
+  cutting a preview sentence down to a bare pointer ("the rest of this page builds
+  exactly that comparison, starting with the order sweep from Table 1") and letting
+  the upcoming content carry its own specifics when the reader can actually see them.
+- **Strawman denial**: a sentence rebuts an assumption the reader never had, e.g.
+  "nobody re-derives BLEU or BERTScore from its paper before using it." The reader
+  was never wondering whether they'd need to implement a metric from scratch — that
+  possibility only enters the reader's mind *because the sentence denied it*. Unlike
+  a genuine misconception worth heading off, this denial responds to a question the
+  paragraph itself invented, so it reads as confusing rather than reassuring: the
+  reader stops to ask "wait, was that actually a thing I should have been worried
+  about?" The tell is the reader asking "why would you tell me this, why would I
+  think otherwise?" Fix by dropping the denial and stating the actual point plainly:
+  "every one of these has a mature library implementation you can call directly"
+  keeps the real information (these are off-the-shelf, not derived by hand) without
+  first raising a doubt that didn't exist.
 - **Point drift**: a sentence is true, well-written, and individually clear, but does
   not serve the paragraph's actual thesis. Every sentence in isolation can pass a
   register check and still leave the reader unable to say what the paragraph was
