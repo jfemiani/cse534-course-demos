@@ -78,9 +78,16 @@ Common shift patterns to check for, in rough order of how much load they add:
   with a wide subject-verb gap: an intervening parenthetical ("including almost
   everything left on this page") can sit far from both the subject and the verb it's
   meant to modify, so untangling the false parse and reconnecting subject-to-verb
-  become two separate repairs. Fix by restoring the relative pronoun explicitly
-  ("evaluation you will actually run") and moving any parenthetical to sit immediately
-  next to the word it modifies, not stranded between subject and verb.
+  become two separate repairs. A first-pass fix can still leave the "that" out
+  ("evaluation you will actually run" repeats the same ellipsis one word later) and
+  can leave a mass noun standing in for what is really a countable, pluralizable
+  thing, which silently breaks subject-verb agreement once the fix changes the
+  subject's number ("evaluation... is" needs to become "evaluations... are," not
+  stay singular). The full fix needs all three: restore "that" explicitly, use the
+  plural countable noun where the concept is actually countable ("evaluations," not
+  "evaluation"), and move any parenthetical to sit immediately next to the word it
+  modifies. "Most evaluations that you will actually run day to day are extrinsic"
+  is the corrected form.
 - **Point drift**: a sentence is true, well-written, and individually clear, but does
   not serve the paragraph's actual thesis. Every sentence in isolation can pass a
   register check and still leave the reader unable to say what the paragraph was
