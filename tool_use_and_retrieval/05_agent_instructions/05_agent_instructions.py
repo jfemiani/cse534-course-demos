@@ -2,37 +2,7 @@
 
 """Demo 5: SKILL.md instructions, dispatched into an agent-as-tool.
 
-See the Canvas page for the full explanation.
-
-This ties together the two ideas from the lesson:
-
-1. A SKILL.md is not a tool call. Only its short front-matter description is
-   read up front; the full body loads only once a task matches it (the same
-   keyword-overlap scoring used in the retrieval lesson stands in for that
-   matching step here).
-
-2. The winning skill's full body gets appended to a specialist agent's
-   ``instructions=`` string. That specialist is then wrapped with
-   ``Agent.as_tool()`` and handed to a manager agent, the pattern this
-   course's earlier agent-loop lessons used for a lookup function, applied
-   here to a block of prose instructions instead.
-
-The three example skills below (tldr_summary, add_hashtags,
-flag_unsupported_claims) are generic, publicly recognizable writing tasks,
-not this course's own production tooling, so the demo stands on its own
-outside this repo. The Reading section on the Canvas page links to public
-skill repositories where real SKILL.md files like these can be browsed.
-
-This is a teaching simplification: real coding assistants pick a skill using
-the model's own judgement together with the description field, not a fixed
-word-overlap score.
-
-Requires OPENAI_API_KEY; makes one real model call.
-
-If this demo needs updating, ask an LLM assistant: "Update this script to
-reflect how SKILL.md dispatch actually works in <tool name>, if it differs
-from simple keyword matching." Keep the scoring step and the as_tool() wiring
-visible.
+See 05_agent_instructions.md for the full explanation.
 """
 
 import os
