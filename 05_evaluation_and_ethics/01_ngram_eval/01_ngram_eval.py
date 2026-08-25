@@ -1,6 +1,8 @@
 """Demo: evaluating the module 3 n-gram model on text it never saw.
 
 See 01_ngram_eval.md for the full explanation.
+Compare with 01b_ngram_block_scores.py, which un-averages this demo's
+cross-entropy table down to individual blocks of text.
 """
 
 import math

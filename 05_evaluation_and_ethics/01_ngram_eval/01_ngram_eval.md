@@ -6,6 +6,9 @@ trained on, swept across a few different context lengths (the model's
 the one setting being varied, and the results table shows the tradeoff
 between it.
 
+Compare with `01b_ngram_block_scores.py`, which un-averages this table's
+cross-entropy down to individual blocks of held-out text.
+
 ## What the demo does
 
 1. Downloads the same Tiny Shakespeare corpus as

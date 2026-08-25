@@ -1,0 +1,10 @@
+exact match                    correct=True  quality=4/5
+                               reason: The student answer exactly matches the reference, including the day, time, building, and room number.
+
+good paraphrase, low overlap   correct=True  quality=4/5
+                               reason: The student answer accurately matches the reference: Tuesdays from 2 to 4 pm in Laws Hall room 205.
+
+wrong room, high overlap       correct=False quality=2/5
+                               reason: The day and time are correct, but the room number is wrong: the reference says Laws Hall room 205, while the student says room 305.
+
+

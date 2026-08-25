@@ -79,27 +79,37 @@ evaluation first, since the lesson order was also reversed (see below).
 
 ### 5.1 Module Overview ✅ (first cut)
 
-### 5.2 Evaluating LLMs ✅ (first cut)
+### 5.2 Evaluating LLMs ✅ (second cut)
 - Two threads under one "evaluation" umbrella: evaluating a model's raw
   capability (benchmarks) and evaluating your own design choices when
   building on top of a model (ablation studies, grid search).
-- Reuses the module 3 n-gram model and cross-entropy lesson: a new demo
+- Reuses the module 3 n-gram model and cross-entropy lesson: a demo
   (`01_ngram_eval`) holds out text, sweeps context length (order 2/4/8),
   and reports cross-entropy and perplexity — the course's first concrete
   grid search, and a real illustration of why a longer context can
   generalize worse to new text.
+- Immediately un-averages that table with a companion demo
+  (`01b_ngram_block_scores`): the best, median, and worst-scoring
+  individual block of held-out text (cherry, apple, lemon), showing what a
+  single averaged cross-entropy number hides — no "margin" concept needed
+  here, since a block's own cross-entropy already sorts cleanly.
 - Covers reading a results table like a research paper (arrow convention,
   bold-best/italic-second-best, and the real limitation that a lot of
   published tables are a single run with no significance testing).
-- Names real benchmark families (MMLU/MMLU-Pro, GSM8K/AIME, HumanEval/
-  SWE-bench, GPQA) without hardcoding scores, and links out to live
-  leaderboards (SWE-bench, and "MMLU leaderboard"/"livebench" as search
-  starting points) instead.
-- Covers LMArena (human head-to-head preference, Elo-style rating) as a
-  different kind of measurement from a correctness benchmark.
-- Covers benchmark contamination, citing Xu et al. 2024 (arXiv:2406.04244)
-  as a real survey of the problem, and LiveBench as one response to it.
-- Second worked ablation: a demo pair (`02a_retrieval_eval_hitrate`,
+- Introduces the zoo of automatic text-generation metrics right after that,
+  with a demo (`03_bleu_score`) showing BLEU reward a factually wrong,
+  high-overlap answer over a correct paraphrase, then a bulleted tour of
+  ROUGE, METEOR, exact-match/F1, and BERTScore.
+- Gives LLM-as-judge its own section (`04_llm_judge`): a model judges the
+  same three BLEU candidates directly and fully reverses BLEU's ranking,
+  catching the wrong-room answer and crediting the correct paraphrase —
+  paired with the cost/reliability tradeoff of judging with a model.
+- Covers evaluating your own work: ablation studies (framed as working
+  backwards from a baseline-then-educated-guesses build process, to prove
+  each kept change mattered) and grid search (framed around combinatorial
+  explosion and a hierarchical/greedy alternative, with an early pointer to
+  hyperparameter-optimization tooling like Optuna/Ray Tune/W&B Sweeps).
+  Worked example: a demo pair (`02a_retrieval_eval_hitrate`,
   `02b_retrieval_eval_examples`) measures hit-rate for vector, keyword, and
   hybrid retrieval on a small labeled test set built from the module 4
   chunking/retrieval demos, then looks past the aggregate number at the
@@ -107,13 +117,19 @@ evaluation first, since the lesson order was also reversed (see below).
   show that a hit-rate can hide a case where retrieval fails in a way a
   human would find obvious — and warns against only ever showing the
   cherry.
-- Introduces the zoo of automatic text-generation metrics (BLEU, ROUGE,
-  METEOR, exact-match/F1, BERTScore, LLM-as-judge), with a new demo
-  (`03_bleu_score`) showing BLEU reward a factually wrong, high-overlap
-  answer over a correct paraphrase.
+- Names real benchmark families (MMLU/MMLU-Pro, GSM8K/AIME, HumanEval/
+  SWE-bench, GPQA) without hardcoding scores, after the ablation/grid-search
+  section, and links out to live leaderboards (SWE-bench, and "MMLU
+  leaderboard"/"livebench" as search starting points) instead.
+- Covers LMArena (human head-to-head preference, Elo-style rating) as a
+  different kind of measurement from a correctness benchmark.
+- Covers benchmark contamination, citing Xu et al. 2024 (arXiv:2406.04244)
+  as a real survey of the problem, and LiveBench as one response to it.
 - Closes with links to OpenAI Evals, Anthropic's evaluation docs, and
   promptfoo/Langfuse as tools that automate this instead of hand-building
-  it every time.
+  it every time, including an illustrative (non-executed) promptfoo config
+  showing how much of the hand-rolled retrieval hit-rate demo a library
+  absorbs.
 
 ### 5.3 Ethics and Responsible AI ✅ (first cut)
 - Hard constraint followed throughout: every section poses an open

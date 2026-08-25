@@ -11,10 +11,14 @@ Work through these in order.
 ## Demos
 
 1. [N-gram evaluation](01_ngram_eval) — the module 3 n-gram model, scored on
-   text it never trained on. Cross-entropy, perplexity, and a grid search
-   over context length (`ORDER = 2, 4, 8`), showing the tradeoff between a
-   short context that has seen almost everything and a long context that
-   often has not.
+   text it never trained on. `01_ngram_eval.py` computes cross-entropy,
+   perplexity, and a grid search over context length
+   (`ORDER = 2, 4, 8`), showing the tradeoff between a short context that
+   has seen almost everything and a long context that often has not.
+   `01b_ngram_block_scores.py` un-averages that table down to individual
+   blocks of held-out text: the best, median, and worst-scoring block
+   (cherry, apple, and lemon), showing what a single averaged cross-entropy
+   number hides.
 2. [Retrieval evaluation](02_retrieval_eval) — an ablation study on a small
    RAG pipeline. `02a_retrieval_eval_hitrate.py` measures vector search,
    keyword search, and a hybrid against a labeled set of test questions,
@@ -26,6 +30,10 @@ Work through these in order.
    factually wrong near-copy against a reference sentence with the BLEU
    metric, showing how a word-overlap metric can reward the wrong answer
    over the right one.
+4. [LLM-as-judge](04_llm_judge) — asks a model to judge the same three
+   candidates BLEU just scored, directly, instead of counting overlapping
+   words. The judge reverses BLEU's ranking, catching the factually wrong
+   candidate and crediting the correct paraphrase.
 
 Each demo folder contains one Python file. The file's docstring points to a
 companion `.md` file of the same name, which carries the full concept, any
@@ -33,8 +41,10 @@ API it depends on, and a regeneration prompt an LLM assistant can use if
 the underlying API changes.
 
 Demo 1 makes no API calls; it downloads a public text file and does the
-counting locally. Demos 2a and 2b call the OpenAI Embeddings API. Demo 3
-makes no API calls; it uses `nltk`'s BLEU implementation locally.
+counting locally, including its block-level companion. Demos 2a and 2b call
+the OpenAI Embeddings API. Demo 3 makes no API calls; it uses `nltk`'s BLEU
+implementation locally. Demo 4 calls the OpenAI API for structured-output
+judgments.
 
 Follow the Canvas lesson for setup, exact run instructions, and links to
 the benchmarks, leaderboards, and evaluation tools this module points to.

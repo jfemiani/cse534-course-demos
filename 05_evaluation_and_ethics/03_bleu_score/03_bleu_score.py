@@ -1,6 +1,8 @@
 """Demo: BLEU rewards word overlap, not correctness. Watch it get fooled.
 
 See 03_bleu_score.md for the full explanation.
+Compare with 04_llm_judge.py, which asks a model to judge the same three
+candidates directly instead of counting overlapping words.
 """
 
 from nltk.translate.bleu_score import SmoothingFunction, sentence_bleu

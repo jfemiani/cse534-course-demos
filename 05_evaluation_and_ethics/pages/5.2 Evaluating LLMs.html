@@ -6,8 +6,19 @@
 <p>Lesson 3.5 built an n-gram model. It predicts the next character from the last few characters it has seen. That context length is called the model's <strong>order</strong>. Until now, you only watched it generate text. This demo does something different. It holds out some text the model never trained on. Then it measures cross-entropy on that held-out text instead.</p>
 <p>Cross-entropy is measured in bits, which is not the most intuitive unit. A second, more readable number is <strong>perplexity</strong>. This lesson uses the convention perplexity = 2 raised to the cross-entropy, when cross-entropy is measured in bits. (If you see cross-entropy reported in nats instead of bits, the matching formula is perplexity = e raised to the cross-entropy. Either convention is standard, and equivilent as long as the base of the logarithm and the exponent match.) A perplexity of 8 means the model is, on average, about as unsure as if it were guessing uniformly among 8 equally likely next characters.</p>
 <p>The demo below trains the n-gram model three times, once for each of three orders. Each time, it reports cross-entropy and perplexity on the same held-out text. Varying one setting and comparing the results is already a small controlled comparison: order is the one parameter being swept, and nothing else changes between runs. Later in this lesson, that same idea gets a name: a <strong>grid search</strong>.</p>
-<p><a href="https://github.com/jfemiani/cse534-course-demos/blob/master/05_evaluation_and_ethics/01_ngram_eval/01_ngram_eval.py" target="_blank">01_ngram_eval.py (full source on GitHub)</a></p>
-<p><iframe style="width: 100%; height: 700px;" title="01_ngram_eval.py: cross-entropy and perplexity on held-out text, swept over context length" src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2F05_evaluation_and_ethics%2F01_ngram_eval%2F01_ngram_eval.py&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on" loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<p>The code below is available in full on GitHub at <a href="https://github.com/jfemiani/cse534-course-demos/blob/master/05_evaluation_and_ethics/01_ngram_eval/01_ngram_eval.py" target="_blank"><code>01_ngram_eval.py</code></a>; we'll walk through the parts that matter.</p>
+<p>The part worth reading closely is what happens when a context has never been seen before: instead of crashing or guessing zero, the model falls back to a small floor probability. That fallback is what turns a rare context into an expensive surprise later in this page.</p>
+<p><iframe
+  src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2F05_evaluation_and_ethics%2F01_ngram_eval%2F01_ngram_eval.py%23L37-L43&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on"
+  style="width: min(100%, 750px); height: 220px; border: 0;"
+  title="01_ngram_eval.py: falling back to a floor probability on an unseen context"
+  loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<p>The sweep itself is a short loop: train fresh counts at each order, evaluate cross-entropy and miss rate on the same held-out blocks, and convert to perplexity.</p>
+<p><iframe
+  src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2F05_evaluation_and_ethics%2F01_ngram_eval%2F01_ngram_eval.py%23L71-L75&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on"
+  style="width: min(100%, 750px); height: 180px; border: 0;"
+  title="01_ngram_eval.py: sweeping order and printing the table"
+  loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
 <p>Here is one run of that demo, trained and evaluated on the same public-domain text used in lesson 3.5:</p>
 <table style="border-collapse: collapse; width: 100%;">
 <thead>
@@ -25,35 +36,112 @@
 <tr><td style="border: 1px solid #ccc; padding: 6px;">8</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">548,803</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">61.4%</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">8.517</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">366.28</td></tr>
 </tbody>
 </table>
-<p>Read the "miss rate" column first. It says how often the held-out text contained a context the model never saw during training. At order 2, almost every two-character context has already shown up during training, so the miss rate stays low. At order 8, most eight-character contexts in new text are new to the model, so the miss rate climbs past 60%. When the model misses, it falls back to a small floor probability instead of a confident guess. That fallback is expensive. A wrong guess made with high confidence produces a large surprise. That is exactly the point lesson 3.4 made about surprise and rare events. This is why order 8's perplexity is so much worse here, even though it "knows more" in the sense of having memorized far more contexts. A short context generalizes. A long context memorizes, and text it has not memorized breaks it.</p>
+<p>One note before moving on: order 8's miss rate — how often a held-out context was never seen in training — climbs past 60%, and every miss falls back to the same small floor probability instead of a confident guess. A wrong guess made with high confidence produces a large surprise, which is exactly why order 8's perplexity is so much worse here even though it has memorized far more contexts than order 2 or 4. A short context generalizes; a long context memorizes, and text it has not memorized breaks it.</p>
+
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Cherries, apples, and lemons: what a single average hides</h2>
+<p>The table above reports one cross-entropy number for order 8, averaged over 723 held-out blocks. A second demo un-averages that number: it scores every held-out block on its own and sorts the results, so you can look at the best, the median, and the worst block directly, as actual text instead of a single figure. The code is available in full on GitHub at <a href="https://github.com/jfemiani/cse534-course-demos/blob/master/05_evaluation_and_ethics/01_ngram_eval/01b_ngram_block_scores.py" target="_blank"><code>01b_ngram_block_scores.py</code></a>; it reuses this demo's own training and probability logic, one block at a time.</p>
+<p>Scoring one block needs nothing beyond the cross-entropy already defined above — there is no extra "margin" idea to introduce here, unlike a ranking-based comparison. Sorting by that score directly is what turns "best," "typical," and "worst" into an exact position in a list instead of a judgment call.</p>
+<p><iframe
+  src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2F05_evaluation_and_ethics%2F01_ngram_eval%2F01b_ngram_block_scores.py%23L44-L53&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on"
+  style="width: min(100%, 750px); height: 260px; border: 0;"
+  title="01b_ngram_block_scores.py: one block's own cross-entropy"
+  loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<p><iframe
+  src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2F05_evaluation_and_ethics%2F01_ngram_eval%2F01b_ngram_block_scores.py%23L66-L69&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on"
+  style="width: min(100%, 750px); height: 160px; border: 0;"
+  title="01b_ngram_block_scores.py: sorting blocks and picking the cherry, apple, and lemon"
+  loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<p>One run of that demo, at order 8, produced this:</p>
+<table style="border-collapse: collapse; width: 100%;">
+<thead>
+<tr style="background-color: #f2f2f2;">
+<th style="border: 1px solid #ccc; padding: 6px; text-align: left;">example</th>
+<th style="border: 1px solid #ccc; padding: 6px; text-align: left;">text</th>
+<th style="border: 1px solid #ccc; padding: 6px; text-align: right;">cross-entropy (bits) &darr;</th>
+<th style="border: 1px solid #ccc; padding: 6px; text-align: right;">perplexity &darr;</th>
+</tr>
+</thead>
+<tbody>
+<tr><td style="border: 1px solid #ccc; padding: 6px;"><strong>cherry</strong></td><td style="border: 1px solid #ccc; padding: 6px;">"PETRUCHIO: What is his name?"</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;"><strong>1.011</strong></td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;"><strong>2.02</strong></td></tr>
+<tr><td style="border: 1px solid #ccc; padding: 6px;"><strong>apple</strong></td><td style="border: 1px solid #ccc; padding: 6px;">"TRANIO: O, sir, Lucentio slipp'd me like his greyhound, Which runs himself and catches for his master."</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">8.335</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">322.92</td></tr>
+<tr><td style="border: 1px solid #ccc; padding: 6px;"><strong>lemon</strong></td><td style="border: 1px solid #ccc; padding: 6px;">"GONZALO: Not since widow Dido's time."</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">13.047</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">8465.99</td></tr>
+</tbody>
+</table>
+<p>The cherry is a short, formulaic line built almost entirely out of common eight-character sequences the model saw constantly during training — the order-8 model at its absolute best, and nothing like the corpus-wide average of 8.517 bits. The apple, a longer and less formulaic sentence, is already far closer to that average than the cherry is: most real text looks more like the apple than the cherry. The lemon is short, but it names "Dido," a proper noun this context barely saw during training, so the model falls back to the floor probability again and again inside those few characters. Its cross-entropy is more than ten times the cherry's, and its perplexity is over 8,000. This is the same "expensive wrong guess" mechanism the note above already named — a rare token inside a long context — but seeing the actual sentence makes it concrete: the failure is not an abstract statistical artifact, it is one specific name the model had barely seen.</p>
 
 <h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Reading a results table like a researcher</h2>
 <p>The table above already uses two conventions you will see in almost every AI paper. Look at the column headers again. The down arrow (&darr;) next to cross-entropy and perplexity means lower is better for that column. An up arrow (&uarr;) would mean the opposite: higher is better. You will usually see accuracy or a benchmark score reported that way. A reader should never have to guess which direction is good; the arrow says it directly.</p>
 <p>Now look at the numbers themselves. The best value in a column is bolded. The second-best is italicized. This lets a reader scan a large table full of numbers and immediately spot the winner in each column. They do not have to read every cell.</p>
 <p>Here is the limitation this convention hides. A single run, like the one in the table above, is one sample. If you retrained the order-2 and order-4 models with a different train/held-out split, the two perplexity numbers might swap places, because they are close. Checking whether a small difference is a real improvement, or just noise, means running a large model many times. That is often too expensive to actually do. That is why a lot of published tables report a single run's numbers with no error bars at all. Treat a difference of a point or two on a benchmark table as informative, but not as proof that one model is truly better than another. This is a real limitation of how the field reports results, not a trick question.</p>
 
-<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Benchmarks for large, frontier models</h2>
-<p>The n-gram model above is small enough to evaluate by hand. The large models you use through an API are evaluated with standardized tests called benchmarks. A few benchmark families come up constantly. You should recognize their names, even though this page will not give you specific scores. Scores from large models change every few months. Any number printed here would be out of date within a year.</p>
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">A zoo of automatic metrics</h2>
+<p>Cross-entropy and perplexity are two metrics out of a much larger set that shows up constantly in papers and leaderboards. The most common one for scoring generated text against a reference answer is <strong>BLEU</strong>, borrowed from machine translation. BLEU counts overlapping runs of words between a candidate and a reference; it has no idea what the words mean. The code below is available in full on GitHub at <a href="https://github.com/jfemiani/cse534-course-demos/blob/master/05_evaluation_and_ethics/03_bleu_score/03_bleu_score.py" target="_blank"><code>03_bleu_score.py</code></a>; the part worth reading is the scoring loop itself.</p>
+<p>The three candidates are chosen to expose exactly what BLEU cannot see: a correct paraphrase that shares almost no words with the reference, and a factually wrong sentence that shares almost every word.</p>
+<p><iframe
+  src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2F05_evaluation_and_ethics%2F03_bleu_score%2F03_bleu_score.py%23L8-L20&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on"
+  style="width: min(100%, 750px); height: 480px; border: 0;"
+  title="03_bleu_score.py: scoring three candidates against one reference"
+  loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<p>One run of that demo produced this:</p>
+<table style="border-collapse: collapse; width: 100%;">
+<thead>
+<tr style="background-color: #f2f2f2;">
+<th style="border: 1px solid #ccc; padding: 6px; text-align: left;">candidate</th>
+<th style="border: 1px solid #ccc; padding: 6px; text-align: right;">BLEU &uarr;</th>
+</tr>
+</thead>
+<tbody>
+<tr><td style="border: 1px solid #ccc; padding: 6px;">exact match</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;"><strong>1.000</strong></td></tr>
+<tr><td style="border: 1px solid #ccc; padding: 6px;">wrong room, high overlap</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;"><em>0.919</em></td></tr>
+<tr><td style="border: 1px solid #ccc; padding: 6px;">good paraphrase, low overlap</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">0.078</td></tr>
+</tbody>
+</table>
+<p>Read that middle row carefully: a sentence with the wrong room number scores nearly as high as an exact match, while a correct paraphrase scores far lower than either. BLEU rewarded the wrong answer over the right one, for the same reason the lemon above happened: a metric can be precisely defined and consistently computed while still measuring something other than "is this actually a good answer." This is not a reason to distrust every metric equally, but it is a reason to know which metric you are reading and what it can and cannot see before treating its number as the last word.</p>
+<p>BLEU is one entry in a larger zoo, each trading off cost, speed, and how closely it tracks human judgment. This page will not go further into how each one is computed; the names and what they are for are enough to recognize them when a paper or leaderboard reports one:</p>
 <ul>
-<li><strong>MMLU and MMLU-Pro</strong> test broad academic knowledge across many subjects, from history to physics.</li>
-<li><strong>GSM8K and AIME</strong> test math, from grade-school word problems to olympiad-level competition problems.</li>
-<li><strong>HumanEval and SWE-bench</strong> test code. HumanEval checks whether a model can write a short function correctly. SWE-bench checks whether a model can fix a real bug in a real open-source codebase.</li>
-<li><strong>GPQA</strong> tests graduate-level science questions, written to be hard to answer by search alone.</li>
+<li><strong>ROUGE</strong> scores n-gram and longest-common-subsequence <em>recall</em> instead of precision. Standard for summarization, where the question is closer to "did the summary keep the important parts" than "did it use the exact same words."</li>
+<li><strong>METEOR</strong> matches synonyms and word stems instead of requiring an exact string match, specifically to reduce the paraphrase problem the table above shows.</li>
+<li><strong>Exact match / F1</strong> is standard for extractive question answering (e.g. the SQuAD benchmark), where the answer is a short span of text pulled directly from a document rather than a free-form generated sentence.</li>
+<li><strong>BERTScore</strong> replaces word overlap with embedding similarity between candidate and reference tokens, so a correct paraphrase scores well instead of being penalized the way it is here.</li>
 </ul>
-<p>Rather than memorize numbers, look them up yourself when you need them. <a href="https://www.swebench.com/" target="_blank" rel="noopener">SWE-bench's leaderboards</a> are a live example of a benchmark leaderboard you can check right now. Searching "MMLU leaderboard" or "livebench" will turn up other current comparisons. A table printed on this page would already be stale by the time you read it.</p>
+<p>No single metric here is "the" right one. Knowing which metric a paper or leaderboard reports, and what that metric is blind to, matters as much as the number itself. One more approach to this same problem is different enough from all of the above that it gets its own section next.</p>
 
-<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">A different kind of leaderboard: head-to-head human judgment</h2>
-<p><a href="https://lmarena.ai" target="_blank" rel="noopener">LMArena</a> (formerly known as LMSYS Chatbot Arena) measures something a benchmark cannot. A person is shown two anonymous answers to the same prompt, side by side, with no model names attached. The person picks the answer they prefer, or calls it a tie. Votes accumulate into a rating using the same Elo system used to rank chess players.</p>
-<p>Notice what this measures. Compare it to what MMLU or GSM8K measure. Those benchmarks check whether an answer is factually or formally correct. LMArena checks whether people liked the answer better. That is a different question. A model can rank differently on the two kinds of leaderboard. Being correct and being preferred are not the same thing.</p>
-
-<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Benchmarks go stale</h2>
-<p>A benchmark's questions eventually end up online. Once that happens, those questions can get scraped into the training data of the next model. If that happens, a high score on the benchmark might mean the model memorized the answer, not that it solved the problem. This is called <strong>benchmark contamination</strong>. It is a documented, studied problem, not a rumor. See Xu et al., <a href="https://arxiv.org/abs/2406.04244" target="_blank" rel="noopener">"Benchmark Data Contamination of Large Language Models: A Survey"</a> (2024) for a real, citable overview of how this happens and how researchers try to detect it.</p>
-<p>One response to this problem is to keep rotating in new questions instead of keeping a benchmark fixed forever. <a href="https://livebench.ai" target="_blank" rel="noopener">LiveBench</a> is built this way. The idea is that a benchmark's newest questions have not had time to leak into anyone's training data yet.</p>
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">LLM-as-judge: asking a model instead of counting words</h2>
+<p>Every metric above works from the outside: it counts overlapping words or subsequences and never actually reads the candidate for meaning. <strong>LLM-as-judge</strong> replaces the formula entirely. A separate model reads the question, the reference answer, and the candidate, and reports a judgment directly. The code below is available in full on GitHub at <a href="https://github.com/jfemiani/cse534-course-demos/blob/master/05_evaluation_and_ethics/04_llm_judge/04_llm_judge.py" target="_blank"><code>04_llm_judge.py</code></a>; it judges the exact same three candidates BLEU just scored.</p>
+<p>The judgment itself is a small structured-output object, the same pattern "Demo 6: Structured Output with Pydantic" used back in module 2: a boolean for whether the answer is correct, a 1-to-5 quality score, and a one-sentence reason, so the result is something you can put in a table instead of free text you have to re-read every time.</p>
+<p><iframe
+  src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2F05_evaluation_and_ethics%2F04_llm_judge%2F04_llm_judge.py%23L25-L28&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on"
+  style="width: min(100%, 750px); height: 140px; border: 0;"
+  title="04_llm_judge.py: the structured judgment returned for each candidate"
+  loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<p>The prompt is where the strictness actually comes from: it tells the judge model explicitly to check factual details like room numbers, rather than trusting it to notice on its own.</p>
+<p><iframe
+  src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2F05_evaluation_and_ethics%2F04_llm_judge%2F04_llm_judge.py%23L31-L44&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on"
+  style="width: min(100%, 750px); height: 340px; border: 0;"
+  title="04_llm_judge.py: asking the model to judge one candidate"
+  loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<p>One run of that demo produced this:</p>
+<table style="border-collapse: collapse; width: 100%;">
+<thead>
+<tr style="background-color: #f2f2f2;">
+<th style="border: 1px solid #ccc; padding: 6px; text-align: left;">candidate</th>
+<th style="border: 1px solid #ccc; padding: 6px; text-align: right;">BLEU &uarr;</th>
+<th style="border: 1px solid #ccc; padding: 6px; text-align: left;">judge: correct?</th>
+<th style="border: 1px solid #ccc; padding: 6px; text-align: right;">judge: quality &uarr;</th>
+</tr>
+</thead>
+<tbody>
+<tr><td style="border: 1px solid #ccc; padding: 6px;">exact match</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;"><strong>1.000</strong></td><td style="border: 1px solid #ccc; padding: 6px;">yes</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">4/5</td></tr>
+<tr><td style="border: 1px solid #ccc; padding: 6px;">wrong room, high overlap</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;"><em>0.919</em></td><td style="border: 1px solid #ccc; padding: 6px;"><strong>no</strong></td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">2/5</td></tr>
+<tr><td style="border: 1px solid #ccc; padding: 6px;">good paraphrase, low overlap</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">0.078</td><td style="border: 1px solid #ccc; padding: 6px;"><strong>yes</strong></td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">4/5</td></tr>
+</tbody>
+</table>
+<p>Look at the two bolded cells. The judge calls the wrong-room candidate incorrect and names the exact reason (the room number does not match), even though BLEU gave it a near-perfect 0.919. The judge calls the good paraphrase correct, the same quality score as the exact match, even though BLEU gave it only 0.078. That is a full reversal of BLEU's ranking, and it happened because the judge reads for meaning instead of counting words. This is not free: every judgment here is a full model call, slower and more expensive than a formula, and only as good as the model doing the judging. A weaker judge model or a vaguer prompt can miss the same mistake a strong judge just caught. That tradeoff is why word-overlap metrics like BLEU still get used alongside LLM-as-judge instead of being replaced by it.</p>
 
 <h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Evaluating your own work: ablation studies and grid search</h2>
-<p>Benchmarks measure a model. Most of the time, you are not evaluating a whole model. You are evaluating a choice you made while building something on top of one. Two ideas cover almost every version of this.</p>
-<p>An <strong>ablation study</strong> removes or changes one piece of a system. Then it re-measures the result, to find out what that piece was actually contributing. Maybe you added a sentence to a prompt because you thought it helped. An ablation study means running the system with and without that sentence. Then you check whether the results actually changed.</p>
-<p>A <strong>grid search</strong> tries combinations of settings systematically, to find the best combination instead of guessing one. The n-gram demo above already did this with one setting: order. A grid search can sweep more than one setting at once, checking every combination.</p>
+<p>Benchmarks measure a model on its own. Most of the time, you are not evaluating a whole model — you are evaluating a choice you made while building something on top of one. Two ideas cover almost every version of this: the ablation study and the grid search.</p>
+<p>An <strong>ablation study</strong> removes or changes one piece of a system, then re-measures the result to find out what that piece was actually contributing. Maybe you added a sentence to a prompt because you thought it helped. An ablation study means running the system with and without that sentence, then checking whether the results actually changed. In practice, an ablation study usually runs backwards from how the system was actually built. Most projects start from a baseline — often someone else's published result — partly just to prove you can reproduce it and get a working system running before sticking your neck out too far. From there, a system improves through a series of educated guesses: try something, keep it if it helps, drop it if it doesn't. An ablation study is how you prove that story to somebody else afterward: for each guess you kept, show the result with it and without it, so a skeptical reader does not have to take your word for which changes actually mattered.</p>
+<p>A <strong>grid search</strong> tries combinations of settings systematically, to find the best combination instead of guessing one. The n-gram demo above already did this with one setting: order. A grid search can sweep more than one setting at once, checking every combination — but the size of that grid grows exponentially with the number of settings you want to explore. Three settings with four values each is 64 combinations to run; five settings with four values each is over a thousand. Because of that, a full grid search over everything you are unsure about is rarely what actually gets run. A common compromise is a <strong>hierarchical</strong> (or greedy) search: fix your best guess for most settings, sweep only the one you are least confident about, lock in whatever wins, then sweep the next setting you are least sure of. This costs far less than a full grid, at the price of never checking combinations the hierarchy skips over. This general problem — searching over the settings a model or pipeline exposes — is usually called <strong>hyperparameter optimization</strong>, and libraries such as Optuna and Ray Tune automate smarter-than-grid strategies (e.g. Bayesian search) instead of the exhaustive or hand-rolled hierarchical sweep described here.</p>
 <p>Here is a second worked example, pulled from module 4. Which retrieval strategy actually works best for a small collection of documents: vector search, keyword search, or a hybrid of the two? Instead of guessing, this demo builds a small labeled test set: six questions, each paired with the one document that answers it. It measures <strong>hit-rate</strong>: how often the correct document showed up in the top results. The code below is available in full on GitHub at <a href="https://github.com/jfemiani/cse534-course-demos/blob/master/05_evaluation_and_ethics/02_retrieval_eval/02a_retrieval_eval_hitrate.py" target="_blank"><code>02a_retrieval_eval_hitrate.py</code></a>; we'll walk through the parts that matter.</p>
 <p>The documents and questions are the test set itself, so getting them right matters more than any code around them. Each question names the exact index of the one document that should answer it, which is what turns "does this look about right" into something you can actually count.</p>
 <p><iframe
@@ -117,38 +205,23 @@
 <p>The cherry is a clean win: the correct document is close to a paraphrase of the question. The apple still wins, but barely — this is closer to what most of the "hits" behind that 0.83 actually looked like than the cherry is. The lemon is the one genuine miss behind that same 0.83: for a plain question about attendance, vector search's top pick was a sentence about a lab assignment code, and the sentence that actually answers the question ranked third. No person reading both sentences would make that mistake. This is what the section title means by "a hit-rate hides individual examples": the number said 0.83, and 0.83 is true, but it does not tell you that vector search failed here in a way a human would find obviously wrong. A measurement can be accurate and still do a poor job matching human judgment.</p>
 <p>Notice the temptation sitting right here: it would have been easy to only show the cherry above, and this page would still be telling the truth, in the narrow sense that the cherry really did happen. That is <strong>cherry-picking</strong> — reporting your best example instead of a representative one — and it is a real risk in your own reports, not just a hypothetical one. It is worth developing the habit of asking, of your own results and of anyone else's: "is this the typical case, or is this the cherry?" A demo, a blog post, or a paper that shows only glowing examples earns exactly that suspicion.</p>
 
-<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">A zoo of automatic metrics</h2>
-<p>Hit-rate and perplexity are two metrics out of a much larger set that shows up constantly in papers and leaderboards. The most common one for scoring generated text against a reference answer is <strong>BLEU</strong>, borrowed from machine translation. BLEU counts overlapping runs of words between a candidate and a reference; it has no idea what the words mean. The code below is available in full on GitHub at <a href="https://github.com/jfemiani/cse534-course-demos/blob/master/05_evaluation_and_ethics/03_bleu_score/03_bleu_score.py" target="_blank"><code>03_bleu_score.py</code></a>; the part worth reading is the scoring loop itself.</p>
-<p>The three candidates are chosen to expose exactly what BLEU cannot see: a correct paraphrase that shares almost no words with the reference, and a factually wrong sentence that shares almost every word.</p>
-<p><iframe
-  src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2F05_evaluation_and_ethics%2F03_bleu_score%2F03_bleu_score.py%23L8-L20&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on"
-  style="width: min(100%, 750px); height: 480px; border: 0;"
-  title="03_bleu_score.py: scoring three candidates against one reference"
-  loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
-<p>One run of that demo produced this:</p>
-<table style="border-collapse: collapse; width: 100%;">
-<thead>
-<tr style="background-color: #f2f2f2;">
-<th style="border: 1px solid #ccc; padding: 6px; text-align: left;">candidate</th>
-<th style="border: 1px solid #ccc; padding: 6px; text-align: right;">BLEU &uarr;</th>
-</tr>
-</thead>
-<tbody>
-<tr><td style="border: 1px solid #ccc; padding: 6px;">exact match</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;"><strong>1.000</strong></td></tr>
-<tr><td style="border: 1px solid #ccc; padding: 6px;">wrong room, high overlap</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;"><em>0.919</em></td></tr>
-<tr><td style="border: 1px solid #ccc; padding: 6px;">good paraphrase, low overlap</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">0.078</td></tr>
-</tbody>
-</table>
-<p>Read that middle row carefully: a sentence with the wrong room number scores nearly as high as an exact match, while a correct paraphrase scores far lower than either. BLEU rewarded the wrong answer over the right one, for the same reason the lemon above happened: a metric can be precisely defined and consistently computed while still measuring something other than "is this actually a good answer." This is not a reason to distrust every metric equally, but it is a reason to know which metric you are reading and what it can and cannot see before treating its number as the last word.</p>
-<p>BLEU is one entry in a larger zoo, each trading off cost, speed, and how closely it tracks human judgment:</p>
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Benchmarks for large, frontier models</h2>
+<p>Everything above evaluated something small enough to build and measure by hand. The large models you use through an API are evaluated with standardized tests called benchmarks instead. A few benchmark families come up constantly. You should recognize their names, even though this page will not give you specific scores. Scores from large models change every few months. Any number printed here would be out of date within a year.</p>
 <ul>
-<li><strong>ROUGE</strong> scores n-gram and longest-common-subsequence <em>recall</em> instead of precision. Standard for summarization, where the question is closer to "did the summary keep the important parts" than "did it use the exact same words."</li>
-<li><strong>METEOR</strong> matches synonyms and word stems instead of requiring an exact string match, specifically to reduce the paraphrase problem the table above shows.</li>
-<li><strong>Exact match / F1</strong> is standard for extractive question answering (e.g. the SQuAD benchmark), where the answer is a short span of text pulled directly from a document rather than a free-form generated sentence.</li>
-<li><strong>BERTScore</strong> replaces word overlap with embedding similarity between candidate and reference tokens, so a correct paraphrase scores well instead of being penalized the way it is here.</li>
-<li><strong>LLM-as-judge</strong> replaces the formula entirely: a separate, usually stronger, model reads the candidate and reference and scores or ranks the answer. It tracks human judgment more closely than word-overlap metrics, at the cost of being slower, more expensive, and dependent on whichever model is doing the judging.</li>
+<li><strong>MMLU and MMLU-Pro</strong> test broad academic knowledge across many subjects, from history to physics.</li>
+<li><strong>GSM8K and AIME</strong> test math, from grade-school word problems to olympiad-level competition problems.</li>
+<li><strong>HumanEval and SWE-bench</strong> test code. HumanEval checks whether a model can write a short function correctly. SWE-bench checks whether a model can fix a real bug in a real open-source codebase.</li>
+<li><strong>GPQA</strong> tests graduate-level science questions, written to be hard to answer by search alone.</li>
 </ul>
-<p>No single metric here is "the" right one. Knowing which metric a paper or leaderboard reports, and what that metric is blind to, matters as much as the number itself.</p>
+<p>Rather than memorize numbers, look them up yourself when you need them. <a href="https://www.swebench.com/" target="_blank" rel="noopener">SWE-bench's leaderboards</a> are a live example of a benchmark leaderboard you can check right now. Searching "MMLU leaderboard" or "livebench" will turn up other current comparisons. A table printed on this page would already be stale by the time you read it.</p>
+
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">A different kind of leaderboard: head-to-head human judgment</h2>
+<p><a href="https://lmarena.ai" target="_blank" rel="noopener">LMArena</a> (formerly known as LMSYS Chatbot Arena) measures something a benchmark cannot. A person is shown two anonymous answers to the same prompt, side by side, with no model names attached. The person picks the answer they prefer, or calls it a tie. Votes accumulate into a rating using the same Elo system used to rank chess players.</p>
+<p>Notice what this measures. Compare it to what MMLU or GSM8K measure. Those benchmarks check whether an answer is factually or formally correct. LMArena checks whether people liked the answer better. That is a different question, close to the one the LLM-as-judge demo above asked, except here the judge is a person instead of a model. A model can rank differently on the two kinds of leaderboard. Being correct and being preferred are not the same thing.</p>
+
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Benchmarks go stale</h2>
+<p>A benchmark's questions eventually end up online. Once that happens, those questions can get scraped into the training data of the next model. If that happens, a high score on the benchmark might mean the model memorized the answer, not that it solved the problem. This is called <strong>benchmark contamination</strong>. It is a documented, studied problem, not a rumor. See Xu et al., <a href="https://arxiv.org/abs/2406.04244" target="_blank" rel="noopener">"Benchmark Data Contamination of Large Language Models: A Survey"</a> (2024) for a real, citable overview of how this happens and how researchers try to detect it.</p>
+<p>One response to this problem is to keep rotating in new questions instead of keeping a benchmark fixed forever. <a href="https://livebench.ai" target="_blank" rel="noopener">LiveBench</a> is built this way. The idea is that a benchmark's newest questions have not had time to leak into anyone's training data yet.</p>
 
 
 <h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Tools that do this for you</h2>
@@ -158,6 +231,24 @@
 <li>Anthropic publishes its own <a href="https://docs.anthropic.com/en/docs/test-and-evaluate/develop-tests" target="_blank" rel="noopener">guidance on building evaluations</a>, including tooling built into the Anthropic Console.</li>
 <li><a href="https://www.promptfoo.dev/" target="_blank" rel="noopener">promptfoo</a> is a widely used open-source tool for testing and comparing prompts and models side by side. Tools like <a href="https://langfuse.com/" target="_blank" rel="noopener">Langfuse</a> add tracing on top of that, so you can see exactly what a multi-step agent did before it produced a given answer.</li>
 </ul>
+<p>Every demo on this page was written by hand, on purpose: seeing the margin calculation, the cross-entropy formula, or the BLEU loop written out is what makes it possible to say exactly what a metric can and cannot see. But it is worth seeing, at least once, how much of that hand-written code a library like promptfoo would absorb. Our most significant demo on this page is the retrieval hit-rate comparison (<code>02a_retrieval_eval_hitrate.py</code>): a loop over six test questions, each checked against vector, keyword, and hybrid search, with hits and misses tallied by hand into the table shown earlier. The same idea, expressed as a promptfoo config instead of a Python loop, looks roughly like this (illustrative only &mdash; not run for this page):</p>
+<pre style="background-color: #f2f2f2; padding: 10px; overflow-x: auto;"><code>providers:
+  - file://retrieve.py   # wraps whatever search strategy you're testing: vector, keyword, or hybrid
+
+tests:
+  - vars:
+      query: "What is the assignment code for LAB-4071?"
+    assert:
+      - type: contains
+        value: "LAB-4071"
+  - vars:
+      query: "When can I stop by without an appointment?"
+    assert:
+      - type: contains
+        value: "office hours"
+  # ...one test case per question, one assert per expected document</code></pre>
+<p>Running <code>promptfoo eval</code> against a config like this checks every question against every provider and prints a comparison table automatically &mdash; the equivalent of the hand-built hit-rate table above, without writing the loop, the tally, or the table formatting yourself. That is a real reduction in code for exactly this kind of check. The tradeoff is that the library makes assumptions about how your retrieval script is structured and how "hit" is defined (here, a substring match instead of the rank-and-margin logic our demo used); the hand-rolled version on this page is longer specifically so you can see, line by line, what "hit" means before a library decides that for you.</p>
+
 
 <h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Reading</h2>
 <ul>

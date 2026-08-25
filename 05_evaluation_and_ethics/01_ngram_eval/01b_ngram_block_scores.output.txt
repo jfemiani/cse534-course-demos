@@ -1,0 +1,15 @@
+order=8, 723 held-out blocks
+
+--- CHERRY (lowest) ---
+cross-entropy: 1.011 bits/char   perplexity: 2.02
+text: 'PETRUCHIO: What is his name?'
+
+--- APPLE (median) ---
+cross-entropy: 8.335 bits/char   perplexity: 322.92
+text: "TRANIO: O, sir, Lucentio slipp'd me like his greyhound, Which runs himself and catches for his master."
+
+--- LEMON (highest) ---
+cross-entropy: 13.047 bits/char   perplexity: 8465.99
+text: "GONZALO: Not since widow Dido's time."
+
+
