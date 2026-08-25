@@ -48,6 +48,15 @@ Common shift patterns to check for, in rough order of how much load they add:
 - **Circular or moralizing close**: "measuring what they think it is measuring" is a
   near-tautology; "a good researcher looks at both" is a generic virtue appeal instead
   of a concrete payoff. Endings like this feel unearned after a dense middle.
+- **Elided-verb garden path**: "Table 2 reveals something Table 1's number cannot"
+  drops the verb after "cannot" (cannot *what*? — "reveal," but the reader has to
+  backfill it), and often stacks a dense noun phrase ("Table 1's single averaged
+  number") right before the gap, so the hardest parsing moment lands on top of the
+  densest phrase instead of being spaced away from it. Fix by giving each clause its
+  own explicit subject and verb: "The examples in Table 2 show us something that the
+  single averaged numbers shown in Table 1 cannot" resolves both the ellipsis and the
+  stacking, and additionally puts the true subject of the sentence (the examples doing
+  the showing) first instead of burying it inside a possessive.
 
 ### Procedure
 
