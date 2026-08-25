@@ -1,0 +1,9 @@
+--- valid layout: PASS ---
+
+--- overlapping rooms: FAIL ---
+  rooms overlap: 'bedroom' and 'bathroom'
+
+--- room with no door: FAIL ---
+  room has no door: 'bathroom'
+
+

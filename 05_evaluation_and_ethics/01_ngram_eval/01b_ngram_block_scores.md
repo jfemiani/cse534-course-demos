@@ -4,41 +4,42 @@ Concept: `01_ngram_eval.py`'s table reports one cross-entropy number per
 order, averaged over 723 held-out blocks. That number is real, but it is
 also a fog. This demo un-averages it: it scores every held-out block on
 its own, sorts the blocks by their individual cross-entropy, and prints
-the lowest (cherry), the middle (apple), and the highest (lemon) — with
-the actual text, not just a number.
+the 5 lowest-scoring (cherries), the 5 closest to the median (apples),
+and the 5 highest-scoring (lemons) — with the actual text, not just a
+number. Showing 5 of each, instead of just 1, is what reveals that
+several blocks are exact duplicates.
 
 This reuses `01_ngram_eval.py`'s exact training and probability logic,
-applied to order 8, the order whose *average* cross-entropy was worst in
-the original table. Unlike the retrieval demo's cherries/apples/lemons
-(`02b_retrieval_eval_examples.py`), there is no "margin" here — cross-
-entropy is already an absolute score for a single block, so sorting
-blocks by that score directly is enough.
+applied to order 3, the best-performing order in the original table.
+There is no "margin" here — cross-entropy is already an absolute score
+for a single block, so sorting blocks by that score directly is enough.
 
 ## What the demo does
 
-1. Trains the same order-8 model on the same held-out split as
+1. Trains the same order-3 model on the same held-out split as
    `01_ngram_eval.py`.
 2. For every held-out block, computes that one block's own cross-entropy
    (bits per character), instead of only the corpus-wide average.
-3. Sorts the blocks by cross-entropy and prints the lowest, the median,
-   and the highest, each with its actual text.
+3. Sorts the blocks by cross-entropy and prints the 5 lowest, the 5
+   closest to the median, and the 5 highest, each with its actual text.
 
 ## Reading the result
 
-The cherry is a short, formulaic line of dialogue ("PETRUCHIO: What is
-his name?") built almost entirely out of common two-to-eight-character
-sequences the model saw constantly during training — this is the order-8
-model at its best, and it looks nothing like the corpus-wide average.
-The apple is a longer, less formulaic sentence, and its cross-entropy is
-already far higher: most real text is closer to the apple than the
-cherry. The lemon is a short line too, but it names "Dido," a proper noun
-the model's training data barely uses in this context; the model has to
-fall back to the floor probability again and again inside those eight
-characters, and the resulting cross-entropy is more than ten times the
-cherry's. This is the same "expensive wrong guess" mechanism `01_ngram_eval.py`'s
-table already named — a rare token inside a long context — but seeing the
-actual sentence makes it concrete instead of abstract: the failure is not
-a statistical artifact, it is one specific name the model had barely seen.
+Three of the five cherries are exact duplicates: the held-out set
+contains several blank-line-separated blocks that are nothing but
+"PETRUCHIO:" and score identically. The same happens with "PROSPERO:"
+among the lemons. Petruchio is a major, frequently-speaking character
+elsewhere in the training data, so the trigrams that spell his name were
+common; Prospero is a different character from a different play, and
+several of the letter-to-letter transitions in his name fall back to the
+floor probability. Packed into a block this short, those few misses
+dominate the average and push the lemons' cross-entropy to over 11 bits
+— roughly nine times the cherries', with a perplexity over 2,500. The
+apples, all a full sentence or more with no bare names, sit much closer
+to the corpus-wide average of 2.791 bits: most held-out text looks more
+like the apples than either extreme. The lesson is not that short blocks
+are bad; it is that a block's difficulty depends on exactly which
+characters it contains, and a single average cannot show you that.
 
 ## Endpoint
 
@@ -51,5 +52,5 @@ If this needs to be regenerated, ask an LLM assistant: "Reuse the training
 and probability logic from `01_ngram_eval.py`, but instead of only
 reporting the corpus-wide average cross-entropy, compute each held-out
 block's own cross-entropy, sort the blocks by that score, and print the
-lowest (cherry), median (apple), and highest (lemon) block along with
-its actual text. Keep this to order 8."
+5 lowest (cherries), 5 closest to the median (apples), and 5 highest
+(lemons) blocks along with their actual text. Keep this to order 3."

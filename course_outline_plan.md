@@ -84,22 +84,33 @@ evaluation first, since the lesson order was also reversed (see below).
   capability (benchmarks) and evaluating your own design choices when
   building on top of a model (ablation studies, grid search).
 - Reuses the module 3 n-gram model and cross-entropy lesson: a demo
-  (`01_ngram_eval`) holds out text, sweeps context length (order 2/4/8),
-  and reports cross-entropy and perplexity — the course's first concrete
-  grid search, and a real illustration of why a longer context can
-  generalize worse to new text.
+  (`01_ngram_eval`) holds out text, sweeps context length (orders 2
+  through 8), and reports cross-entropy and perplexity — the course's
+  first concrete grid search, and a real illustration of overfitting and
+  the bias-variance tradeoff (order 3 wins; order 8 memorizes and fails to
+  generalize).
 - Immediately un-averages that table with a companion demo
-  (`01b_ngram_block_scores`): the best, median, and worst-scoring
-  individual block of held-out text (cherry, apple, lemon), showing what a
-  single averaged cross-entropy number hides — no "margin" concept needed
-  here, since a block's own cross-entropy already sorts cleanly.
+  (`01b_ngram_block_scores`): the 5 lowest-scoring, 5 median, and 5
+  highest-scoring individual blocks of held-out text (cherries, apples,
+  lemons), showing what a single averaged cross-entropy number hides, and
+  naming Goodhart's Law — a model (or a report) can look better by
+  favoring short, low-information text, since fewer characters means
+  fewer chances to be surprised.
 - Covers reading a results table like a research paper (arrow convention,
   bold-best/italic-second-best, and the real limitation that a lot of
   published tables are a single run with no significance testing).
 - Introduces the zoo of automatic text-generation metrics right after that,
   with a demo (`03_bleu_score`) showing BLEU reward a factually wrong,
   high-overlap answer over a correct paraphrase, then a bulleted tour of
-  ROUGE, METEOR, exact-match/F1, and BERTScore.
+  ROUGE, METEOR, exact-match/F1, and BERTScore, followed by a second demo
+  (`03b_multi_metric_score`) that scores the same three candidates with
+  BLEU, ROUGE-L, METEOR, and BERTScore side by side — all four still rank
+  the wrong-room answer above the correct paraphrase, showing that even an
+  embedding-based metric is not the same as a correctness check. All four
+  metrics are computed without adding new packages to the shared
+  environment (`nltk` for BLEU/METEOR, a hand-written longest-common-
+  subsequence for ROUGE-L, and a hand-written greedy cosine-similarity
+  match over `transformers`/`torch` embeddings for BERTScore).
 - Gives LLM-as-judge its own section (`04_llm_judge`): a model judges the
   same three BLEU candidates directly and fully reverses BLEU's ranking,
   catching the wrong-room answer and crediting the correct paraphrase —
@@ -112,11 +123,10 @@ evaluation first, since the lesson order was also reversed (see below).
   Worked example: a demo pair (`02a_retrieval_eval_hitrate`,
   `02b_retrieval_eval_examples`) measures hit-rate for vector, keyword, and
   hybrid retrieval on a small labeled test set built from the module 4
-  chunking/retrieval demos, then looks past the aggregate number at the
-  best, median, and worst individual example (cherry, apple, lemon) to
-  show that a hit-rate can hide a case where retrieval fails in a way a
-  human would find obvious — and warns against only ever showing the
-  cherry.
+  chunking/retrieval demos; `02b` is available for anyone who wants the
+  same cherry/apple/lemon-by-margin idea applied to retrieval, but the page
+  itself does not repeat that explanation a second time (it is already
+  taught in full using the n-gram demo above).
 - Names real benchmark families (MMLU/MMLU-Pro, GSM8K/AIME, HumanEval/
   SWE-bench, GPQA) without hardcoding scores, after the ablation/grid-search
   section, and links out to live leaderboards (SWE-bench, and "MMLU
@@ -130,6 +140,24 @@ evaluation first, since the lesson order was also reversed (see below).
   it every time, including an illustrative (non-executed) promptfoo config
   showing how much of the hand-rolled retrieval hit-rate demo a library
   absorbs.
+- Adds a section on verifiers as a third kind of "scoring": when a task has
+  a precise, checkable specification, a program can decide correct/
+  incorrect directly, with no metric formula and no second model forming
+  an opinion. Demo (`05_math_verifier`) extracts a final numeric answer
+  from four candidate solutions to one math problem and checks it against
+  a known ground truth, contrasting a format check against an accuracy
+  check (echoing DeepSeek-R1's dual reward design) and showing the
+  verifier is immune to the wording-vs-value confusion BLEU fell into
+  earlier on the page. Companion demo (`05b_floorplan_verifier`) applies
+  the same idea to a non-numeric, spatial output — no room overlaps, every
+  room has a door — via plain rectangle geometry, showing a verifier
+  generalizes past math. Ties this to Reinforcement Learning with
+  Verifiable Rewards (RLVR), citing DeepSeek-R1 (arXiv:2501.12948) and
+  AlphaProof (Nature, s41586-025-09833-y) as real, citable examples, and
+  names the boundary (no specification precise enough to check
+  automatically means no verifier, which is why the earlier metrics and
+  LLM-as-judge still matter) plus the Goodhart's-Law risk of a
+  non-airtight verifier. No new packages: both demos are pure Python.
 
 ### 5.3 Ethics and Responsible AI ✅ (first cut)
 - Hard constraint followed throughout: every section poses an open

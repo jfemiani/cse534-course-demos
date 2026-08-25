@@ -9,10 +9,11 @@ from urllib.request import urlopen
 CORPUS_URL = "https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt"
 PAD = "^"
 END = "$"
-ORDER = 8  # the order that struggled most in 01_ngram_eval.py's table
+ORDER = 3  # the best-performing order in 01_ngram_eval.py's sweep
 HELD_OUT_FRACTION = 0.1
 FLOOR_PROBABILITY = 1e-4
 PREVIEW_CHARS = 160  # how much of each block to print
+GROUP_SIZE = 5  # how many blocks to show per group (cherries / apples / lemons)
 
 
 def load_blocks() -> list[str]:
@@ -62,14 +63,15 @@ counts = train_counts(train_blocks, ORDER)
 scored_blocks = [(block_cross_entropy(counts, block, ORDER), block) for block in held_out_blocks]
 scored_blocks.sort(key=lambda item: item[0])
 
-cherry = scored_blocks[0]
-apple = scored_blocks[len(scored_blocks) // 2]
-lemon = scored_blocks[-1]
+cherries = scored_blocks[:GROUP_SIZE]
+mid = len(scored_blocks) // 2
+apples = scored_blocks[mid - GROUP_SIZE // 2:mid - GROUP_SIZE // 2 + GROUP_SIZE]
+lemons = scored_blocks[-GROUP_SIZE:]
 
 print(f"order={ORDER}, {len(held_out_blocks)} held-out blocks\n")
-for label, (cross_entropy, block) in [("CHERRY (lowest)", cherry), ("APPLE (median)", apple), ("LEMON (highest)", lemon)]:
-    preview = block[:PREVIEW_CHARS].replace("\n", " ")
+for label, group in [("CHERRIES (lowest)", cherries), ("APPLES (median)", apples), ("LEMONS (highest)", lemons)]:
     print(f"--- {label} ---")
-    print(f"cross-entropy: {cross_entropy:.3f} bits/char   perplexity: {2 ** cross_entropy:.2f}")
-    print(f"text: {preview!r}{'...' if len(block) > PREVIEW_CHARS else ''}")
+    for cross_entropy, block in group:
+        preview = block[:PREVIEW_CHARS].replace("\n", " ")
+        print(f"cross-entropy: {cross_entropy:6.3f} bits/char   perplexity: {2 ** cross_entropy:9.2f}   text: {preview!r}{'...' if len(block) > PREVIEW_CHARS else ''}")
     print()

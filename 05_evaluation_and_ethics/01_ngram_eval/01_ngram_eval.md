@@ -16,10 +16,10 @@ cross-entropy down to individual blocks of held-out text.
    on blank lines.
 2. Holds out the last 10% of blocks. The model never sees these while
    training.
-3. For each order in {2, 4, 8}, counts n-grams on the training blocks only,
-   then walks through the held-out blocks computing the cross-entropy
-   (in bits per character) of the real next character under the trained
-   counts.
+3. For each order in {2, 3, 4, 5, 6, 7, 8}, counts n-grams on the training
+   blocks only, then walks through the held-out blocks computing the
+   cross-entropy (in bits per character) of the real next character under
+   the trained counts.
 4. Converts that cross-entropy to perplexity using perplexity = 2^(cross-entropy in bits).
    This demo always uses base-2 logarithms and this exact formula; a
    model using natural logarithms (nats) would instead use perplexity =

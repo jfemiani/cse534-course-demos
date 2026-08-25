@@ -1,15 +1,24 @@
-order=8, 723 held-out blocks
+order=3, 723 held-out blocks
 
---- CHERRY (lowest) ---
-cross-entropy: 1.011 bits/char   perplexity: 2.02
-text: 'PETRUCHIO: What is his name?'
+--- CHERRIES (lowest) ---
+cross-entropy:  1.212 bits/char   perplexity:      2.32   text: 'PETRUCHIO:'
+cross-entropy:  1.212 bits/char   perplexity:      2.32   text: 'PETRUCHIO:'
+cross-entropy:  1.212 bits/char   perplexity:      2.32   text: 'PETRUCHIO:'
+cross-entropy:  1.242 bits/char   perplexity:      2.36   text: 'PETRUCHIO: What?'
+cross-entropy:  1.296 bits/char   perplexity:      2.46   text: 'PETRUCHIO: Proceed.'
 
---- APPLE (median) ---
-cross-entropy: 8.335 bits/char   perplexity: 322.92
-text: "TRANIO: O, sir, Lucentio slipp'd me like his greyhound, Which runs himself and catches for his master."
+--- APPLES (median) ---
+cross-entropy:  2.715 bits/char   perplexity:      6.57   text: "TRANIO: Is't possible, friend Licio, that Mistress Bianca Doth fancy any other but Lucentio? I tell you, sir, she bears me fair in hand."
+cross-entropy:  2.718 bits/char   perplexity:      6.58   text: 'FERDINAND: Most sure, the goddess On whom these airs attend! Vouchsafe my prayer May know if you remain upon this island; And that you will some good instructio'...
+cross-entropy:  2.727 bits/char   perplexity:      6.62   text: 'GREMIO: I marvel Cambio comes not all this while.'
+cross-entropy:  2.729 bits/char   perplexity:      6.63   text: 'BIONDELLO: Cambio!'
+cross-entropy:  2.729 bits/char   perplexity:      6.63   text: 'Widow: He that is giddy thinks the world turns round.'
 
---- LEMON (highest) ---
-cross-entropy: 13.047 bits/char   perplexity: 8465.99
-text: "GONZALO: Not since widow Dido's time."
+--- LEMONS (highest) ---
+cross-entropy:  8.833 bits/char   perplexity:    455.91   text: 'Tailor:'
+cross-entropy:  9.568 bits/char   perplexity:    759.27   text: 'CALIBAN:'
+cross-entropy: 11.332 bits/char   perplexity:   2578.62   text: 'PROSPERO:'
+cross-entropy: 11.332 bits/char   perplexity:   2578.62   text: 'PROSPERO:'
+cross-entropy: 11.332 bits/char   perplexity:   2578.62   text: 'PROSPERO:'
 
 

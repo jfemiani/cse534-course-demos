@@ -11,7 +11,7 @@ from urllib.request import urlopen
 CORPUS_URL = "https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt"
 PAD = "^"  # padding character at the start of a sequence
 END = "$"  # end-of-sequence marker
-ORDERS = [2, 4, 8]  # context lengths to compare
+ORDERS = [2, 3, 4, 5, 6, 7, 8]  # context lengths to compare
 HELD_OUT_FRACTION = 0.1  # last 10% of blocks are never trained on
 FLOOR_PROBABILITY = 1e-4  # assigned when a context or character was never seen in training
 

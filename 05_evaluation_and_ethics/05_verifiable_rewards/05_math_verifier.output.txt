@@ -1,0 +1,9 @@
+problem: Twelve friends split a $180 dinner bill equally, then each pays an extra $5 tip. How much does each person pay in total?
+ground truth: 20.0
+
+candidate                       format ok  extracted  accuracy reward
+correct, well-formatted              True       20.0             True
+correct, no format marker           False       20.0             True
+wrong arithmetic, well-formatted       True       23.0            False
+correct, different formatting        True       20.0             True
+

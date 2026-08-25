@@ -3,3 +3,5 @@ pydantic
 numpy
 python-dotenv
 nltk
+torch
+transformers
