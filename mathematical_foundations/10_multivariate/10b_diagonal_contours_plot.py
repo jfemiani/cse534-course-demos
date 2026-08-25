@@ -11,6 +11,7 @@ import os
 from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.colors import LinearSegmentedColormap
 
 dark = os.environ.get("PLOT_THEME", "light").lower() == "dark"
 plt.style.use("dark_background" if dark else "default")
@@ -47,14 +48,20 @@ ax_main = fig.add_subplot(gs[1, 0])
 ax_top = fig.add_subplot(gs[0, 0], sharex=ax_main)
 ax_right = fig.add_subplot(gs[1, 1], sharey=ax_main)
 
-ax_main.scatter(samples[:, 0], samples[:, 1], s=14, alpha=0.8, color=accent)
-ax_main.plot(*mu, marker="+", markersize=14, markeredgewidth=2, color=accent)
-
-# Contours of the joint density -- since the measurements are independent,
-# this is just the product of the two marginal curves plotted above/beside it.
+# Filled contours of the joint density -- since the measurements are
+# independent, this is just the product of the two marginal curves plotted
+# above/beside it. More levels make the elliptical shape easier to read than
+# a handful of line contours would.
 X1, X2 = np.meshgrid(x1_grid, x2_grid)
 joint_density = normal_pdf(X1, mu[0], sigma1) * normal_pdf(X2, mu[1], sigma2)
-ax_main.contour(X1, X2, joint_density, levels=5, colors=accent, linewidths=1, alpha=0.6)
+bg_color = "black" if dark else "white"
+density_cmap = LinearSegmentedColormap.from_list("density_cmap", [bg_color, accent])
+levels = np.linspace(0, joint_density.max(), 12)
+ax_main.contourf(X1, X2, joint_density, levels=levels, cmap=density_cmap, alpha=0.75, zorder=1)
+ax_main.contour(X1, X2, joint_density, levels=levels, colors=accent, linewidths=0.4, alpha=0.5, zorder=2)
+ax_main.scatter(samples[:, 0], samples[:, 1], s=14, alpha=0.85, color=accent,
+                edgecolors=bg_color, linewidths=0.3, zorder=3)
+ax_main.plot(*mu, marker="+", markersize=14, markeredgewidth=2, color=accent, zorder=4)
 
 ax_main.set_xlabel("x1 (height)")
 ax_main.set_ylabel("x2 (diameter)")

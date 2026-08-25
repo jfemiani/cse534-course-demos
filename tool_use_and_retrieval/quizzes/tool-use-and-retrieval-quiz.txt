@@ -1,0 +1,136 @@
+Quiz title: Tool Use, Retrieval, and Agentic Loops Quiz
+Quiz description: This quiz covers Module 4's learning outcomes: tool use (function calling), the multi-step agent loop, retrieval-augmented generation (chunking, embeddings, and cosine similarity), vector vs. keyword vs. graph retrieval, and reusable agent instructions (AGENTS.md and SKILL.md).
+shuffle answers: true
+show correct answers: false
+
+Title: What a Tool Call Actually Is
+Points: 1
+1. When a model "calls a tool," what actually happens?
+a) The model executes the function itself, inside its own runtime
+... Incorrect. The model has no runtime to execute code in; it can only describe what it wants called.
+*b) The model returns a structured request naming a function and its arguments, and your code runs the real function
+... Correct! Tool calling is the model asking for outside help; your code decides whether and how to run it.
+c) The system automatically finds and runs a matching function on your machine
+... Incorrect. Nothing runs on your behalf automatically; your program must run the function and send the result back.
+d) The model rewrites its own prompt to include the function's source code
+... Incorrect. The model never sees the function's source, only a name and description you provide.
+
+Title: Tool Calling vs. Structured Output
+Points: 1
+2. How does tool calling differ from asking a model to produce structured output (a fixed schema for its final answer)?
+a) They are two names for the same feature
+... Incorrect. They shape different parts of the exchange, so they are not interchangeable.
+*b) Structured output shapes the model's final answer; tool calling lets the model ask for information before it writes that answer
+... Correct! Structured output constrains the answer's format; tool calling is a mid-conversation request for outside help.
+c) Tool calling only works with hand-typed schemas, while structured output only works with generated ones
+... Incorrect. Both features can use either a hand-typed schema or one generated from a data model.
+d) Structured output always requires a second round trip to the model, while tool calling never does
+... Incorrect. It is tool calling that typically needs a second request to send the result back; structured output does not.
+
+Title: Naming the Multi-Step Loop
+Points: 1
+3. What is the "agent loop," and what is its older academic name?
+a) A single tool call followed immediately by the model's final answer
+... Incorrect. A single call-and-answer exchange is the simpler case that comes before this pattern; the agent loop specifically repeats.
+*b) The model repeatedly calling tools, reading each result, and deciding whether to call again, until it decides it has enough to answer; academically known as ReAct
+... Correct! This is usually called the agent loop; Yao et al. (2022) described the same reason-act-observe cycle as ReAct.
+c) A background process that retrains the model between conversations
+... Incorrect. The agent loop happens within a single conversation; it does not involve retraining.
+d) A caching system that reuses previous answers to identical questions
+... Incorrect. That describes a caching strategy, not the call-observe-decide cycle this pattern names.
+
+Title: Why You Don't Always Have to Write the Loop Yourself
+Points: 1
+4. Why is it useful that some tool-calling frameworks and built-in tools can run the agent loop for you?
+a) Because a hand-written loop cannot call more than one tool
+... Incorrect. A hand-written loop can call as many tools as it is coded to check for; that is not the limitation being solved.
+*b) Because the same handful of steps, check the response, run the tool, send the result back, repeat, are needed every time, so a library or built-in feature can handle them for you
+... Correct! The loop's steps are mechanical and repetitive, which is exactly the kind of thing worth automating once you understand it.
+c) Because writing the loop yourself makes the model less accurate
+... Incorrect. Accuracy comes from the model and the tools, not from who writes the surrounding loop.
+d) Because only one tool can ever be registered per conversation
+... Incorrect. Nothing about the loop limits how many tools can be made available at once.
+
+Title: Why Documents Get Chunked
+Points: 1
+5. Why does retrieval-augmented generation split a document into chunks before answering a question about it?
+a) To make the document harder for the model to misread
+... Incorrect. Chunking is about fitting text into the model, not about making it harder to read.
+*b) Because a model can only read as much text as fits in its context window, so only the relevant slice gets pasted into the prompt
+... Correct! Chunking lets a large document be searched piece by piece so only the relevant part needs to fit in the prompt.
+c) To convert the document into a different file format
+... Incorrect. Chunking splits text into pieces; it does not change the file's format.
+d) Because generating embeddings only works on single sentences
+... Incorrect. Embeddings can be generated for text of many lengths; chunking is driven by the context-window limit, not by an embedding restriction.
+
+Title: How Chunks Get Ranked by Similarity
+Points: 1
+6. What does comparing a question's embedding against each chunk's embedding, using cosine similarity, actually measure?
+a) The number of identical words shared between the question and the chunk
+... Incorrect. That describes keyword matching; cosine similarity compares embedding vectors, not word overlap.
+*b) How closely two pieces of text point in the same direction in embedding space, as a proxy for shared meaning
+... Correct! Cosine similarity is the dot product of unit vectors; embeddings place text with similar meaning in similar directions.
+c) The exact length, in characters, of each chunk
+... Incorrect. Cosine similarity compares vector direction, not the length of the original text.
+d) Whether the chunk and the question were written by the same author
+... Incorrect. Embeddings capture meaning from the text itself, not authorship.
+
+Title: Where Vector Search Struggles
+Points: 1
+7. A question asks specifically about product code `LAB-4071`, but a vector search also ranks the unrelated `LAB-3042` almost as high. Why does this happen?
+a) The embedding model was trained on too little data
+... Incorrect. This is a general limitation of matching by meaning, not a sign of an undertrained model.
+*b) Embeddings capture meaning and general similarity, not exact spelling, so two similarly formatted codes can look nearly identical to the model
+... Correct! Vector search is strong at paraphrase and meaning but weak at distinguishing near-identical exact strings.
+c) Cosine similarity cannot be computed for text containing numbers
+... Incorrect. Cosine similarity works on any embedded text; the issue is what embeddings capture, not what they can be computed on.
+d) The retrieval system ran out of storage space
+... Incorrect. This is about how embeddings represent meaning, not a storage limitation.
+
+Title: When Keyword Search Wins
+Points: 1
+8. Based on the comparison between vector and keyword search, when does keyword search have a real advantage?
+a) When the question is long and uses many synonyms
+... Incorrect. That situation favors vector search, which captures meaning across paraphrases.
+*b) When the question needs an exact identifier, such as a product code, function name, or error message
+... Correct! Keyword search checks for the exact string, so it reliably distinguishes near-identical exact terms that confuse embeddings.
+c) When there is no question at all, only a document to summarize
+... Incorrect. Neither vector nor keyword search is about summarizing without a query; both rank chunks against a question.
+d) When the corpus is very small, under ten documents
+... Incorrect. Corpus size is not what determines whether keyword or vector search wins; the type of query does.
+
+Title: Where Graph-Based Retrieval Fits
+Points: 1
+9. How does this module frame graph-based retrieval (building a graph of entities and relationships instead of, or alongside, embeddings) relative to vector and keyword retrieval?
+a) As the default choice for every retrieval task from now on
+... Incorrect. It is presented as worth knowing exists, not as a default replacement for vector or keyword search.
+*b) As an option that can help with questions needing synthesis across many documents, at real added engineering cost
+... Correct! Building and maintaining a relationship graph can help with broad synthesis but is not free to build or keep up to date.
+c) As a deprecated technique no longer used in practice
+... Incorrect. It is described as a newer approach, not a deprecated one.
+d) As a way to avoid using embeddings entirely in every retrieval system
+... Incorrect. It is presented as an additional option alongside embeddings-based retrieval, not a universal replacement for it.
+
+Title: AGENTS.md vs. SKILL.md
+Points: 1
+10. What is the key difference between what an always-loaded project-instructions file and an on-demand capability-instructions file are each for?
+a) The project-instructions file is for one specific task, while the capability file covers an entire project
+... Incorrect. This reverses the actual roles of the two kinds of file.
+*b) The project-instructions file holds project-wide guidance loaded every time; the capability file holds instructions for one task, loaded only when it matches the current task
+... Correct! One is always-loaded project context; the other is loaded on demand for a specific kind of task.
+c) They are two different file formats for the exact same content
+... Incorrect. They serve different scopes (whole project vs. one capability), not just different formats for identical content.
+d) The project-instructions file is read by the model, while the capability file is only read by human developers
+... Incorrect. Both kinds of file are meant to be read by the assistant; the difference is scope and when each is loaded.
+
+Title: Progressive Disclosure in Agent Instructions
+Points: 1
+11. What does "progressive disclosure" mean for how a capability-instructions file gets used?
+a) The whole file is loaded once, at the very start of every conversation
+... Incorrect. That is the opposite of progressive disclosure, and closer to how an always-loaded project file behaves.
+*b) Only the short name and description are loaded by default; the full instructions load only once the assistant decides they match the current task
+... Correct! Keeping the short description always available but loading full detail on demand avoids paying the cost of every capability's full instructions up front.
+c) The file discloses a different set of instructions to each individual user
+... Incorrect. Progressive disclosure is about when content loads, not about personalizing content per user.
+d) The instructions are revealed one sentence at a time as the assistant types its response
+... Incorrect. Progressive disclosure refers to loading full content only when needed, not to a typing or streaming effect.

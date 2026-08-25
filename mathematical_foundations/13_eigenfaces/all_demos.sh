@@ -1,0 +1,12 @@
+PLOT_THEME=default python 13b_eigenfaces_plot.py
+PLOT_THEME=default python 13c_eigenfaces_pca_grid_plot.py
+PLOT_THEME=default python 13d_eigenfaces_umap_plot.py
+PLOT_THEME=default python 13e_eigenfaces_tsne_plot.py
+PLOT_THEME=default python 13f_eigenfaces_sampling_plot.py
+
+PLOT_THEME=dark python 13b_eigenfaces_plot.py
+PLOT_THEME=dark python 13c_eigenfaces_pca_grid_plot.py
+PLOT_THEME=dark python 13d_eigenfaces_umap_plot.py
+PLOT_THEME=dark python 13e_eigenfaces_tsne_plot.py
+PLOT_THEME=dark python 13f_eigenfaces_sampling_plot.py
+
