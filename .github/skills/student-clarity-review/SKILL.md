@@ -1,17 +1,20 @@
 ---
 name: student-clarity-review
-description: 'Use when: a lesson paragraph/page "starts strong but gets hard to read", reads as rambling, narrates a table/result instead of engaging the reader, or needs a jargon/concept transition made explicit instead of buried. Diagnoses WHY prose is hard to follow via register-shift analysis, and rewrites narrating prose into Socratic questions or explicit callouts. Triggers: "why is this hard to read", "this is rambling", "make this more Socratic", "this reads like telling the student the answer", "the transition is sneaky/buried". NOT for AI-writing-tells detection (use avoid-ai-writing skill) or general pedagogy review of a whole document (use educational-reviewer agent) — this skill is for diagnosing and fixing ONE paragraph or transition at a time.
+description: 'Use when: a lesson paragraph/page "starts strong but gets hard to read", reads as rambling, narrates a table/result instead of engaging the reader, needs a jargon/concept transition made explicit instead of buried, or strings too many ideas into one sentence instead of letting points land separately. Diagnoses WHY prose is hard to follow via register-shift and argument-chaining analysis, and rewrites narrating prose into Socratic questions, explicit callouts, or short landed statements. Triggers: "why is this hard to read", "this is rambling", "make this more Socratic", "this reads like telling the student the answer", "the transition is sneaky/buried", "you keep chaining ideas together", "too many em dashes". Also self-check this after generating any explanatory paragraph, since chaining and em-dash overuse are a known failure mode of this assistant, not just something to fix on request. Complements avoid-ai-writing (formatting/vocabulary tells) with structural chaining and paragraph-level flow. NOT for whole-document pedagogy review (use educational-reviewer agent) — this skill is for diagnosing and fixing ONE paragraph or transition at a time.
 ---
 
 # Student Clarity Review
 
 Diagnose and fix student-facing prose (lesson pages, notes, demo write-ups) that is
-technically correct but hard to follow. Two distinct techniques, used separately or
+technically correct but hard to follow. Three distinct techniques, used separately or
 together:
 
 1. **Register-shift analysis** — explain *why* a paragraph gets hard to read.
 2. **Socratic rewrite** — replace narration ("the data shows X, which means Y") with
    questions that let the reader find X and Y themselves.
+3. **Argument-chaining check** — a self-check on this assistant's own output: catch
+   the habit of stringing claim + justification + hedge + consequence into one
+   sentence instead of letting each point land on its own.
 
 ## When to Use
 
@@ -20,10 +23,17 @@ together:
 - A section switches to a genuinely different concept, task, or scoring method but the
   switch is buried in a subordinate clause instead of called out.
 - User asks to make something "more Socratic" or to stop "telling."
+- **Any time this assistant writes an explanatory paragraph longer than two or three
+  sentences** — run Part 3 before presenting it, unprompted. This is a documented
+  failure mode of this assistant specifically (see Part 3), not just a user complaint
+  to react to.
 
 Do not use this for whole-document pedagogy audits (jargon, assumed background,
-overall structure) — that's the `educational-reviewer` agent. This skill operates at
-paragraph/transition granularity.
+overall structure) — that's the `educational-reviewer` agent. For formatting/vocabulary
+AI-tells (em dash rate, hollow intensifiers, Tier 1 vocabulary), defer to
+`avoid-ai-writing` — but note Part 3 below: back-to-back em dashes found during a
+clarity review are usually a *symptom* of chaining, not an isolated formatting slip,
+so fix the chaining first and the dash count drops on its own.
 
 ## Part 1: Register-Shift Analysis
 
@@ -107,6 +117,63 @@ After (Socratic):
 > training data, and what would that mean for how familiar the model is with the
 > letter-to-letter transitions inside that name?
 
+## Part 3: Argument-Chaining Check (Self-Check)
+
+This is the deepest and most persistent failure mode this assistant has toward its own
+explanatory writing: **stringing multiple separately-landable ideas into one sentence**
+instead of writing a series of short sentences that each land one point before the
+next one starts. This is not primarily an em-dash problem. Em dashes are just the
+most visible symptom, because chaining needs a connective, and an em dash is the
+cheapest one to reach for. Removing the dashes without un-chaining the sentence just
+swaps in a comma or "since" and leaves the actual defect in place.
+
+**What a chained sentence looks like**: claim + justification + hedge/correction +
+hypothetical + consequence, all in one sentence, connected by dashes, colons, "since,"
+"but," or "though." Example (an actual first draft on this page):
+
+> This model's training does not optimize for that number directly [em dash]
+> counting how often a character follows a given context is nothing like searching for
+> the lowest possible cross-entropy. But Table 1's order sweep did select on that
+> number: order 3 won because it scored lowest. If that same kind of selection also
+> had a say in how long a generated passage runs, it would favor a model that stops
+> early or reaches for short, common words over long, informative ones, since fewer
+> characters mean fewer chances to be surprised [em dash] a cheaper route to a low
+> score that has nothing to do with writing better text.
+
+Three sentences, and every one of them tries to carry an entire argument (a claim, its
+justification, and its consequence) instead of making one point and stopping. The
+second em dash is not the disease; it is where the chaining became visible enough to
+notice.
+
+**The fix**: split each chained sentence at every point where a new claim starts,
+even if the result feels choppy at first. Let each sentence do one job.
+
+> This model's training does not optimize for that number directly. Counting how
+> often a character follows a given context is nothing like searching for the lowest
+> possible cross-entropy. Table 1's order sweep did, though: order 3 won because it
+> scored lowest. Suppose that same kind of selection also decided how long a
+> generated passage runs. Short, common words would beat long, informative ones every
+> time, because fewer characters mean fewer chances to be surprised. That is a
+> cheaper route to a low score. It has nothing to do with writing better text.
+
+Same content, same number of ideas, but each one now lands before the next begins.
+
+### Procedure (run on this assistant's own draft prose before presenting it)
+
+1. Count the ideas in each sentence: how many independent claims, justifications, or
+   consequences does it try to hold? More than one is a chaining candidate.
+2. Check connectives (em dash, colon, "since," "but," "though," "if... then") for
+   whether they join two *landable* points or one point and its own restatement. The
+   former is chaining; the latter is fine.
+3. Split at every chaining connective into its own sentence, even if it looks short
+   or blunt on its own. Short and landed beats long and layered.
+4. Recount em-dash usage after splitting. If it dropped without a deliberate pass to
+   remove dashes, that confirms the dashes were a chaining symptom, not the root
+   issue.
+5. Be honest in the report: if the user flags chaining, confirm it plainly rather than
+   softening it into a formatting note. This is a known, recurring pattern, not a
+   one-off slip.
+
 ## Explicit Callouts for Buried Transitions
 
 When a section switches to a genuinely different task, scoring method, or concept
@@ -122,5 +189,7 @@ just the specific numbers.
 - [ ] Rewrite (if requested) removes stated conclusions, not underlying facts
 - [ ] No filler openers added ("Let's now...", "Here we see...")
 - [ ] Genuine concept/task switches get their own explicit sentence, not a buried clause
+- [ ] No sentence chains claim + justification + hedge + consequence together (Part 3)
+- [ ] Em-dash count checked only after chaining is fixed, not as a substitute for it
 - [ ] Re-read the surrounding paragraphs after a rewrite — a fixed paragraph can still
       read badly if the one before/after it assumed the old phrasing
