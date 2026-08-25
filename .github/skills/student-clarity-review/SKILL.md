@@ -67,6 +67,20 @@ Common shift patterns to check for, in rough order of how much load they add:
   single averaged numbers shown in Table 1 cannot" resolves both the ellipsis and the
   stacking, and additionally puts the true subject of the sentence (the examples doing
   the showing) first instead of burying it inside a possessive.
+- **Elided relative pronoun creates a false noun-compound**: "Most evaluation people
+  run day to day... is extrinsic" drops the "that" from "most evaluation **that**
+  people run day to day." Without it, "evaluation people" is read first as a compound
+  noun (a *type of person*, like "evaluation experts"), which is the wrong parse and
+  sends the reader down a dead end before they reach the real verb. This differs from
+  the elided-verb pattern above: there the missing piece is a verb the reader can
+  backfill correctly once flagged; here the missing "that" causes an actively wrong
+  interpretation before the reader even reaches the gap. It also tends to co-occur
+  with a wide subject-verb gap: an intervening parenthetical ("including almost
+  everything left on this page") can sit far from both the subject and the verb it's
+  meant to modify, so untangling the false parse and reconnecting subject-to-verb
+  become two separate repairs. Fix by restoring the relative pronoun explicitly
+  ("evaluation you will actually run") and moving any parenthetical to sit immediately
+  next to the word it modifies, not stranded between subject and verb.
 - **Point drift**: a sentence is true, well-written, and individually clear, but does
   not serve the paragraph's actual thesis. Every sentence in isolation can pass a
   register check and still leave the reader unable to say what the paragraph was
