@@ -143,7 +143,16 @@ Common shift patterns to check for, in rough order of how much load they add:
   think otherwise?" Fix by dropping the denial and stating the actual point plainly:
   "every one of these has a mature library implementation you can call directly"
   keeps the real information (these are off-the-shelf, not derived by hand) without
-  first raising a doubt that didn't exist.
+  first raising a doubt that didn't exist. A second instance on the same page: "That
+  generated text, not the original held-out block, is what gets compared against the
+  true continuation" rebuts comparing a block against itself, a comparison nobody
+  proposed and that makes no sense once you think about it — the reader's reaction is
+  "why would I expect that, now I question what everything means." This pattern
+  recurs specifically around "X, not Y" and "nobody does Y" constructions, so treat
+  any sentence with that shape as a candidate for this check even when it looks like
+  ordinary clarification. Fix the same way: state what actually happens ("the four
+  metrics above then score that generated continuation against the true one") and
+  drop the rejected alternative entirely.
 - **Point drift**: a sentence is true, well-written, and individually clear, but does
   not serve the paragraph's actual thesis. Every sentence in isolation can pass a
   register check and still leave the reader unable to say what the paragraph was
