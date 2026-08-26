@@ -117,6 +117,21 @@ Common shift patterns to check for, in rough order of how much load they add:
   with the genuinely new claim (what task, and why it needs a plausible right answer)
   and only mentioning the already-established fact (generation is required) in
   passing, if at all, instead of as the sentence's main subject.
+- **Design choice stated as inherent fact**: "For this demo, that task is text
+  continuation" phrases a choice the author made as if it were a discovered truth —
+  as though text continuation is simply *what the task is*, rather than one option
+  picked out of several for a reason. The tell is a reader reaction like "that sounds
+  like it's stating a truth, not a decision we're making," because the sentence gives
+  no hint that anyone chose anything, or why. This differs from point drift (an
+  off-thesis but still-true sentence) and from the strawman denial (rebutting an
+  unheld belief): here the sentence states something true and on-topic, but frames it
+  with the wrong epistemic status, fact instead of decision, which hides the actual
+  reasoning a reader would want (why this task, and not some other one). Fix by naming
+  the constraint that drove the choice and the alternative it ruled out: "This n-gram
+  model was never trained on question-answer pairs, so this demo instead picks text
+  continuation as its task, since a 'correct' continuation is just whatever character
+  run the held-out text actually contains next" states the same fact as a decision
+  with a visible reason, not an unexplained given.
 - **Strawman denial**: a sentence rebuts an assumption the reader never had, e.g.
   "nobody re-derives BLEU or BERTScore from its paper before using it." The reader
   was never wondering whether they'd need to implement a metric from scratch — that
