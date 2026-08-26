@@ -4,15 +4,21 @@ Concept: BLEU is the oldest and most common automatic metric for scoring
 generated text against a reference, borrowed from machine translation. It
 counts overlapping n-grams (runs of consecutive words) between a candidate
 and a reference. It has no idea what the words mean. This demo asks BLEU to
-score three candidate answers against one reference and shows how badly
-that surface-level counting can diverge from human judgment.
+score three candidate answers against a real benchmark question's reference
+answer and shows how badly that surface-level counting can diverge from
+human judgment.
+
+The question and reference answer are real MT-Bench question 120 (math
+category): Zheng et al., "Judging LLM-as-a-Judge with MT-Bench and Chatbot
+Arena," 2023. https://github.com/lm-sys/FastChat
 
 ## What the demo does
 
-1. Defines one reference sentence and three candidates: an exact match, a
+1. Defines one reference sentence, a full worked solution to "given f(x) =
+   4x^3 - 9x - 14, find f(2)," and three candidates: an exact match, a
    correct paraphrase that reuses almost none of the reference's wording,
-   and a near-copy of the reference with a single factual error (the wrong
-   room number).
+   and a near-copy of the reference with a single arithmetic error (the
+   wrong final answer).
 2. Scores each candidate against the reference with `nltk`'s
    `sentence_bleu`, using a smoothing function (short sentences without
    smoothing often score exactly 0, which hides useful detail).
@@ -20,15 +26,16 @@ that surface-level counting can diverge from human judgment.
 ## Reading the result
 
 The exact match scores 1.0, as expected. The good paraphrase, which a
-person would call a correct answer, scores far lower, because BLEU cannot
-recognize "stop by on Tuesday afternoons" as the same fact as "office hours
-are Tuesdays." The factually wrong candidate scores far higher than the
-correct paraphrase, because it reuses almost every word from the reference
-and only changes the room number. BLEU cannot tell that this single change
-makes the answer wrong. A metric like this can reward the wrong answer
-over the right one, for the same reason a hit-rate number can hide a lemon:
-the aggregate number looks clean, but it is not measuring what you actually
-care about.
+person would call a correct answer, scores far lower (0.009), because BLEU
+cannot recognize "the cubic term works out to 32" as the same fact as
+"4 times 2 cubed." The factually wrong candidate scores far higher than
+the correct paraphrase (0.962), because it reuses almost every word from
+the reference and only changes the final number. BLEU cannot tell that
+this single change makes the answer wrong. A metric like this can reward
+the wrong answer over the right one, for the same reason a hit-rate number
+can hide a lemon: the aggregate number looks clean, but it is not
+measuring what you actually care about.
+
 
 ## The zoo of automatic metrics
 
@@ -69,6 +76,6 @@ package already installed in this course's environment.
 
 If `nltk`'s BLEU API changes, ask an LLM assistant: "Update this script to
 match the current `nltk.translate.bleu_score` API. Keep the same reference
-sentence and the same three candidates (exact match, good paraphrase, wrong
-room), and keep printing each candidate's BLEU score with smoothing
-enabled."
+sentence and the same three candidates (exact match, good paraphrase,
+wrong answer), and keep printing each candidate's BLEU score with
+smoothing enabled."

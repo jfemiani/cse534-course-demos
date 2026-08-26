@@ -21,8 +21,8 @@ environment used by every other module.
 ## What the demo does
 
 1. Reuses `03_bleu_score.py`'s reference sentence and three candidates
-   (exact match, good paraphrase with low word overlap, wrong room with
-   high word overlap).
+   (exact match, good paraphrase with low word overlap, wrong final
+   answer with high word overlap).
 2. Scores every candidate four ways:
    - **BLEU**: n-gram precision (same code as `03_bleu_score.py`).
    - **ROUGE-L**: longest-common-subsequence F1 between reference and
@@ -40,23 +40,23 @@ environment used by every other module.
 ```
 candidate                          BLEU  ROUGE-L   METEOR  BERTScore
 exact match                       1.000    1.000    1.000      1.000
-good paraphrase, low overlap      0.078    0.414    0.406      0.679
-wrong room, high overlap          0.919    0.929    0.928      0.947
+good paraphrase, low overlap      0.009    0.115    0.091      0.682
+wrong answer, high overlap        0.962    0.964    0.964      0.966
 ```
 
 All four metrics agree on the ranking, and that agreement is itself the
-finding: every one of them still scores the wrong-room candidate higher
+finding: every one of them still scores the wrong-answer candidate higher
 than the correct paraphrase. BERTScore is supposed to be the metric best
 equipped to recognize a paraphrase, since it compares meaning-bearing
 embeddings instead of exact words, and it does close much of the gap —
-0.679 for the paraphrase versus BLEU's 0.078. But it still ranks the
-factually wrong candidate (0.947) well above the correct one, because
-changing "205" to "305" barely moves a sentence's embeddings, while
-rewording "office hours are Tuesdays" as "you can stop by on Tuesday
-afternoons" moves them more, even though the second change is the one
-that preserves the actual fact. Being more semantic is not the same as
-being correct. This is the same lesson as the BLEU-only demo, now shown
-to survive across four different automatic metrics, not just one.
+0.682 for the paraphrase versus BLEU's 0.009. But it still ranks the
+factually wrong candidate (0.966) well above the correct one, because
+changing "equals 0" to "equals 6" barely moves a sentence's embeddings,
+while rewording the whole derivation in different terms moves them more,
+even though the second change is the one that preserves the actual fact.
+Being more semantic is not the same as being correct. This is the same
+lesson as the BLEU-only demo, now shown to survive across four different
+automatic metrics, not just one.
 
 ## Endpoint
 

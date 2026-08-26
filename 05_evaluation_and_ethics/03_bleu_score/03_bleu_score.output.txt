@@ -1,4 +1,4 @@
-exact match                    BLEU=1.000  'Office hours are Tuesdays from 2 to 4 pm in Laws Hall room 205.'
-good paraphrase, low overlap   BLEU=0.078  'You can stop by on Tuesday afternoons between 2 and 4 in Laws Hall 205.'
-wrong room, high overlap       BLEU=0.919  'Office hours are Tuesdays from 2 to 4 pm in Laws Hall room 305.'
+exact match                    BLEU=1.000  'Substituting x equals 2 gives f(2) equals 4 times 2 cubed minus 9 times 2 minus 14, which equals 32 minus 18 minus 14, so f(2) equals 0.'
+good paraphrase, low overlap   BLEU=0.009  "When x is 2, the cubic term works out to 32, and subtracting 18 then 14 leaves nothing, so the function's output is zero."
+wrong answer, high overlap     BLEU=0.962  'Substituting x equals 2 gives f(2) equals 4 times 2 cubed minus 9 times 2 minus 14, which equals 32 minus 18 minus 14, so f(2) equals 6.'
 

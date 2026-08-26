@@ -100,13 +100,15 @@ evaluation first, since the lesson order was also reversed (see below).
   bold-best/italic-second-best, and the real limitation that a lot of
   published tables are a single run with no significance testing).
 - Introduces the zoo of automatic text-generation metrics right after that,
-  with a demo (`03_bleu_score`) showing BLEU reward a factually wrong,
-  high-overlap answer over a correct paraphrase, then a bulleted tour of
-  ROUGE, METEOR, exact-match/F1, and BERTScore, followed by a second demo
-  (`03b_multi_metric_score`) that scores the same three candidates with
-  BLEU, ROUGE-L, METEOR, and BERTScore side by side — all four still rank
-  the wrong-room answer above the correct paraphrase, showing that even an
-  embedding-based metric is not the same as a correctness check. All four
+  with a demo (`03_bleu_score`) using a real MT-Bench math question
+  (Zheng et al., 2023, question 120) and showing BLEU reward a factually
+  wrong, high-overlap answer over a correct paraphrase, then a bulleted
+  tour of ROUGE, METEOR, exact-match/F1, and BERTScore, followed by a
+  second demo (`03b_multi_metric_score`) that scores the same three
+  candidates with BLEU, ROUGE-L, METEOR, and BERTScore side by side — all
+  four still rank the wrong-answer candidate above the correct
+  paraphrase, showing that even an embedding-based metric is not the same
+  as a correctness check. All four
   metrics are computed without adding new packages to the shared
   environment (`nltk` for BLEU/METEOR, a hand-written longest-common-
   subsequence for ROUGE-L, and a hand-written greedy cosine-similarity
@@ -119,9 +121,12 @@ evaluation first, since the lesson order was also reversed (see below).
   gap between an easy teacher-forced training signal and the harder
   free-running generation task.
 - Gives LLM-as-judge its own section (`04_llm_judge`), collapsed to a
-  single minimal demo: a model judges whether a hand-written email reply
-  reads as friendly, across three replies varying only in tone. No BLEU
-  comparison and no fixed reference answer — the point is a quality with
+  single minimal demo grounded in a real benchmark question instead of an
+  invented one: MT-Bench question 151 (Zheng et al., 2023), a two-turn
+  conversation with no fixed reference answer at all — explain how GDP,
+  inflation, unemployment, and fiscal/monetary policy relate, then
+  explain it again like the reader is five. No BLEU comparison and no
+  reference answer — the point is a quality with
   no reference wording to count overlap against at all, paired with the
   cost/reliability tradeoff of judging with a model and the honest
   instability of a judge's call on a genuine borderline case.

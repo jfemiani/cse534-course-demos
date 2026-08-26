@@ -14,12 +14,24 @@ from transformers import AutoModel, AutoTokenizer
 nltk.download("wordnet", quiet=True)
 nltk.download("omw-1.4", quiet=True)
 
-REFERENCE = "Office hours are Tuesdays from 2 to 4 pm in Laws Hall room 205."
+# Real MT-Bench question 120 (math category) and its reference answer.
+# Zheng et al., "Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena,"
+# 2023. https://github.com/lm-sys/FastChat
+REFERENCE = (
+    "Substituting x equals 2 gives f(2) equals 4 times 2 cubed minus 9 "
+    "times 2 minus 14, which equals 32 minus 18 minus 14, so f(2) equals 0."
+)
 
 CANDIDATES = {
-    "exact match": "Office hours are Tuesdays from 2 to 4 pm in Laws Hall room 205.",
-    "good paraphrase, low overlap": "You can stop by on Tuesday afternoons between 2 and 4 in Laws Hall 205.",
-    "wrong room, high overlap": "Office hours are Tuesdays from 2 to 4 pm in Laws Hall room 305.",
+    "exact match": REFERENCE,
+    "good paraphrase, low overlap": (
+        "When x is 2, the cubic term works out to 32, and subtracting 18 "
+        "then 14 leaves nothing, so the function's output is zero."
+    ),
+    "wrong answer, high overlap": (
+        "Substituting x equals 2 gives f(2) equals 4 times 2 cubed minus 9 "
+        "times 2 minus 14, which equals 32 minus 18 minus 14, so f(2) equals 6."
+    ),
 }
 
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"

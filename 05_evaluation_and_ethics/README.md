@@ -28,9 +28,9 @@ Work through these in order.
    aggregate hit-rate at individual questions by margin, for anyone who
    wants to see the same cherry/apple/lemon idea applied to retrieval.
 3. [BLEU score](03_bleu_score) — scores a correct paraphrase and a
-   factually wrong near-copy against a reference sentence with the BLEU
-   metric, showing how a word-overlap metric can reward the wrong answer
-   over the right one. `03b_multi_metric_score.py` repeats the same
+   factually wrong near-copy against a real MT-Bench math question's
+   reference answer with the BLEU metric, showing how a word-overlap
+   metric can reward the wrong answer over the right one. `03b_multi_metric_score.py` repeats the same
    three candidates through ROUGE-L, METEOR, and BERTScore alongside
    BLEU, showing that even an embedding-based metric like BERTScore still
    ranks the factually wrong candidate above the correct paraphrase.
@@ -41,10 +41,12 @@ Work through these in order.
    real instance of exposure bias, the gap between a teacher-forced
    training signal and free-running generation.
 4. [LLM-as-judge](04_llm_judge) — asks a model to judge a quality that has
-   no reference wording to count overlap against at all: whether a
-   hand-written email reply reads as friendly. Three replies to the same
-   request, varying only in tone, get a `friendly` verdict and a
-   one-sentence reason each — a judgment call, not a fact lookup.
+   no reference wording to count overlap against at all, using a real
+   benchmark question instead of an invented one: MT-Bench question 151
+   (Zheng et al., 2023), a two-turn conversation asking for an ELI5
+   explanation of GDP, inflation, and fiscal/monetary policy. The judge
+   returns an `appropriate_for_a_five_year_old` verdict and a one-sentence
+   reason — a judgment call, not a fact lookup.
 5. [Verifiable rewards](05_verifiable_rewards) — instead of a metric or a
    second model, a short program checks the output directly.
    `05_math_verifier.py` extracts a final numeric answer from four

@@ -1,5 +1,5 @@
 candidate                          BLEU  ROUGE-L   METEOR  BERTScore
 exact match                       1.000    1.000    1.000      1.000
-good paraphrase, low overlap      0.078    0.414    0.406      0.679
-wrong room, high overlap          0.919    0.929    0.928      0.947
+good paraphrase, low overlap      0.009    0.115    0.091      0.682
+wrong answer, high overlap        0.962    0.964    0.964      0.966
 
