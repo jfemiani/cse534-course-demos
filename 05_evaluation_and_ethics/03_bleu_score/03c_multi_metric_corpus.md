@@ -40,60 +40,58 @@ never has to account for.
    METEOR, and BERTScore.
 5. Averages all four metrics per order, printed alongside the same
    cross-entropy and perplexity Table 1 already reported.
-6. At order 3 — Table 1's cross-entropy winner — sorts the 30 generated
-   continuations by BERTScore and prints the 5 highest (cherries), 5
-   near the median (apples), and 5 lowest (lemons), each with its prompt,
-   generated candidate, and true reference.
+6. At order 3 (the cross-entropy winner) and again at order 7 (the
+   BLEU/ROUGE-L/METEOR winner), sorts the 30 generated continuations by
+   ROUGE-L and prints the 5 highest (cherries), 5 near the median
+   (apples), and 5 lowest (lemons), each with its prompt, generated
+   candidate, true reference, and ROUGE-L score.
 
 ## Reading the result
 
 ```
 order  contexts  miss rate  cross-ent  perplexity    BLEU  ROUGE-L  METEOR  BERTScore
-    2      1408      1.79%      3.009        8.05   0.005    0.023   0.013      0.201
-    3     11347      4.66%      2.791        6.92   0.009    0.046   0.028      0.201
-    4     48846     10.49%      3.082        8.47   0.009    0.052   0.026      0.199
-    5    132958     20.65%      4.005       16.06   0.009    0.049   0.026      0.198
-    6    261305     33.90%      5.394       42.05   0.009    0.050   0.032      0.189
-    7    406576     48.13%      6.984      126.57   0.010    0.062   0.034      0.181
-    8    548803     61.35%      8.517      366.28   0.009    0.055   0.027      0.164
+    2      1408      1.79%      3.009        8.05   0.005    0.027   0.013      0.203
+    3     11347      4.66%      2.791        6.92   0.009    0.045   0.028      0.205
+    4     48846     10.49%      3.082        8.47   0.009    0.060   0.026      0.202
+    5    132958     20.65%      4.005       16.06   0.009    0.068   0.026      0.201
+    6    261305     33.90%      5.394       42.05   0.009    0.057   0.032      0.192
+    7    406576     48.13%      6.984      126.57   0.010    0.073   0.034      0.184
+    8    548803     61.35%      8.517      366.28   0.009    0.063   0.027      0.166
 ```
 
 Order 3 is still the cross-entropy winner, exactly as in Table 1 (same
 code, same corpus, same split — the numbers match to three decimals).
-But the generation-quality columns tell a different story than
-cross-entropy did. BLEU, ROUGE-L, and METEOR are all close to zero at
-every order and do not clearly favor order 3 over its neighbors —
-40 characters of sampled generation rarely reproduces the same words as
-the real continuation, at any order, because the n-gram model has no
-notion of a sentence's overall meaning, only of what character usually
-follows a short window of previous ones. BERTScore is the one column
-with a clear trend, and it is not the trend cross-entropy showed: it is
-essentially flat from order 2 through order 4, then declines steadily
-through order 8. Free-running generation punishes a high-order model
-harder than teacher-forced cross-entropy did, because once a high-order
-model's own generated text drifts even slightly from anything it saw in
-training, every later character is conditioned on a context that is now
-partly synthetic and unfamiliar — a small early mistake compounds into a
-worse one, over and over, for the rest of the 40 characters. Order 8's
-first table (Table 1) already showed this model missing its context 61%
-of the time on real held-out text; here that same weakness shows up as
-generation quality that degrades the longer the model runs on its own
-output. This mismatch between an easy-to-compute training signal
-(teacher-forced cross-entropy) and the harder-to-improve thing you
-actually want (good free-running generation) is a well-known failure
-mode in sequence models called **exposure bias**.
+But BLEU, ROUGE-L, and METEOR all peak at order 7 instead, the same
+order whose perplexity was nearly the worst in the entire sweep.
+BERTScore nominally still favors order 3, but every value in that
+column sits in a narrow band (0.166 to 0.205), tight enough that a
+single win there is easy to mistake for signal when it may just be
+noise — and both the prompt and the reference are cut off mid-word
+rather than at a sentence boundary, so BERTScore is comparing two
+fragments neither of which looks like anything in BERT's own training
+data. The contrast worth taking seriously is order 3 (the
+cross-entropy winner) against order 7 (the word-overlap winner). A
+likely reason for order 7's win is exposure bias, a known limitation of
+sequence models: cross-entropy tests the model on the true previous
+characters at every step, but generating text lets the model's own
+output feed into its own next prediction, and a higher-order model has
+memorized long enough verbatim stretches of training text that it can
+occasionally reproduce a run of words overlapping the reference by
+chance, even while the passage as a whole stays nonsense.
 
-The cherries, apples, and lemons at order 3 make the "generation quality
-is genuinely low everywhere" point concrete: even the best-scoring
-continuation ("he duke men and quin; novatier,\nLest\nMy ") is not real
-English, just a sequence of English-shaped fragments; the worst-scoring
-one ("his reath Tybalt true\nWhose\nUnless bushi") is further from the
-reference but not obviously worse to a casual glance. Unlike Table 2's
-cherries and lemons, which showed the model looking sharply better or
-worse on different held-out blocks, here every block looks roughly
-equally unconvincing — a reminder that a 3-character-order model was
-never going to write real sentences, no matter which held-out text you
-ask it to continue.
+Sorting order 3's and order 7's own continuations by ROUGE-L shows what
+that word-overlap win actually looks like as text. Order 7's best row
+genuinely reuses a real phrase from training almost verbatim ("loves a
+caitiff wretched Clarence") — that is where its higher ROUGE-L average
+comes from. But several of order 7's apples and lemons are not
+generated text at all: order 7's 48% miss rate (see Table 1) means the
+model runs out of a matching context partway through and falls back to
+repeating a single filler character for the rest of the continuation.
+Order 3's own best row tops out at a ROUGE-L of only 0.190 and is not
+real English either. Word overlap can go up either by getting luckier
+at reusing a memorized phrase, or by failing outright and producing
+filler that happens to share zero words with anything — neither is
+"better writing."
 
 ## Endpoint
 
@@ -115,6 +113,7 @@ character on an unseen context), and score it against the reference
 with BLEU, ROUGE-L, METEOR, and BERTScore (reusing the hand-written
 implementations from `03b_multi_metric_score.py`). Print the average of
 all four metrics per order alongside cross-entropy and perplexity. At
-order 3, sort the sampled continuations by BERTScore and print the 5
-highest, 5 near the median, and 5 lowest, each with its prompt,
-generated candidate, and true reference."
+order 3 (the cross-entropy winner) and at order 7 (the BLEU/ROUGE-L/
+METEOR winner), sort that order's own sampled continuations by ROUGE-L
+and print the 5 highest, 5 near the median, and 5 lowest, each with its
+prompt, generated candidate, true reference, and ROUGE-L score."

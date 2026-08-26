@@ -1,6 +1,7 @@
 """Demo: Table 1's n-gram order sweep, scored with BLEU, ROUGE-L, METEOR,
 and BERTScore (via nltk, rouge-score, and bert-score) over generated
-continuations of real held-out text.
+continuations of real held-out text. Also prints, for orders 3 and 7
+separately, the generated continuations sorted by ROUGE-L.
 
 See 03c_multi_metric_corpus.md for the full explanation.
 Reuses the same corpus, split, and training logic as 01_ngram_eval.py.
@@ -31,6 +32,7 @@ CONTINUATION_CHARS = 40  # characters generated, and compared to the true contin
 SAMPLE_SIZE = 30  # held-out blocks sampled for the generation metrics (BERTScore is not free)
 GROUP_SIZE = 5
 BEST_ORDER = 3  # the order Table 1 already found best by cross-entropy
+WORD_OVERLAP_ORDER = 7  # the order that wins on BLEU/ROUGE-L/METEOR despite worse perplexity
 RANDOM_SEED = 42
 
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
@@ -143,7 +145,7 @@ for order in ORDERS:
         candidate = generate(counts, order, prompt, CONTINUATION_CHARS, fallback_char)
         b, r, m, s = bleu(reference, candidate), rouge_l(reference, candidate), meteor(reference, candidate), bertscore(reference, candidate)
         bleu_scores.append(b), rouge_scores.append(r), meteor_scores.append(m), bert_scores.append(s)
-        per_block.append((s, prompt, candidate, reference))
+        per_block.append((r, s, prompt, candidate, reference))
     results_by_order[order] = per_block
 
     avg = lambda values: sum(values) / len(values)
@@ -151,15 +153,16 @@ for order in ORDERS:
     print(f"{order:5d} {len(counts):9d} {miss_rate:10.2%} {cross_entropy:10.3f} {perplexity:11.2f} "
           f"{avg(bleu_scores):7.3f} {avg(rouge_scores):8.3f} {avg(meteor_scores):7.3f} {avg(bert_scores):10.3f}")
 
-per_block = sorted(results_by_order[BEST_ORDER], key=lambda item: item[0])
-lemons, apples, cherries = per_block[:GROUP_SIZE], per_block[len(per_block) // 2 - GROUP_SIZE // 2:len(per_block) // 2 - GROUP_SIZE // 2 + GROUP_SIZE], per_block[-GROUP_SIZE:]
+for order in (BEST_ORDER, WORD_OVERLAP_ORDER):
+    per_block = sorted(results_by_order[order], key=lambda item: item[0])
+    lemons, apples, cherries = per_block[:GROUP_SIZE], per_block[len(per_block) // 2 - GROUP_SIZE // 2:len(per_block) // 2 - GROUP_SIZE // 2 + GROUP_SIZE], per_block[-GROUP_SIZE:]
 
-print(f"\norder={BEST_ORDER} generated continuations, sorted by BERTScore (higher is better)\n")
-for label, group in [("CHERRIES (highest BERTScore)", cherries), ("APPLES (median)", apples), ("LEMONS (lowest BERTScore)", lemons)]:
-    print(f"--- {label} ---")
-    for score, prompt, candidate, reference in group:
-        print(f"BERTScore: {score:.3f}")
-        print(f"  prompt:     {prompt!r}")
-        print(f"  candidate:  {candidate!r}")
-        print(f"  reference:  {reference!r}")
-    print()
+    print(f"\norder={order} generated continuations, sorted by ROUGE-L (higher is better)\n")
+    for label, group in [("CHERRIES (highest ROUGE-L)", cherries), ("APPLES (median)", apples), ("LEMONS (lowest ROUGE-L)", lemons)]:
+        print(f"--- {label} ---")
+        for rouge_score, bert_score, prompt, candidate, reference in group:
+            print(f"ROUGE-L: {rouge_score:.3f}  BERTScore: {bert_score:.3f}")
+            print(f"  prompt:     {prompt!r}")
+            print(f"  candidate:  {candidate!r}")
+            print(f"  reference:  {reference!r}")
+        print()
