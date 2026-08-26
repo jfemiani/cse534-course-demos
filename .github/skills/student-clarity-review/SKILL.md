@@ -102,6 +102,21 @@ Common shift patterns to check for, in rough order of how much load they add:
   cutting a preview sentence down to a bare pointer ("the rest of this page builds
   exactly that comparison, starting with the order sweep from Table 1") and letting
   the upcoming content carry its own specifics when the reader can actually see them.
+- **Restating the established instead of leading with the new**: an opening sentence
+  presents already-known information as if it were the new point, so the actually new
+  idea only shows up later, buried in the sentences that follow. "Running the four
+  extrinsic metrics above means the model has to actually generate something first"
+  restates a fact the reader was already given two paragraphs earlier (extrinsic
+  evaluation, by definition, generates one output and scores it) — it reads as new
+  information but tells the reader nothing they didn't know. The real news, that the
+  task needs a plausible "right" answer to compare against, and that this demo's
+  version of that task is completing a held-out block of text from a short prompt,
+  doesn't arrive until the following sentences. The tell is a reaction like "what, no,
+  that's not the point" from a reader who already knows the restated fact and is
+  waiting for the sentence to say something they don't already know. Fix by opening
+  with the genuinely new claim (what task, and why it needs a plausible right answer)
+  and only mentioning the already-established fact (generation is required) in
+  passing, if at all, instead of as the sentence's main subject.
 - **Strawman denial**: a sentence rebuts an assumption the reader never had, e.g.
   "nobody re-derives BLEU or BERTScore from its paper before using it." The reader
   was never wondering whether they'd need to implement a metric from scratch — that
