@@ -43,10 +43,10 @@ Work through these in order.
 4. [LLM-as-judge](04_llm_judge) — asks a model to judge the same three
    candidates BLEU just scored, directly, instead of counting overlapping
    words. The judge reverses BLEU's ranking, catching the factually wrong
-   candidate and crediting the correct paraphrase. `04b_llm_judge_corpus.py`
-   asks the same kind of judge to rate the continuations `03c_multi_metric_corpus.py`
-   generated, at every order — confirming, from an independent direction,
-   that free-running generation stays weak regardless of order.
+   candidate and crediting the correct paraphrase. `04b_llm_judge_prompt_compare.py`
+   uses a judge for a different job with no single reference answer: comparing
+   two competing prompts on the same questions, to see which one gets better
+   answers out of the same model.
 5. [Verifiable rewards](05_verifiable_rewards) — instead of a metric or a
    second model, a short program checks the output directly.
    `05_math_verifier.py` extracts a final numeric answer from four
@@ -69,9 +69,9 @@ uses `nltk`'s BLEU implementation locally, and `03b_multi_metric_score.py`
 and `03c_multi_metric_corpus.py` add ROUGE-L, METEOR, and BERTScore, all
 computed locally with `nltk`, `transformers`, and `torch` (no new packages
 beyond what this course's environment already installs for other lessons).
-Demo 4 calls the OpenAI API for structured-output judgments; `04b_llm_judge_corpus.py`
-makes one call per generated continuation per order (70 calls total for its
-full sweep). Demo 5 makes no API calls; both scripts are pure Python (`re`
+Demo 4 calls the OpenAI API for structured-output judgments; `04b_llm_judge_prompt_compare.py`
+makes three calls per question (one answer per prompt variant, plus one judge
+call). Demo 5 makes no API calls; both scripts are pure Python (`re`
 and plain rectangle geometry) with no new dependencies.
 
 Follow the Canvas lesson for setup, exact run instructions, and links to

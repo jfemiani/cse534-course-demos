@@ -122,11 +122,11 @@ evaluation first, since the lesson order was also reversed (see below).
   same three BLEU candidates directly and fully reverses BLEU's ranking,
   catching the wrong-room answer and crediting the correct paraphrase —
   paired with the cost/reliability tradeoff of judging with a model. A
-  companion demo (`04b_llm_judge_corpus`) reuses `03c`'s exact generation
-  setup and asks the same kind of judge to rate the generated
-  continuations at every order (70 real API calls total), confirming from
-  an independent direction that free-running generation stays weak
-  regardless of order.
+  companion demo (`04b_llm_judge_prompt_compare`) uses a judge for a
+  question with no single reference answer: which of two competing
+  prompts gets better answers out of the same model, on the same set of
+  questions — a real prompt-engineering use of LLM-as-judge, distinct from
+  grading a candidate against a fixed reference.
 - Covers evaluating your own work: ablation studies (framed as working
   backwards from a baseline-then-educated-guesses build process, to prove
   each kept change mattered) and grid search (framed around combinatorial
