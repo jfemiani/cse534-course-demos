@@ -1,4 +1,4 @@
-"""Demo: ask a model to judge answers instead of scoring word overlap.
+"""Demo: ask a model to judge something no formula can score at all.
 
 See 04_llm_judge.md for the full explanation.
 """
@@ -11,30 +11,27 @@ from pydantic import BaseModel
 client = OpenAI()
 model = os.getenv("OPENAI_MODEL", "gpt-5.6")
 
-QUESTION = "When are office hours and where do I go?"
-REFERENCE = "Office hours are Tuesdays from 2 to 4 pm in Laws Hall room 205."
-
-# The same three candidates 03_bleu_score.py scored with BLEU.
-CANDIDATES = {
-    "exact match": "Office hours are Tuesdays from 2 to 4 pm in Laws Hall room 205.",
-    "good paraphrase, low overlap": "You can stop by on Tuesday afternoons between 2 and 4 in Laws Hall 205.",
-    "wrong room, high overlap": "Office hours are Tuesdays from 2 to 4 pm in Laws Hall room 305.",
+# Three replies a TA might send to the same student email. There is no
+# single "correct" reply to compare these against, so a word-overlap
+# metric has nothing to score them against. "Friendly" is a judgment call.
+REPLIES = {
+    "warm": "Hi Sam! No problem at all, take the extra day and let me know if you need anything else.",
+    "curt": "Extension granted. Submit by Friday.",
+    "cold_but_polite": "Your request has been reviewed. An extension until Friday is approved.",
 }
 
 
 class Judgment(BaseModel):
-    correct: bool
-    quality: int  # 1 (bad) to 5 (excellent)
+    friendly: bool
     reason: str
 
 
-def judge(question: str, reference: str, candidate: str) -> Judgment:
+def judge(reply: str) -> Judgment:
     prompt = (
-        f"Question: {question}\n"
-        f"Reference answer: {reference}\n"
-        f"Student answer: {candidate}\n\n"
-        "Judge the student answer against the reference. Be strict about "
-        "factual details such as room numbers, days, and times."
+        f"Email reply: {reply!r}\n\n"
+        "Judge whether this reply reads as friendly, the way one person would "
+        "describe another person's tone in conversation. There is no fixed "
+        "rule for this; use your own sense of tone."
     )
     response = client.responses.parse(
         model=model,
@@ -44,8 +41,9 @@ def judge(question: str, reference: str, candidate: str) -> Judgment:
     return response.output_parsed
 
 
-for label, candidate in CANDIDATES.items():
-    result = judge(QUESTION, REFERENCE, candidate)
-    print(f"{label:30s} correct={result.correct!s:5s} quality={result.quality}/5")
-    print(f"{'':30s} reason: {result.reason}")
+for label, reply in REPLIES.items():
+    result = judge(reply)
+    print(f"{label:15s} friendly={result.friendly!s:5s} {reply!r}")
+    print(f"{'':15s} reason: {result.reason}")
     print()
+

@@ -1,10 +1,10 @@
-exact match                    correct=True  quality=4/5
-                               reason: The student answer exactly matches the reference, including the day, time, building, and room number.
+warm            friendly=True  'Hi Sam! No problem at all, take the extra day and let me know if you need anything else.'
+                reason: The reply is warm, accommodating, and supportive, with upbeat phrasing and an offer to help further.
 
-good paraphrase, low overlap   correct=True  quality=4/5
-                               reason: The student answer accurately matches the reference: Tuesdays from 2 to 4 pm in Laws Hall room 205.
+curt            friendly=False 'Extension granted. Submit by Friday.'
+                reason: The reply is clear and accommodating, but its terse, directive wording reads as neutral or curt rather than distinctly friendly.
 
-wrong room, high overlap       correct=False quality=2/5
-                               reason: The day and time are correct, but the room number is wrong: the reference says Laws Hall room 205, while the student says room 305.
+cold_but_polite friendly=True  'Your request has been reviewed. An extension until Friday is approved.'
+                reason: The reply is polite and helpful, though concise and somewhat formal.
 
 

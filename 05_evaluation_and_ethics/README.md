@@ -40,13 +40,11 @@ Work through these in order.
    already found best does not also produce the best generated text — a
    real instance of exposure bias, the gap between a teacher-forced
    training signal and free-running generation.
-4. [LLM-as-judge](04_llm_judge) — asks a model to judge the same three
-   candidates BLEU just scored, directly, instead of counting overlapping
-   words. The judge reverses BLEU's ranking, catching the factually wrong
-   candidate and crediting the correct paraphrase. `04b_llm_judge_prompt_compare.py`
-   uses a judge for a different job with no single reference answer: comparing
-   two competing prompts on the same questions, to see which one gets better
-   answers out of the same model.
+4. [LLM-as-judge](04_llm_judge) — asks a model to judge a quality that has
+   no reference wording to count overlap against at all: whether a
+   hand-written email reply reads as friendly. Three replies to the same
+   request, varying only in tone, get a `friendly` verdict and a
+   one-sentence reason each — a judgment call, not a fact lookup.
 5. [Verifiable rewards](05_verifiable_rewards) — instead of a metric or a
    second model, a short program checks the output directly.
    `05_math_verifier.py` extracts a final numeric answer from four
@@ -69,9 +67,8 @@ uses `nltk`'s BLEU implementation locally, and `03b_multi_metric_score.py`
 and `03c_multi_metric_corpus.py` add ROUGE-L, METEOR, and BERTScore, all
 computed locally with `nltk`, `transformers`, and `torch` (no new packages
 beyond what this course's environment already installs for other lessons).
-Demo 4 calls the OpenAI API for structured-output judgments; `04b_llm_judge_prompt_compare.py`
-makes three calls per question (one answer per prompt variant, plus one judge
-call). Demo 5 makes no API calls; both scripts are pure Python (`re`
+Demo 4 calls the OpenAI API for structured-output judgments, one call per
+reply. Demo 5 makes no API calls; both scripts are pure Python (`re`
 and plain rectangle geometry) with no new dependencies.
 
 Follow the Canvas lesson for setup, exact run instructions, and links to

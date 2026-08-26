@@ -118,15 +118,13 @@ evaluation first, since the lesson order was also reversed (see below).
   on generation-quality metrics — a real instance of exposure bias, the
   gap between an easy teacher-forced training signal and the harder
   free-running generation task.
-- Gives LLM-as-judge its own section (`04_llm_judge`): a model judges the
-  same three BLEU candidates directly and fully reverses BLEU's ranking,
-  catching the wrong-room answer and crediting the correct paraphrase —
-  paired with the cost/reliability tradeoff of judging with a model. A
-  companion demo (`04b_llm_judge_prompt_compare`) uses a judge for a
-  question with no single reference answer: which of two competing
-  prompts gets better answers out of the same model, on the same set of
-  questions — a real prompt-engineering use of LLM-as-judge, distinct from
-  grading a candidate against a fixed reference.
+- Gives LLM-as-judge its own section (`04_llm_judge`), collapsed to a
+  single minimal demo: a model judges whether a hand-written email reply
+  reads as friendly, across three replies varying only in tone. No BLEU
+  comparison and no fixed reference answer — the point is a quality with
+  no reference wording to count overlap against at all, paired with the
+  cost/reliability tradeoff of judging with a model and the honest
+  instability of a judge's call on a genuine borderline case.
 - Covers evaluating your own work: ablation studies (framed as working
   backwards from a baseline-then-educated-guesses build process, to prove
   each kept change mattered) and grid search (framed around combinatorial
