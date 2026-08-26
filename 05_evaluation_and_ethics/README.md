@@ -34,12 +34,14 @@ Work through these in order.
    three candidates through ROUGE-L, METEOR, and BERTScore alongside
    BLEU, showing that even an embedding-based metric like BERTScore still
    ranks the factually wrong candidate above the correct paraphrase.
-   `03c_multi_metric_corpus.py` runs all four metrics again at the scale
-   of demo 1's order sweep: it generates a continuation of real held-out
-   text at every order and scores it, showing that the order cross-entropy
-   already found best does not also produce the best generated text — a
-   real instance of exposure bias, the gap between a teacher-forced
-   training signal and free-running generation.
+   `03c_multi_metric_corpus.py` runs all four metrics on a real
+   extrinsic task instead of toy sentences: a tiny slice of the BillSum
+   summarization benchmark, with ChatGPT writing a one-paragraph summary
+   of each of two real bills, scored against BillSum's own human
+   reference summary — showing BLEU score both correct summaries low
+   because they reword rather than copy the reference, while ROUGE-L,
+   METEOR, and especially BERTScore credit the same summaries much more
+   fairly.
 4. [LLM-as-judge](04_llm_judge) — asks a model to judge a quality that has
    no reference wording to count overlap against at all, using a real
    benchmark question instead of an invented one: MT-Bench question 151
@@ -64,14 +66,16 @@ the underlying API changes.
 
 Demo 1 makes no API calls; it downloads a public text file and does the
 counting locally, including its block-level companion. Demos 2a and 2b call
-the OpenAI Embeddings API. Demo 3 makes no API calls; `03_bleu_score.py`
-uses `nltk`'s BLEU implementation locally, and `03b_multi_metric_score.py`
-and `03c_multi_metric_corpus.py` add ROUGE-L, METEOR, and BERTScore, all
-computed locally with `nltk`, `transformers`, and `torch` (no new packages
-beyond what this course's environment already installs for other lessons).
-Demo 4 calls the OpenAI API for structured-output judgments, one call per
-reply. Demo 5 makes no API calls; both scripts are pure Python (`re`
-and plain rectangle geometry) with no new dependencies.
+the OpenAI Embeddings API. Demo 3's `03_bleu_score.py` and
+`03b_multi_metric_score.py` make no API calls — BLEU, ROUGE-L, METEOR, and
+BERTScore are all computed locally with `nltk`, `transformers`, and `torch`
+(no new packages beyond what this course's environment already installs
+for other lessons). `03c_multi_metric_corpus.py` calls the OpenAI
+Responses API to generate each summary, then scores it with the same
+local metrics. Demo 4 calls the OpenAI API for structured-output
+judgments, one call per reply. Demo 5 makes no API calls; both scripts
+are pure Python (`re` and plain rectangle geometry) with no new
+dependencies.
 
 Follow the Canvas lesson for setup, exact run instructions, and links to
 the benchmarks, leaderboards, and evaluation tools this module points to.

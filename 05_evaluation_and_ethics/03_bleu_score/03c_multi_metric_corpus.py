@@ -1,116 +1,169 @@
-"""Demo: Table 1's n-gram order sweep, scored with BLEU, ROUGE-L, METEOR,
-and BERTScore (via nltk, rouge-score, and bert-score) over generated
-continuations of real held-out text. Also prints, for orders 3 and 7
-separately, the generated continuations sorted by BERTScore. The prompt
-and true continuation are snapped out to the nearest word boundary
-(never cut mid-word); the generated candidate is sampled character by
-character and is not snapped, since nothing guarantees it lands on a
-word boundary at all.
+"""Demo: a real summarization benchmark, scored with BLEU, ROUGE-L,
+METEOR, and BERTScore (via nltk, rouge-score, and bert-score) against a
+real human reference summary instead of an invented one.
+
+Two bills from BillSum (Kornilova and Eidelman, "BillSum: A Corpus for
+Automatic Summarization of US Legislation," 2019,
+https://huggingface.co/datasets/FiscalNote/billsum) are summarized by
+ChatGPT, then scored against BillSum's own human-written reference
+summary for that bill.
 
 See 03c_multi_metric_corpus.md for the full explanation.
-Reuses the same corpus, split, and training logic as 01_ngram_eval.py.
 """
 
-import math
-import random
-from collections import Counter
-from urllib.request import urlopen
+import os
 
 import nltk
 from bert_score import BERTScorer
 from nltk.translate.bleu_score import SmoothingFunction, sentence_bleu
 from nltk.translate.meteor_score import meteor_score
+from openai import OpenAI
 from rouge_score import rouge_scorer
 
 nltk.download("wordnet", quiet=True)
 nltk.download("omw-1.4", quiet=True)
 
-CORPUS_URL = "https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt"
-PAD = "^"
-END = "$"
-ORDERS = [2, 3, 4, 5, 6, 7, 8]
-HELD_OUT_FRACTION = 0.1
-FLOOR_PROBABILITY = 1e-4
-PROMPT_CHARS = 20  # target length of the prompt, snapped out to the nearest word boundary
-CONTINUATION_CHARS = 40  # target length of the true continuation, snapped the same way
-WORD_SNAP_MARGIN = 15  # extra headroom so snapping never runs past the end of a block
-SAMPLE_SIZE = 30  # held-out blocks sampled for the generation metrics (BERTScore is not free)
-GROUP_SIZE = 5
-BEST_ORDER = 3  # the order Table 1 already found best by cross-entropy
-BERTSCORE_ORDER = 7  # the order that wins on BERTScore despite worse perplexity
-RANDOM_SEED = 42
+client = OpenAI()
+model = os.getenv("OPENAI_MODEL", "gpt-5.6")
 
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 rouge = rouge_scorer.RougeScorer(["rougeL"], use_stemmer=True)
 bert_scorer = BERTScorer(model_type=MODEL_NAME, num_layers=6, lang="en", rescale_with_baseline=False)
 
+# Two real BillSum test-set bills (public domain, US Government Publishing
+# Office). Each "reference_summary" below is BillSum's own human-written
+# summary, not something written for this demo.
+BILLS = [
+    {
+        "title": "Merchant Marine of World War II Congressional Gold Medal Act",
+        "text": (
+            "SECTION 1. SHORT TITLE.\n\n"
+            "    This Act may be cited as the ``Merchant Marine of World War II "
+            "Congressional Gold Medal Act''.\n\n"
+            "SEC. 2. FINDINGS.\n\n"
+            "    The Congress finds the following:\n"
+            "        (1) The United States Merchant Marine was integral in "
+            "providing the link between domestic production and the fighting "
+            "forces overseas, providing combat equipment, fuel, food, "
+            "commodities, and raw materials to troops stationed overseas.\n"
+            "        (2) The United States Merchant Marine provided for the "
+            "successful transport of resources and personnel despite "
+            "consistent and ongoing exposure to enemy combatants from both "
+            "the air and the sea, such as enemy bomber squadrons, "
+            "submarines, and mines.\n"
+            "        (3) The efforts of the United States Merchant Marine were "
+            "not without sacrifices as they bore a higher per capita "
+            "casualty rate than any other branch of the military during the "
+            "war.\n"
+            "        (4) The feats and accomplishments of the Merchant Marine "
+            "are deserving of broader public recognition.\n\n"
+            "SEC. 3. CONGRESSIONAL GOLD MEDAL.\n\n"
+            "    (a) Award Authorized.--The Speaker of the House of Representatives "
+            "and the President pro tempore of the Senate shall make appropriate "
+            "arrangements for the award, on behalf of the Congress, of a single gold "
+            "medal of appropriate design to the U.S. Merchant Marine of World War "
+            "II, in recognition of their dedicated and vital service during World "
+            "War II.\n"
+            "    (b) Design and Striking.--For the purposes of the award referred to "
+            "in subsection (a), the Secretary of the Treasury shall strike the gold "
+            "medal with suitable emblems, devices, and inscriptions.\n"
+            "    (c) American Merchant Marine Museum.--Following the award of the "
+            "gold medal in honor of the U.S. Merchant Marine, the gold medal shall "
+            "be given to the American Merchant Marine Museum, where it will be "
+            "available for display as appropriate and available for research.\n\n"
+            "SEC. 4. DUPLICATE MEDALS.\n\n"
+            "    Under such regulations as the Secretary may prescribe, the "
+            "Secretary may strike and sell duplicates in bronze of the gold medal "
+            "struck under section 3, at a price sufficient to cover the costs of the "
+            "medals, including labor, materials, dies, use of machinery, and "
+            "overhead expenses.\n\n"
+            "SEC. 5. STATUS OF MEDALS.\n\n"
+            "    (a) National Medals.--Medals struck pursuant to this Act are "
+            "national medals for purposes of chapter 51 of title 31, United States "
+            "Code.\n"
+            "    (b) Numismatic Items.--For purposes of section 5134 of title 31, "
+            "United States Code, all medals struck under this Act shall be "
+            "considered to be numismatic items."
+        ),
+        "reference_summary": (
+            "Merchant Marine of World War II Congressional Gold Medal Act "
+            "(Sec. 3) This bill requires the Speaker of the House of Representatives "
+            "and the President pro tempore of the Senate to arrange for the award, "
+            "on behalf of Congress, of a single gold medal to the U.S. Merchant "
+            "Marine of World War II, in recognition of their dedicated and vital "
+            "service during World War II. Following its award the medal shall be "
+            "given to the American Merchant Marine Museum where it will be available "
+            "for display and research."
+        ),
+    },
+    {
+        "title": "Prescription Drug Monitoring Act of 2016",
+        "text": (
+            "SECTION 1. SHORT TITLE.\n\n"
+            "    This Act may be cited as the ``Prescription Drug Monitoring Act of "
+            "2016''.\n\n"
+            "SEC. 3. PRESCRIPTION DRUG MONITORING PROGRAM REQUIREMENTS.\n\n"
+            "    (a) In General.--Beginning 2 years after the date of enactment of "
+            "this Act, each covered State shall require--\n"
+            "        (1) each prescribing practitioner within the covered State "
+            "or their designee to consult the PDMP of the covered State "
+            "before initiating treatment with a prescription for a "
+            "controlled substance listed in schedule II, III, or IV, and every 3 "
+            "months thereafter as long as the treatment continues;\n"
+            "        (2) the PDMP of the covered State to provide proactive "
+            "notification to a practitioner when patterns indicative of "
+            "controlled substance misuse, including opioid misuse, are "
+            "detected;\n"
+            "        (3) each dispenser within the covered State to report each "
+            "prescription for a controlled substance dispensed by the "
+            "dispenser to the PDMP not later than 24 hours after the "
+            "controlled substance is dispensed to the patient; and\n"
+            "        (4) that the PDMP make available a quarterly de-identified "
+            "data set and an annual report for public and private use.\n"
+            "    (b) Noncompliance.--If a covered State fails to comply with "
+            "subsection (a), the Attorney General or the Secretary of Health and "
+            "Human Services, as appropriate, may withhold grant funds from being "
+            "awarded to the covered State under the Harold Rogers Prescription Drug "
+            "Monitoring Program or the controlled substance monitoring program.\n\n"
+            "SEC. 4. SHARING PDMP INFORMATION AMONG STATES.\n\n"
+            "    (a) Requirement.--Beginning 2 years after the date of enactment of "
+            "this Act, each covered State shall make the data contained in the PDMP "
+            "of the covered State available to other States through the data-sharing "
+            "single technology solution established under subsection (b).\n"
+            "    (b) Data-Sharing Single Technology Solution.--The Attorney General, "
+            "in coordination with the Secretary of Health and Human Services, shall "
+            "award, on a competitive basis, a grant to an eligible entity to "
+            "establish and maintain an inter-State data-sharing single hub to "
+            "facilitate the sharing of PDMP data among States and the accessing of "
+            "such data by practitioners. The hub shall allow States to retain "
+            "ownership of the data they submit, provide de-identified data for "
+            "research, and allow authorized users to access data without a user fee."
+        ),
+        "reference_summary": (
+            "Prescription Drug Monitoring Act of 2016 This bill requires a state "
+            "that receives grant funds under the prescription drug monitoring "
+            "program (PDMP) or the controlled substance monitoring program to "
+            "comply with specified requirements. The Department of Justice (DOJ) or "
+            "Department of Health and Human Services may withhold grant funds from "
+            "a state that fails to comply. Additionally, the bill requires a state "
+            "to share its PDMP data with other states through a data-sharing hub "
+            "established by DOJ."
+        ),
+    },
+]
 
-def load_blocks() -> list[str]:
-    with urlopen(CORPUS_URL) as response:
-        text = response.read().decode("utf-8")
-    return [block.strip() for block in text.split("\n\n") if block.strip()]
 
-
-def snap_to_word_end(text: str, pos: int) -> int:
-    """Push `pos` forward to the end of whatever word it falls inside, so a cut lands on whitespace instead of mid-word."""
-    while pos < len(text) and not text[pos].isspace():
-        pos += 1
-    return pos
-
-
-def train_counts(blocks: list[str], order: int) -> dict[str, dict[str, int]]:
-    counts: dict[str, dict[str, int]] = {}
-    for block in blocks:
-        sequence = PAD * order + block + END
-        for i in range(len(sequence) - order):
-            context = sequence[i:i + order]
-            next_char = sequence[i + order]
-            counts.setdefault(context, {})
-            counts[context][next_char] = counts[context].get(next_char, 0) + 1
-    return counts
-
-
-def evaluate(counts: dict[str, dict[str, int]], blocks: list[str], order: int) -> tuple[float, float]:
-    """Cross-entropy (bits/char) and miss rate over blocks — same measurement as 01_ngram_eval.py."""
-    total_bits = 0.0
-    total_chars = 0
-    misses = 0
-    for block in blocks:
-        sequence = PAD * order + block + END
-        for i in range(len(sequence) - order):
-            context = sequence[i:i + order]
-            next_char = sequence[i + order]
-            context_counts = counts.get(context)
-            if not context_counts or next_char not in context_counts:
-                p, miss = FLOOR_PROBABILITY, True
-            else:
-                p, miss = context_counts[next_char] / sum(context_counts.values()), False
-            total_bits += -math.log2(p)
-            total_chars += 1
-            misses += miss
-    return total_bits / total_chars, misses / total_chars
-
-
-def generate(counts: dict[str, dict[str, int]], order: int, prompt: str, length: int, fallback_char: str) -> str:
-    """Generate `length` characters after `prompt`, sampling from the trained distribution."""
-    text = PAD * order + prompt
-    generated = []
-    for _ in range(length):
-        context_counts = counts.get(text[-order:])
-        if context_counts:
-            chars, weights = zip(*context_counts.items())
-            next_char = random.choices(chars, weights=weights)[0]
-        else:
-            next_char = fallback_char
-        generated.append(next_char)
-        text += next_char
-    return "".join(generated)
+def summarize(bill_text: str) -> str:
+    prompt = (
+        "Summarize the following US Congressional bill in one paragraph, "
+        "the way a legislative summary service would: state what the bill "
+        "does, not how it is worded.\n\n" + bill_text
+    )
+    return client.responses.create(model=model, input=prompt).output_text.strip()
 
 
 def bleu(reference: str, candidate: str) -> float:
     ref_tokens, cand_tokens = reference.lower().split(), candidate.lower().split()
-    if not cand_tokens:
-        return 0.0
     return sentence_bleu([ref_tokens], cand_tokens, smoothing_function=SmoothingFunction().method1)
 
 
@@ -120,8 +173,6 @@ def rouge_l(reference: str, candidate: str) -> float:
 
 def meteor(reference: str, candidate: str) -> float:
     ref_tokens, cand_tokens = reference.lower().split(), candidate.lower().split()
-    if not ref_tokens or not cand_tokens:
-        return 0.0
     return meteor_score([ref_tokens], cand_tokens)
 
 
@@ -130,53 +181,14 @@ def bertscore(reference: str, candidate: str) -> float:
     return f1.item()
 
 
-blocks = load_blocks()
-split = int(len(blocks) * (1 - HELD_OUT_FRACTION))
-train_blocks, held_out_blocks = blocks[:split], blocks[split:]
-
-min_length = PROMPT_CHARS + CONTINUATION_CHARS + WORD_SNAP_MARGIN
-eligible_blocks = [block for block in held_out_blocks if len(block) >= min_length]
-random.seed(RANDOM_SEED)
-sample_blocks = random.sample(eligible_blocks, SAMPLE_SIZE)
-fallback_char = Counter("".join(train_blocks)).most_common(1)[0][0]
-
-print(f"{len(train_blocks)} training blocks, {len(held_out_blocks)} held-out blocks, "
-      f"{len(eligible_blocks)} long enough to generate from, sampling {SAMPLE_SIZE}\n")
-
-results_by_order: dict[int, list[tuple[float, str, str, str]]] = {}
-print(f"{'order':>5s} {'contexts':>9s} {'miss rate':>10s} {'cross-ent':>10s} {'perplexity':>11s} "
-      f"{'BLEU':>7s} {'ROUGE-L':>8s} {'METEOR':>7s} {'BERTScore':>10s}")
-for order in ORDERS:
-    counts = train_counts(train_blocks, order)
-    cross_entropy, miss_rate = evaluate(counts, held_out_blocks, order)
-
-    bleu_scores, rouge_scores, meteor_scores, bert_scores = [], [], [], []
-    per_block = []
-    for block in sample_blocks:
-        prompt_end = snap_to_word_end(block, PROMPT_CHARS)
-        reference_end = snap_to_word_end(block, prompt_end + CONTINUATION_CHARS)
-        prompt, reference = block[:prompt_end], block[prompt_end:reference_end]
-        candidate = generate(counts, order, prompt, len(reference), fallback_char)
-        b, r, m, s = bleu(reference, candidate), rouge_l(reference, candidate), meteor(reference, candidate), bertscore(reference, candidate)
-        bleu_scores.append(b), rouge_scores.append(r), meteor_scores.append(m), bert_scores.append(s)
-        per_block.append((r, s, prompt, candidate, reference))
-    results_by_order[order] = per_block
-
-    avg = lambda values: sum(values) / len(values)
-    perplexity = 2 ** cross_entropy
-    print(f"{order:5d} {len(counts):9d} {miss_rate:10.2%} {cross_entropy:10.3f} {perplexity:11.2f} "
-          f"{avg(bleu_scores):7.3f} {avg(rouge_scores):8.3f} {avg(meteor_scores):7.3f} {avg(bert_scores):10.3f}")
-
-for order in (BEST_ORDER, BERTSCORE_ORDER):
-    per_block = sorted(results_by_order[order], key=lambda item: item[1])
-    lemons, apples, cherries = per_block[:GROUP_SIZE], per_block[len(per_block) // 2 - GROUP_SIZE // 2:len(per_block) // 2 - GROUP_SIZE // 2 + GROUP_SIZE], per_block[-GROUP_SIZE:]
-
-    print(f"\norder={order} generated continuations, sorted by BERTScore (higher is better)\n")
-    for label, group in [("CHERRIES (highest BERTScore)", cherries), ("APPLES (median)", apples), ("LEMONS (lowest BERTScore)", lemons)]:
-        print(f"--- {label} ---")
-        for rouge_score, bert_score, prompt, candidate, reference in group:
-            print(f"ROUGE-L: {rouge_score:.3f}  BERTScore: {bert_score:.3f}")
-            print(f"  prompt:     {prompt!r}")
-            print(f"  candidate:  {candidate!r}")
-            print(f"  reference:  {reference!r}")
-        print()
+print(f"{'bill':<45s} {'BLEU':>7s} {'ROUGE-L':>8s} {'METEOR':>7s} {'BERTScore':>10s}")
+for bill in BILLS:
+    generated_summary = summarize(bill["text"])
+    reference = bill["reference_summary"]
+    b = bleu(reference, generated_summary)
+    r = rouge_l(reference, generated_summary)
+    m = meteor(reference, generated_summary)
+    s = bertscore(reference, generated_summary)
+    print(f"{bill['title'][:45]:<45s} {b:7.3f} {r:8.3f} {m:7.3f} {s:10.3f}")
+    print(f"  reference: {reference}")
+    print(f"  chatgpt:   {generated_summary}\n")

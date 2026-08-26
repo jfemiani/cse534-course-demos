@@ -113,13 +113,16 @@ evaluation first, since the lesson order was also reversed (see below).
   environment (`nltk` for BLEU/METEOR, a hand-written longest-common-
   subsequence for ROUGE-L, and a hand-written greedy cosine-similarity
   match over `transformers`/`torch` embeddings for BERTScore). A third
-  demo (`03c_multi_metric_corpus`) reruns all four metrics at the scale of
-  the order sweep itself: for each order, it generates a continuation of
-  real held-out text and scores it against the true continuation, showing
-  that the order cross-entropy already favors (order 3) does not also win
-  on generation-quality metrics — a real instance of exposure bias, the
-  gap between an easy teacher-forced training signal and the harder
-  free-running generation task.
+  demo (`03c_multi_metric_corpus`) applies all four metrics to a real
+  extrinsic task instead of an invented one: a tiny slice of the BillSum
+  summarization benchmark (Kornilova and Eidelman, 2019), where ChatGPT
+  writes a one-paragraph summary of each of two real Congressional bills
+  and that summary is scored against BillSum's own human reference
+  summary — showing BLEU score both correct summaries low because they
+  reword rather than copy the reference, while ROUGE-L, METEOR, and
+  especially BERTScore credit the same summaries far more fairly, a real
+  instance of a metric being the wrong tool for a task with no single
+  correct wording, not just the wrong tool for one contrived example.
 - Gives LLM-as-judge its own section (`04_llm_judge`), collapsed to a
   single minimal demo grounded in a real benchmark question instead of an
   invented one: MT-Bench question 151 (Zheng et al., 2023), a two-turn
