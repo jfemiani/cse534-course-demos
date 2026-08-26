@@ -186,15 +186,19 @@ Common shift patterns to check for, in rough order of how much load they add:
   editing process onto the page. It is also different from a legitimate historical
   note about the *subject matter itself* (e.g. "LMArena, formerly known as LMSYS
   Chatbot Arena" is fine — that is a real rename of the product being discussed, not
-  a note about how this page was drafted). Fix by stating the point directly, with no
-  reference to a draft, a prior run, or "this same demo": if the underlying fact is
-  worth keeping (e.g. why word-boundary snapping matters), rewrite it as a
-  self-contained explanation or a hypothetical ("cutting either one off mid-word
-  would starve every word-overlap metric...") instead of a before/after comparison
-  against a version the student never saw. Watch for this specifically after a
-  multi-turn editing session where this assistant reran a demo or reworked a
-  paragraph — the temptation to narrate "what changed" directly onto the student-facing
-  page is strongest right after making that kind of change.
+  a note about how this page was drafted). The correct fix is usually deletion, not
+  rewriting: if the underlying mechanism was already explained earlier on the page
+  (e.g. in the paragraph that first set up word-boundary snapping), restating it here
+  as a hypothetical ("cutting either one off mid-word would starve every word-overlap
+  metric...") is not a real fix either — it is the same off-thesis padding in a new
+  shape, just with the "earlier version" framing removed instead of the padding
+  removed. Check whether the paragraph's actual point (here: "order 3 wins on these
+  metrics too") already stands on its own without the mechanism recap, and if so, cut
+  the recap entirely rather than finding a way to keep it. Watch for this specifically
+  after a multi-turn editing session where this assistant reran a demo or reworked a
+  paragraph — the temptation to narrate "what changed," and then the temptation to
+  re-explain "why it changed" even after removing the narration, are both strongest
+  right after making that kind of edit.
 - **Point drift**: a sentence is true, well-written, and individually clear, but does
   not serve the paragraph's actual thesis. Every sentence in isolation can pass a
   register check and still leave the reader unable to say what the paragraph was
