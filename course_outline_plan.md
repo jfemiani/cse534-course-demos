@@ -158,24 +158,6 @@ evaluation first, since the lesson order was also reversed (see below).
   it every time, including an illustrative (non-executed) promptfoo config
   showing how much of the hand-rolled retrieval hit-rate demo a library
   absorbs.
-- Adds a section on verifiers as a third kind of "scoring": when a task has
-  a precise, checkable specification, a program can decide correct/
-  incorrect directly, with no metric formula and no second model forming
-  an opinion. Demo (`05_math_verifier`) extracts a final numeric answer
-  from four candidate solutions to one math problem and checks it against
-  a known ground truth, contrasting a format check against an accuracy
-  check (echoing DeepSeek-R1's dual reward design) and showing the
-  verifier is immune to the wording-vs-value confusion BLEU fell into
-  earlier on the page. Companion demo (`05b_floorplan_verifier`) applies
-  the same idea to a non-numeric, spatial output — no room overlaps, every
-  room has a door — via plain rectangle geometry, showing a verifier
-  generalizes past math. Ties this to Reinforcement Learning with
-  Verifiable Rewards (RLVR), citing DeepSeek-R1 (arXiv:2501.12948) and
-  AlphaProof (Nature, s41586-025-09833-y) as real, citable examples, and
-  names the boundary (no specification precise enough to check
-  automatically means no verifier, which is why the earlier metrics and
-  LLM-as-judge still matter) plus the Goodhart's-Law risk of a
-  non-airtight verifier. No new packages: both demos are pure Python.
 
 ### 5.3 Ethics and Responsible AI ✅ (first cut)
 - Hard constraint followed throughout: every section poses an open
