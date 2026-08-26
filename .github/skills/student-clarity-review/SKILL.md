@@ -174,6 +174,27 @@ Common shift patterns to check for, in rough order of how much load they add:
   the corrected sentence; state only what the code does ("skipping any block too
   short to supply both") and drop the alternative entirely, even when the fix is
   responding to an error this assistant itself introduced.
+- **Revision-history leakage**: a sentence tells the student what an *earlier version
+  of this demo/page* showed, said, or did, instead of just stating the current fact.
+  "An earlier version of this same demo did not show that agreement" is authoring
+  process trivia — the student has no access to that earlier version, was never shown
+  it, and gains nothing from knowing it existed. The tell is a reader reaction like
+  "earlier than what? I've only ever seen this one" — the sentence assumes a revision
+  history the student was never a part of and has no reason to care about. This is
+  different from a strawman denial (rebutting an assumption the reader never had):
+  here nothing is being denied, the sentence is just narrating this assistant's own
+  editing process onto the page. It is also different from a legitimate historical
+  note about the *subject matter itself* (e.g. "LMArena, formerly known as LMSYS
+  Chatbot Arena" is fine — that is a real rename of the product being discussed, not
+  a note about how this page was drafted). Fix by stating the point directly, with no
+  reference to a draft, a prior run, or "this same demo": if the underlying fact is
+  worth keeping (e.g. why word-boundary snapping matters), rewrite it as a
+  self-contained explanation or a hypothetical ("cutting either one off mid-word
+  would starve every word-overlap metric...") instead of a before/after comparison
+  against a version the student never saw. Watch for this specifically after a
+  multi-turn editing session where this assistant reran a demo or reworked a
+  paragraph — the temptation to narrate "what changed" directly onto the student-facing
+  page is strongest right after making that kind of change.
 - **Point drift**: a sentence is true, well-written, and individually clear, but does
   not serve the paragraph's actual thesis. Every sentence in isolation can pass a
   register check and still leave the reader unable to say what the paragraph was
