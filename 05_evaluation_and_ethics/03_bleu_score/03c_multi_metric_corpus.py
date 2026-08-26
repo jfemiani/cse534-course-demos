@@ -1,12 +1,16 @@
-"""Demo: a real summarization benchmark, scored with BLEU, ROUGE-L,
-METEOR, and BERTScore (via nltk, rouge-score, and bert-score) against a
-real human reference summary instead of an invented one.
+"""Demo: zero-shot vs. one-shot prompting on a real summarization
+benchmark, scored with BLEU, ROUGE-L, METEOR, and BERTScore (via nltk,
+rouge-score, and bert-score) against real human reference summaries
+instead of invented ones.
 
 Two bills from BillSum (Kornilova and Eidelman, "BillSum: A Corpus for
 Automatic Summarization of US Legislation," 2019,
-https://huggingface.co/datasets/FiscalNote/billsum) are summarized by
-ChatGPT, then scored against BillSum's own human-written reference
-summary for that bill.
+https://huggingface.co/datasets/FiscalNote/billsum) are each summarized by
+ChatGPT twice: once with a zero-shot prompt (no example) and once with a
+one-shot prompt that includes one worked example -- a third, different
+bill and its real BillSum summary. Each generated summary is scored
+against BillSum's own human-written reference summary for that bill, and
+the two scores per bill are averaged into one row per prompt.
 
 See 03c_multi_metric_corpus.md for the full explanation.
 """
@@ -29,6 +33,131 @@ model = os.getenv("OPENAI_MODEL", "gpt-5.6")
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 rouge = rouge_scorer.RougeScorer(["rougeL"], use_stemmer=True)
 bert_scorer = BERTScorer(model_type=MODEL_NAME, num_layers=6, lang="en", rescale_with_baseline=False)
+
+# A third real BillSum bill (public domain, US Government Publishing
+# Office), used only as the worked example inside the one-shot prompt
+# below. It is never itself summarized or scored.
+EXAMPLE_BILL = {
+    "title": "Children's Bicycle Helmet Safety Act of 1993",
+    "text": (
+        "SECTION 1. SHORT TITLE.\n\n"
+        "    This Act may be cited as the ``Children's Bicycle Helmet Safety Act "
+        "of 1993''.\n\n"
+        "SEC. 2. FINDINGS.\n\n"
+        "    The Congress finds that--\n"
+        "        (1) 90 million Americans ride bicycles and 20 million ride "
+        "a bicycle more than once a week;\n"
+        "        (2) between 1984 and 1988, 2,985 bicyclists in the United "
+        "States died from head injuries and 905,752 suffered head injuries "
+        "that were treated in hospital emergency rooms;\n"
+        "        (3) 41 percent of bicycle-related head injury deaths and 76 "
+        "percent of bicycle-related head injuries occurred among American "
+        "children under age 15;\n"
+        "        (4) deaths and injuries from bicycle accidents cost society "
+        "$7.6 billion annually; and a child suffering from a head injury, on "
+        "average, will cost society $4.5 million over the child's lifetime;\n"
+        "        (5) universal use of bicycle helmets in the United States "
+        "would have prevented 2,600 deaths from head injuries and 757,000 "
+        "injuries; and\n"
+        "        (6) only 5 percent of children in the Nation who ride "
+        "bicycles wear helmets.\n\n"
+        "SEC. 3. ESTABLISHMENT OF PROGRAM.\n\n"
+        "    The Administrator of the National Highway Traffic Safety "
+        "Administration may, in accordance with section 4, make grants to "
+        "States, State political subdivisions, and nonprofit organizations for "
+        "programs that require or encourage individuals under the age of 16 to "
+        "wear approved bicycle helmets. In making those grants, the "
+        "Administrator shall allow grantees to use wide discretion in designing "
+        "programs that effectively promote increased bicycle helmet use.\n\n"
+        "SEC. 4. PURPOSES FOR GRANTS.\n\n"
+        "    A grant made under section 3 may be used by a grantee to--\n"
+        "        (1) enforce a law that requires individuals under the age "
+        "of 16 to wear approved bicycle helmets on their heads while riding "
+        "on bicycles;\n"
+        "        (2) assist individuals under the age of 16 to acquire "
+        "approved bicycle helmets;\n"
+        "        (3) develop and administer a program to educate individuals "
+        "under the age of 16 and their families on the importance of wearing "
+        "such helmets in order to improve bicycle safety; or\n"
+        "        (4) carry out any combination of the activities described "
+        "in paragraphs (1), (2), and (3).\n\n"
+        "SEC. 5. STANDARDS.\n\n"
+        "    (a) In General.--Bicycle helmets manufactured 9 months or more "
+        "after the date of the enactment of this Act shall conform to--\n"
+        "        (1) any interim standard described under subsection (b), "
+        "pending the establishment of a final standard pursuant to "
+        "subsection (c); and\n"
+        "        (2) the final standard, once it has been established under "
+        "subsection (c).\n"
+        "    (b) Interim Standards.--The interim standards are as follows:\n"
+        "        (1) The American National Standards Institute standard "
+        "designated as ``Z90.4-1984''.\n"
+        "        (2) The Snell Memorial Foundation standard designated as "
+        "``B-90''.\n"
+        "        (3) Any other standard that the Consumer Product Safety "
+        "Commission determines is appropriate.\n"
+        "    (c) Final Standard.--Not later than 60 days after the date of the "
+        "enactment of this Act, the Consumer Product Safety Commission shall "
+        "begin a proceeding under section 553 of title 5, United States Code, "
+        "to--\n"
+        "        (1) review the requirements of the interim standards set "
+        "forth in subsection (a) and establish a final standard based on "
+        "such requirements;\n"
+        "        (2) include in the final standard a provision to protect "
+        "against the risk of helmets coming off the heads of bicycle riders;\n"
+        "        (3) include in the final standard provisions that address "
+        "the risk of injury to children; and\n"
+        "        (4) include additional provisions as appropriate.\n"
+        "Sections 7 and 9 of the Consumer Product Safety Act (15 U.S.C. 2056 and "
+        "2058) shall not apply to the proceeding under this subsection and "
+        "section 11 of such Act (15 U.S.C. 2060) shall not apply with respect to "
+        "any standard issued under such proceeding. The final standard shall "
+        "take effect 1 year from the date it is issued.\n"
+        "    (d) Failure To Meet Standards.--\n"
+        "        (1) Failure to meet interim standard.--Until the final "
+        "standard takes effect, a bicycle helmet that does not conform to an "
+        "interim standard as required under subsection (a)(1) shall be "
+        "considered in violation of a consumer product safety standard "
+        "promulgated under the Consumer Product Safety Act.\n"
+        "        (2) Status of final standard.--The final standard developed "
+        "under subsection (c) shall be considered a consumer product safety "
+        "standard promulgated under the Consumer Product Safety Act.\n\n"
+        "SEC. 6. AUTHORIZATION OF APPROPRIATIONS.\n\n"
+        "    For the National Highway Traffic Safety Administration to carry out "
+        "the grant program authorized by this Act, there are authorized to be "
+        "appropriated $2,000,000 for fiscal year 1994, $3,000,000 for fiscal "
+        "year 1995, and $4,000,000 for fiscal year 1996.\n\n"
+        "SEC. 7. DEFINITION.\n\n"
+        "    In this Act, the term ``approved bicycle helmet'' means a bicycle "
+        "helmet that meets--\n"
+        "        (1) any interim standard described in section 5(b), pending "
+        "establishment of a final standard under section 5(c); and\n"
+        "        (2) the final standard, once it is established under "
+        "section 5(c)."
+    ),
+    "reference_summary": (
+        "Children's Bicycle Helmet Safety Act of 1993 - Authorizes the "
+        "Administrator of the National Highway Traffic Safety Administration "
+        "to make grants to States, political subdivisions, and nonprofit "
+        "organizations for programs that require or encourage individuals "
+        "under age 16 to wear approved bicycle helmets. Specifies that such "
+        "grants may be used to: (1) enforce a law that requires such "
+        "individuals to wear approved bicycle helmets; (2) assist such "
+        "individuals to acquire such helmets; and (3) develop and administer "
+        "a program to educate such individuals and their families on the "
+        "importance of wearing such helmets. Sets interim standards for "
+        "bicycle helmets and provides that a helmet that does not conform "
+        "shall be considered in violation of a consumer product safety "
+        "standard promulgated under the Consumer Product Safety Act (CPSA). "
+        "Directs the Consumer Product Safety Commission to begin a proceeding "
+        "to review the requirements of the interim standards and establish a "
+        "final standard that includes provisions to protect against the risk "
+        "of helmets coming off the heads of bicycle riders and to address the "
+        "risk of injury to children. Specifies that the final standard shall "
+        "be considered a consumer product safety standard under the CPSA. "
+        "Authorizes appropriations."
+    ),
+}
 
 # Two real BillSum test-set bills (public domain, US Government Publishing
 # Office). Each "reference_summary" below is BillSum's own human-written
@@ -153,11 +282,26 @@ BILLS = [
 ]
 
 
-def summarize(bill_text: str) -> str:
+INSTRUCTIONS = (
+    "Summarize the following US Congressional bill in one paragraph, "
+    "the way a legislative summary service would: state what the bill "
+    "does, not how it is worded.\n\n"
+)
+
+
+def summarize_zero_shot(bill_text: str) -> str:
+    prompt = INSTRUCTIONS + bill_text
+    return client.responses.create(model=model, input=prompt).output_text.strip()
+
+
+def summarize_one_shot(bill_text: str) -> str:
     prompt = (
-        "Summarize the following US Congressional bill in one paragraph, "
-        "the way a legislative summary service would: state what the bill "
-        "does, not how it is worded.\n\n" + bill_text
+        INSTRUCTIONS
+        + "Here is an example of a bill and its summary:\n\n"
+        + f"BILL:\n{EXAMPLE_BILL['text']}\n\n"
+        + f"SUMMARY:\n{EXAMPLE_BILL['reference_summary']}\n\n"
+        + "Now summarize this bill the same way:\n\n"
+        + bill_text
     )
     return client.responses.create(model=model, input=prompt).output_text.strip()
 
@@ -181,14 +325,30 @@ def bertscore(reference: str, candidate: str) -> float:
     return f1.item()
 
 
-print(f"{'bill':<45s} {'BLEU':>7s} {'ROUGE-L':>8s} {'METEOR':>7s} {'BERTScore':>10s}")
-for bill in BILLS:
-    generated_summary = summarize(bill["text"])
-    reference = bill["reference_summary"]
-    b = bleu(reference, generated_summary)
-    r = rouge_l(reference, generated_summary)
-    m = meteor(reference, generated_summary)
-    s = bertscore(reference, generated_summary)
-    print(f"{bill['title'][:45]:<45s} {b:7.3f} {r:8.3f} {m:7.3f} {s:10.3f}")
-    print(f"  reference: {reference}")
-    print(f"  chatgpt:   {generated_summary}\n")
+PROMPTS = {
+    "zero-shot (no example)": summarize_zero_shot,
+    "one-shot (one example)": summarize_one_shot,
+}
+
+results = {}
+for prompt_name, summarize in PROMPTS.items():
+    scores = {"BLEU": [], "ROUGE-L": [], "METEOR": [], "BERTScore": []}
+    print(f"=== {prompt_name} ===")
+    for bill in BILLS:
+        generated_summary = summarize(bill["text"])
+        reference = bill["reference_summary"]
+        scores["BLEU"].append(bleu(reference, generated_summary))
+        scores["ROUGE-L"].append(rouge_l(reference, generated_summary))
+        scores["METEOR"].append(meteor(reference, generated_summary))
+        scores["BERTScore"].append(bertscore(reference, generated_summary))
+        print(f"  {bill['title']}")
+        print(f"    reference: {reference}")
+        print(f"    chatgpt:   {generated_summary}\n")
+    results[prompt_name] = {metric: sum(vals) / len(vals) for metric, vals in scores.items()}
+
+print(f"{'prompt':<28s} {'BLEU':>7s} {'ROUGE-L':>8s} {'METEOR':>7s} {'BERTScore':>10s}")
+for prompt_name, avg in results.items():
+    print(
+        f"{prompt_name:<28s} {avg['BLEU']:7.3f} {avg['ROUGE-L']:8.3f} "
+        f"{avg['METEOR']:7.3f} {avg['BERTScore']:10.3f}"
+    )

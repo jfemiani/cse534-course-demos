@@ -37,11 +37,13 @@ Work through these in order.
    `03c_multi_metric_corpus.py` runs all four metrics on a real
    extrinsic task instead of toy sentences: a tiny slice of the BillSum
    summarization benchmark, with ChatGPT writing a one-paragraph summary
-   of each of two real bills, scored against BillSum's own human
-   reference summary — showing BLEU score both correct summaries low
-   because they reword rather than copy the reference, while ROUGE-L,
-   METEOR, and especially BERTScore credit the same summaries much more
-   fairly.
+   of each of two real bills twice — once zero-shot and once one-shot
+   with a worked example — scored against BillSum's own human reference
+   summary. Averaged across the two bills, one-shot scores a little
+   higher than zero-shot on all four metrics, while within either prompt
+   BLEU still scores both correct summaries low because they reword
+   rather than copy the reference, and ROUGE-L, METEOR, and especially
+   BERTScore credit the same summaries much more fairly.
 4. [LLM-as-judge](04_llm_judge) — asks a model to judge a quality that has
    no reference wording to count overlap against at all, using a real
    benchmark question instead of an invented one: MT-Bench question 151

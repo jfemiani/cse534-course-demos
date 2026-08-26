@@ -117,10 +117,14 @@ evaluation first, since the lesson order was also reversed (see below).
   extrinsic task instead of an invented one: a tiny slice of the BillSum
   summarization benchmark (Kornilova and Eidelman, 2019), where ChatGPT
   writes a one-paragraph summary of each of two real Congressional bills
-  and that summary is scored against BillSum's own human reference
-  summary — showing BLEU score both correct summaries low because they
-  reword rather than copy the reference, while ROUGE-L, METEOR, and
-  especially BERTScore credit the same summaries far more fairly, a real
+  twice — once zero-shot and once one-shot with a worked example (a
+  third real BillSum bill and its summary) — and each summary is scored
+  against BillSum's own human reference summary, averaged per prompt
+  across the two bills. One-shot scores a little higher than zero-shot
+  on all four metrics; within either prompt, BLEU still scores both
+  correct summaries low because they reword rather than copy the
+  reference, while ROUGE-L, METEOR, and especially BERTScore credit the
+  same summaries far more fairly, a real
   instance of a metric being the wrong tool for a task with no single
   correct wording, not just the wrong tool for one contrived example.
 - Gives LLM-as-judge its own section (`04_llm_judge`), collapsed to a
