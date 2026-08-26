@@ -102,6 +102,17 @@ Common shift patterns to check for, in rough order of how much load they add:
   cutting a preview sentence down to a bare pointer ("the rest of this page builds
   exactly that comparison, starting with the order sweep from Table 1") and letting
   the upcoming content carry its own specifics when the reader can actually see them.
+- **Yes/no answer stranded after a compound question**: a Socratic setup asks a
+  yes/no question and then piles on follow-up wh-questions in the same sentence
+  ("does order 3 still win? Which order wins instead, and how did that order's
+  perplexity look back in Table 1?"), and the answer sentence that follows ("It does
+  not.") sits directly after the wh-questions instead of directly after the yes/no
+  question it's actually answering. A wh-question ("how did that order's perplexity
+  look?") has no yes/no answer, so a reader hitting "It does not" right afterward
+  can't tell what is being negated. The tell is "does not *what*?" Fix by giving the
+  yes/no question its own short paragraph, answering it immediately, and only then
+  asking (and separately answering) any follow-up questions — don't stack multiple
+  question types in one sentence before the reader gets an answer to any of them.
 - **Restating the established instead of leading with the new**: an opening sentence
   presents already-known information as if it were the new point, so the actually new
   idea only shows up later, buried in the sentences that follow. "Running the four
