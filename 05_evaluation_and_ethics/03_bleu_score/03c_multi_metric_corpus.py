@@ -1,7 +1,11 @@
 """Demo: Table 1's n-gram order sweep, scored with BLEU, ROUGE-L, METEOR,
 and BERTScore (via nltk, rouge-score, and bert-score) over generated
 continuations of real held-out text. Also prints, for orders 3 and 7
-separately, the generated continuations sorted by ROUGE-L.
+separately, the generated continuations sorted by BERTScore. The prompt
+and true continuation are snapped out to the nearest word boundary
+(never cut mid-word); the generated candidate is sampled character by
+character and is not snapped, since nothing guarantees it lands on a
+word boundary at all.
 
 See 03c_multi_metric_corpus.md for the full explanation.
 Reuses the same corpus, split, and training logic as 01_ngram_eval.py.
@@ -27,12 +31,13 @@ END = "$"
 ORDERS = [2, 3, 4, 5, 6, 7, 8]
 HELD_OUT_FRACTION = 0.1
 FLOOR_PROBABILITY = 1e-4
-PROMPT_CHARS = 20  # characters of real held-out text used to seed generation
-CONTINUATION_CHARS = 40  # characters generated, and compared to the true continuation
+PROMPT_CHARS = 20  # target length of the prompt, snapped out to the nearest word boundary
+CONTINUATION_CHARS = 40  # target length of the true continuation, snapped the same way
+WORD_SNAP_MARGIN = 15  # extra headroom so snapping never runs past the end of a block
 SAMPLE_SIZE = 30  # held-out blocks sampled for the generation metrics (BERTScore is not free)
 GROUP_SIZE = 5
 BEST_ORDER = 3  # the order Table 1 already found best by cross-entropy
-WORD_OVERLAP_ORDER = 7  # the order that wins on BLEU/ROUGE-L/METEOR despite worse perplexity
+BERTSCORE_ORDER = 7  # the order that wins on BERTScore despite worse perplexity
 RANDOM_SEED = 42
 
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
@@ -44,6 +49,13 @@ def load_blocks() -> list[str]:
     with urlopen(CORPUS_URL) as response:
         text = response.read().decode("utf-8")
     return [block.strip() for block in text.split("\n\n") if block.strip()]
+
+
+def snap_to_word_end(text: str, pos: int) -> int:
+    """Push `pos` forward to the end of whatever word it falls inside, so a cut lands on whitespace instead of mid-word."""
+    while pos < len(text) and not text[pos].isspace():
+        pos += 1
+    return pos
 
 
 def train_counts(blocks: list[str], order: int) -> dict[str, dict[str, int]]:
@@ -122,7 +134,7 @@ blocks = load_blocks()
 split = int(len(blocks) * (1 - HELD_OUT_FRACTION))
 train_blocks, held_out_blocks = blocks[:split], blocks[split:]
 
-min_length = PROMPT_CHARS + CONTINUATION_CHARS
+min_length = PROMPT_CHARS + CONTINUATION_CHARS + WORD_SNAP_MARGIN
 eligible_blocks = [block for block in held_out_blocks if len(block) >= min_length]
 random.seed(RANDOM_SEED)
 sample_blocks = random.sample(eligible_blocks, SAMPLE_SIZE)
@@ -141,8 +153,10 @@ for order in ORDERS:
     bleu_scores, rouge_scores, meteor_scores, bert_scores = [], [], [], []
     per_block = []
     for block in sample_blocks:
-        prompt, reference = block[:PROMPT_CHARS], block[PROMPT_CHARS:PROMPT_CHARS + CONTINUATION_CHARS]
-        candidate = generate(counts, order, prompt, CONTINUATION_CHARS, fallback_char)
+        prompt_end = snap_to_word_end(block, PROMPT_CHARS)
+        reference_end = snap_to_word_end(block, prompt_end + CONTINUATION_CHARS)
+        prompt, reference = block[:prompt_end], block[prompt_end:reference_end]
+        candidate = generate(counts, order, prompt, len(reference), fallback_char)
         b, r, m, s = bleu(reference, candidate), rouge_l(reference, candidate), meteor(reference, candidate), bertscore(reference, candidate)
         bleu_scores.append(b), rouge_scores.append(r), meteor_scores.append(m), bert_scores.append(s)
         per_block.append((r, s, prompt, candidate, reference))
@@ -153,12 +167,12 @@ for order in ORDERS:
     print(f"{order:5d} {len(counts):9d} {miss_rate:10.2%} {cross_entropy:10.3f} {perplexity:11.2f} "
           f"{avg(bleu_scores):7.3f} {avg(rouge_scores):8.3f} {avg(meteor_scores):7.3f} {avg(bert_scores):10.3f}")
 
-for order in (BEST_ORDER, WORD_OVERLAP_ORDER):
-    per_block = sorted(results_by_order[order], key=lambda item: item[0])
+for order in (BEST_ORDER, BERTSCORE_ORDER):
+    per_block = sorted(results_by_order[order], key=lambda item: item[1])
     lemons, apples, cherries = per_block[:GROUP_SIZE], per_block[len(per_block) // 2 - GROUP_SIZE // 2:len(per_block) // 2 - GROUP_SIZE // 2 + GROUP_SIZE], per_block[-GROUP_SIZE:]
 
-    print(f"\norder={order} generated continuations, sorted by ROUGE-L (higher is better)\n")
-    for label, group in [("CHERRIES (highest ROUGE-L)", cherries), ("APPLES (median)", apples), ("LEMONS (lowest ROUGE-L)", lemons)]:
+    print(f"\norder={order} generated continuations, sorted by BERTScore (higher is better)\n")
+    for label, group in [("CHERRIES (highest BERTScore)", cherries), ("APPLES (median)", apples), ("LEMONS (lowest BERTScore)", lemons)]:
         print(f"--- {label} ---")
         for rouge_score, bert_score, prompt, candidate, reference in group:
             print(f"ROUGE-L: {rouge_score:.3f}  BERTScore: {bert_score:.3f}")
