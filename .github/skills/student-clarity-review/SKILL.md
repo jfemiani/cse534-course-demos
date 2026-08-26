@@ -152,7 +152,17 @@ Common shift patterns to check for, in rough order of how much load they add:
   any sentence with that shape as a candidate for this check even when it looks like
   ordinary clarification. Fix the same way: state what actually happens ("the four
   metrics above then score that generated continuation against the true one") and
-  drop the rejected alternative entirely.
+  drop the rejected alternative entirely. **A self-inflicted variant**: this pattern
+  can also appear in the *fix* itself, not just the original draft. When a factual
+  correction requires naming something briefly considered and rejected (e.g. "any
+  block too short to supply both is skipped rather than padded," written after this
+  same assistant had incorrectly claimed the demo padded short blocks), the "rather
+  than padded" clause is still a strawman denial — the reader never assumed padding
+  in the first place, they're only aware of it because a prior draft mentioned it.
+  Fixing a factual error is not license to keep the rejected alternative visible in
+  the corrected sentence; state only what the code does ("skipping any block too
+  short to supply both") and drop the alternative entirely, even when the fix is
+  responding to an error this assistant itself introduced.
 - **Point drift**: a sentence is true, well-written, and individually clear, but does
   not serve the paragraph's actual thesis. Every sentence in isolation can pass a
   register check and still leave the reader unable to say what the paragraph was
