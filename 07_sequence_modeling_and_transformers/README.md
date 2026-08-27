@@ -54,3 +54,14 @@ it's why every demo tracks validation loss and reports the checkpoint with
 the lowest validation loss, instead of just training for a fixed number of
 epochs and hoping for the best (the same evaluation discipline Module 5
 taught with the n-gram order sweep).
+
+## Canvas pages and activities
+
+`pages/` holds the working copies of the four Canvas lesson pages (7.1
+Module Overview, 7.2 RNNs, 7.3 LSTMs, 7.4 Transformers/Attention/RLHF),
+built from this module's real, captured demo output. `discussion/` holds
+the working copies of the 7.5 and 7.6 discussion prompts, rewritten to ask
+students to reason about the specific numbers and examples in 7.2/7.3's
+demo output rather than generic RNN/LSTM trivia. Neither has been pushed to
+Canvas yet -- see `DESIGN-module-7.md` for the design brief these were
+authored from.
