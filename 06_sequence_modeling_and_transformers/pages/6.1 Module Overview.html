@@ -1,0 +1,21 @@
+<p>Module 3 built a language model from character counts. Module 4 and 5 showed you how to steer, retrieve for, and evaluate a model you didn't train yourself. This module asks a different question: how do you actually build a model that reads one sequence and produces another? That is the problem behind translation, summarization, and, eventually, every chat model you have used.</p>
+<p>Every lesson in this module trains the same task on the same data: translating short English sentences into French. What changes from lesson to lesson is the architecture. You will train a recurrent network (RNN), then a gated recurrent network (LSTM), then a Transformer (the architecture behind GPT, ChatGPT, and every other modern large language model) on the identical corpus and the identical five evaluation sentences, so you can watch the same failure get fixed twice in a row.</p>
+
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">By the end of this module, you will be able to</h2>
+<ul>
+<li>Explain why a fixed-context model (the n-gram model from Module 3) cannot represent arbitrary-length dependencies, and why a model needs a state that persists across the whole sequence to do so.</li>
+<li>Train a recurrent encoder-decoder (RNN) on a real sequence-to-sequence task, and diagnose the specific way it fails as sentences get longer.</li>
+<li>Train a gated (LSTM) encoder-decoder on the identical task and data, and explain mechanistically why gating extends a model's effective memory.</li>
+<li>Train a small Transformer encoder-decoder on the identical task, and explain attention as a learned, per-step weighted lookup over the whole source sentence, not a compressed summary vector.</li>
+<li>Describe the pipeline (supervised fine-tuning, reward modeling, and reinforcement learning via PPO, short for Proximal Policy Optimization) that turns a pretrained next-token predictor into an instruction-following assistant like ChatGPT.</li>
+<li>Compare RNN, LSTM, and Transformer translation quality on the same held-out sentences, and state which architectural property explains each gap.</li>
+</ul>
+
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">One corpus, three architectures</h2>
+<p>Every demo in this module is built on the same real, if noisy, data: a few thousand English-French sentence pairs streamed from the Hugging Face <code>Helsinki-NLP/opus-100</code> dataset. All three lessons use PyTorch (this module's framework, not the Keras/TensorFlow code in the assigned textbook) and the same five held-out sentences for evaluation, including one deliberately long one. Watch that long sentence across the module: an RNN squeezes an entire sentence into one fixed-size vector and starts to lose the thread. An LSTM's gates help, but the bottleneck is still there. A Transformer removes the bottleneck entirely; at every step, the decoder can look directly at any word in the source sentence.</p>
+
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Reading</h2>
+<ul>
+<li><a href="https://go.oreilly.com/ohiolinkmiami/https://learning.oreilly.com/library/view/generative-deep-learning/9781098134174/ch05.html" target="_blank">GDL Chapter 5 &ndash; Autoregressive Models</a> (RNN and LSTM sections; read before 6.2/6.3 for the recurrence and gating concepts. GDL's own code example uses a recipe-generation dataset in Keras, not this module's translation task in PyTorch.)</li>
+<li><a href="https://go.oreilly.com/ohiolinkmiami/https://learning.oreilly.com/library/view/generative-deep-learning/9781098134174/ch09.html" target="_blank">GDL Chapter 9 &ndash; Transformers</a> (read before 6.4)</li>
+</ul>

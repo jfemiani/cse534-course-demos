@@ -1,0 +1,17 @@
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Purpose</h2>
+<p>Lesson 6.2 trained a plain RNN encoder-decoder and showed that its reference loss on the module's five held-out sentences tends to climb as sentences get longer, with the eight-word sentence scoring worst of the five. This discussion asks you to reason about <em>why</em> that happens and where it matters, before Lesson 6.3 shows you one fix.</p>
+
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Instructions</h2>
+<p>Pick <span style="text-decoration: underline;">one</span> of the questions below. Write a post of 250-400 words. State your position clearly, and explain the reasoning behind it, referring to specific numbers or examples from 6.2's demo where you can. Then reply to at least one classmate who picked a different question, or who reached a different conclusion on the same question.</p>
+
+<h3>1. Is the bottleneck the right explanation?</h3>
+<p>6.2 argues that a single fixed-size context vector, combined with a vanishing gradient across many time steps, explains why the RNN's reference loss was worst on the eight-word sentence. But "Here it is." (only 3 words) scored a reference loss of 5.481, worse than the 6-word sentence, and not far off the 8-word one. Is length really the dominant factor here, or is something else going on with that particular sentence? What evidence in the demo's output would help you tell the difference?</p>
+
+<h3>2. Where would this actually break something?</h3>
+<p>An RNN's hidden state has no hard limit on how far back it can theoretically look, unlike Module 3's n-gram model with its fixed order. In practice, though, this lesson showed that information from early words still tends to fade before it reaches the decoder. Pick a real task, either translation or something else (voice assistants, document summarization, code completion) and argue whether this kind of gradual forgetting would actually cause a noticeable, practical problem for it, or whether it mostly matters for sentences longer than people would ever really send in that task.</p>
+
+<h3>3. Is a bigger hidden vector the fix?</h3>
+<p>This demo used a 256-dimensional hidden state. Suppose you doubled it to 512, without changing anything else about the architecture. Would you expect that to meaningfully fix the long-sentence problem, or just delay it to a longer sentence? Justify your answer using what a hidden state is actually being asked to do at every single time step, not just "more numbers should help."</p>
+
+<h3>4. What would a stronger test of this claim look like?</h3>
+<p>Lesson 6.2 draws a conclusion (longer sentences are harder for a plain RNN) from just five held-out sentences, run once. Module 5 already taught you to be suspicious of small samples. Design a better experiment, using only the tools and data already available in this module (the same opus-100 corpus, the same architecture), that would test this claim more rigorously. What would you hold constant, and what would you vary?</p>

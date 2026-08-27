@@ -194,12 +194,116 @@ evaluation first, since the lesson order was also reversed (see below).
 
 ---
 
-## Later modules (unchanged for now)
+## Later modules — ✅ executed on live Canvas course this session
 
-6. Tutorial 1: Advanced Prompting Tools Explorer
-7. Trigrams Simplest Generation
-8. Exam 1
-9. RNNs, LSTMs, Transformers, VAEs, GANs, Diffusion, etc. (unchanged)
+9. **✅ "6. Sequence Modeling and Transformers"** (module id 895485) —
+   merged this session on the live course: was three separate modules
+   ("7. RNNs - Recurrent Neural Networks," "8. LSTMs and Advanced Sequence
+   Modeling," "9. Transformers and Attention"). Combined into one module
+   to match how GDL Ch. 5 (Autoregressive Models) already groups RNNs and
+   LSTMs together, with Transformers folding in as the module's
+   architectural payoff. Final item order on Canvas:
+   - 6.1. Module Overview
+   - 6.2. RNNs - Recurrent Neural Networks
+   - 6.3. LSTMs Advanced Sequence Modeling
+   - 6.4. **Transformers, Attention, and RLHF** (renamed from "Transformers
+     Attention" — GDL Ch. 9; "RLHF" makes explicit this lesson is also
+     where the ChatGPT/RLHF/PPO training-pipeline material from GDL Ch. 9
+     lives, not just attention mechanics)
+   - Activities: 6.5 Discussion (Limitations of RNNs), 6.6 Discussion
+     (LSTM Fundamentals, moved in), Pre-Test quiz
+   - The old modules 8 (LSTMs) and 9 (Transformers) were deleted after
+     their content items were moved; their now-orphaned "Module Overview"
+     pages (8.1, 9.1) were left as unlinked Pages (not deleted, just no
+     longer in a module) rather than merging their prose into 6.1 — that's
+     a content-writing task, flagged as a follow-up, not done this session.
+   - Renumbered from "7." to "6." in a later session: the merge had
+     initially frozen the module at "7." on top of a pre-existing gap at
+     "6." (the old position-6/7 "Tutorial 1"/"Trigrams" modules referenced
+     below had since been deleted, and position 6 on live Canvas is
+     actually "4. Tool Use, Retrieval, and Agentic Loops" — there was never
+     a real live "6." module). Fixed by renaming the module ("7." →
+     "6. Sequence Modeling and Transformers"), its four pages (7.1-7.4 →
+     6.1-6.4), and its two discussion topics (7.5/7.6 → 6.5/6.6) on Canvas,
+     and renaming the local folder `07_sequence_modeling_and_transformers`
+     → `06_sequence_modeling_and_transformers` (with all internal
+     `emgithub` embed paths and in-page `7.x` lesson references updated to
+     match). Course now has published modules 1-6 with no gaps; the
+     numbering gap moved to "7."/"9." (10 through 14 still out of scope).
+
+---
+
+## ✅ UNCOVERED - Local Fine-Tuning (LoRA and GRPO) — created this session
+
+Rationale: this was a planned 🚧 module ("Running LLMs Locally and
+Fine-Tuning with LoRA") that was never built. Confirmed neither GDL nor
+this repo covers **LoRA** or **GRPO** anywhere. Time is out for this term,
+so it was created directly as `UNCOVERED` rather than built or dropped —
+same treatment as the image-generation modules below, for the same reason
+(out of time, not out of scope for the field).
+
+Created as a new unpublished module (id 994310, position 10, right after
+the merged Sequence Modeling and Transformers module), filling the freed
+"8." slot, with four unpublished stub pages (title only, placeholder
+"not yet covered" body text — no real content written):
+
+- `UNCOVERED - 8.1 Module Overview`
+- `UNCOVERED - 8.2 Running an LLM Locally`
+- `UNCOVERED - 8.3 Fine-Tuning with LoRA`
+- `UNCOVERED - 8.4 GRPO` — Group Relative Policy Optimization (DeepSeek-R1):
+  the post-RLHF/PPO training approach that drops the learned critic/reward
+  model in favor of a group-relative baseline over sampled outputs, usually
+  paired with verifiable rewards (see the existing RLVR material in
+  `05_evaluation_and_ethics/05_verifiable_rewards/`). Natural companion to
+  6.4's RLHF/PPO coverage — GRPO is "what came after PPO."
+
+---
+
+## ✅ Image-generation modules: UNCOVERED, not deleted — executed this session
+
+Rationale: this course is scoped to text/LLM generative AI for the time
+remaining, and the image-generation modules (VAEs, GANs, diffusion,
+multimodal) are not going to get built out this term. Rather than delete
+or unpublish-and-forget them, the content was kept in place and relabeled
+so students and the instructor can see at a glance it's not covered,
+without losing the work already there (e.g. the GAN Demo) for a future
+term.
+
+**Convention applied: prefix the Canvas module and page/item titles with
+`UNCOVERED - `, keep the module's existing number as `X.Y`.** Every module
+and page below was unpublished (module, and each Page/Quiz's own published
+state) and renamed on the live course:
+
+- `895488` "10. Variational Autoencoders" → `UNCOVERED - 10. Variational Autoencoders`
+  - `UNCOVERED - 10.1. Variational Autoencoders`
+  - Note: "AI Agents in the Wild Discussion" also lives in this module and
+    was **left untouched** (still published, not renamed) — it isn't
+    image-generation content and doesn't belong here; flagged for a
+    follow-up move to a more appropriate module (Tool Use/Agents), not
+    done this session.
+- `895489` "11. Generative Adversarial Networks (GANs)" → `UNCOVERED - 11. Generative Adversarial Networks (GANs)`
+  - `UNCOVERED - 11.1. Generative Adversarial Networks (GANs)`
+  - `UNCOVERED - 11.2. GAN Demo`
+  - `UNCOVERED - 11.3 Quiz: Generative Adversarial Networks (GANs) Fundamentals`
+- `895490` "12. Advanced GANs and Diffusion Models" → `UNCOVERED - 12. Advanced GANs and Diffusion Models`
+  - `UNCOVERED - 12.1. Advanced GANs Module Overview`
+  - `UNCOVERED - 12.2. Lesson: Advanced GANs`
+- `895491` "13. Diffusion Models" → `UNCOVERED - 13. Diffusion Models`
+  - `UNCOVERED - 13.1. Diffusion Models`
+  - `UNCOVERED - 13.2 Quiz: Training Diffusion Models`
+  - Note: this page's existing GDL citation points at Ch. 7 (Energy-Based
+    Models); it should actually cite Ch. 8 (Diffusion Models) — fix if/when
+    this module is ever revived.
+- `895492` "14. Advanced Architectures and Multimodal Models" → `UNCOVERED - 14. Advanced Architectures and Multimodal Models`
+  - `UNCOVERED - 14.1. Advanced Architectures Multimodal Models`
+
+**"Tutorial 2: AI Agent Platforms Explorer" and "Tutorial 3: Multimodal AI
+Tools Explorer" don't actually exist as Canvas modules** — they were only
+placeholder bullets in the original downloaded outline and were never
+built, so there was nothing to rename/unpublish for either.
+
+Not yet done: Exam 2's coverage statement and any syllabus text pointing
+at these modules — flagged here so it isn't forgotten, not fixed yet.
 
 ---
 
