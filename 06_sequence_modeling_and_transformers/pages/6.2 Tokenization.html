@@ -1,0 +1,63 @@
+<p>Every demo later in this module, the RNN, LSTM, and Transformer lessons, will quietly depend on a shortcut. <code>mt_data.py</code>, the shared data pipeline behind them, builds a closed, word-level vocabulary and falls back to a single <code>&lt;unk&gt;</code> id for any word it has never seen. Its own docstring calls this &ldquo;a deliberate simplification.&rdquo; This lesson asks the question that simplification was covering up: what would a tokenizer that never needs <code>&lt;unk&gt;</code> even look like?</p>
+
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">The out-of-vocabulary problem</h2>
+<p>A word-level vocabulary is built once, from whatever training text is available, and frozen. Anything not in that fixed list (a typo, a name, a word coined after the vocabulary was built) gets mapped to the exact same <code>&lt;unk&gt;</code> id as every other unknown word. The model literally cannot tell one unknown word from another.</p>
+<p>The code below is available in full on GitHub at <a href="https://github.com/jfemiani/cse534-course-demos/blob/master/06_sequence_modeling_and_transformers/01_tokenization/01_tokenization.py" target="_blank"><code>01_tokenization.py</code></a>; we'll walk through the parts that matter.</p>
+<p><iframe
+  src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2F06_sequence_modeling_and_transformers%2F01_tokenization%2F01_tokenization.py%23L38-L45&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on"
+  style="width: min(100%, 750px); height: 220px; border: 0;"
+  title="01_tokenization.py: an invented word gets the same id as every other unknown word"
+  loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<p>Run this and an entirely made-up word (<code>supercalifragilisticexpialidocious</code>, never seen during training) maps to the same id as any other unknown word. That single shared bucket is the problem this lesson solves.</p>
+
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Byte-pair encoding: building a vocabulary from the bottom up</h2>
+<p>Production tokenizers take the opposite approach: instead of a fixed list of whole words, <strong>byte-pair encoding (BPE)</strong> builds a vocabulary of subword pieces, starting from individual characters. The algorithm (Sennrich, Haddow &amp; Birch, 2016, adapting a data-compression technique from Gage, 1994) is a short loop: count how often each adjacent pair of symbols occurs across the training corpus, merge the single most frequent pair into a new symbol, and repeat.</p>
+<p>Here it is on a five-word toy corpus (<code>low, lower, lowest, newer, wider</code>), watching the merge table build up one step at a time:</p>
+<p><iframe
+  src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2F06_sequence_modeling_and_transformers%2F01_tokenization%2F01_tokenization.py%23L82-L94&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on"
+  style="width: min(100%, 750px); height: 300px; border: 0;"
+  title="01_tokenization.py: the entire BPE algorithm -- count pairs, merge the most frequent, repeat"
+  loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<p>That loop drives the whole algorithm (the full file also has small helper functions for counting pairs and applying a merge, but this is the part making the decisions). After eight merges, the trainer has learned pieces like <code>low</code> and <code>er</code>. Applying those same learned merges to <code>lowering</code>, a word the trainer never saw, still produces a reasonable segmentation. Worst case, an unfamiliar word falls back to one piece per character. There is no such thing as an unrepresentable string anymore, only a longer list of smaller pieces.</p>
+
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Two real tokenizers, side by side</h2>
+<p>Production vocabularies run the identical idea at a much larger scale, tens of thousands of merges instead of eight. Different model families use different tokenizers, so the same sentence splits differently depending on which one you ask:</p>
+<p><iframe
+  src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2F06_sequence_modeling_and_transformers%2F01_tokenization%2F01_tokenization.py%23L121-L130&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on"
+  style="width: min(100%, 750px); height: 260px; border: 0;"
+  title="01_tokenization.py: tiktoken (OpenAI) and Hugging Face AutoTokenizer on the same sentence"
+  loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<p>One real run produced this (full captured output: <a href="https://github.com/jfemiani/cse534-course-demos/blob/master/06_sequence_modeling_and_transformers/01_tokenization/01_tokenization.output.txt" target="_blank"><code>01_tokenization.output.txt</code></a>):</p>
+<table style="border-collapse: collapse; width: 100%;">
+<caption style="caption-side: top; text-align: left; font-weight: bold; padding: 4px 0;">Table 1: &ldquo;The cse534 students are tokenizing sentences.&rdquo;, two tokenizers</caption>
+<thead>
+<tr style="background-color: #f2f2f2;">
+<th style="border: 1px solid #ccc; padding: 6px; text-align: left;">Tokenizer</th>
+<th style="border: 1px solid #ccc; padding: 6px; text-align: right;">Token count</th>
+<th style="border: 1px solid #ccc; padding: 6px; text-align: left;">Pieces</th>
+</tr>
+</thead>
+<tbody>
+<tr><td style="border: 1px solid #ccc; padding: 6px;">tiktoken (<code>cl100k_base</code>, GPT-4 family)</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">10</td><td style="border: 1px solid #ccc; padding: 6px;">The, &nbsp;c, se, 534, &nbsp;students, &nbsp;are, &nbsp;token, izing, &nbsp;sentences, .</td></tr>
+<tr><td style="border: 1px solid #ccc; padding: 6px;">Hugging Face <code>AutoTokenizer</code> (<code>gpt2</code>)</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">11</td><td style="border: 1px solid #ccc; padding: 6px;">The, &#288;c, se, 5, 34, &#288;students, &#288;are, &#288;token, izing, &#288;sentences, .</td></tr>
+</tbody>
+</table>
+<p>Predict-before-reveal: before reading the table above, how many tiktoken tokens do you think <code>supercalifragilisticexpialidocious</code> takes?</p>
+<p>The real run above answers it: 11 pieces, more than the whole sentence around it, but still a small, bounded number, never a single <code>&lt;unk&gt;</code>.</p>
+
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Why an LLM struggles to count letters</h2>
+<p>Module 4.2's function-calling lesson showed a model failing to count the letters in &ldquo;strawberry.&rdquo; Tokenization is the actual explanation: a model never sees individual letters, only whatever pieces its tokenizer produced.</p>
+<p><iframe
+  src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2F06_sequence_modeling_and_transformers%2F01_tokenization%2F01_tokenization.py%23L137-L142&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on"
+  style="width: min(100%, 750px); height: 220px; border: 0;"
+  title="01_tokenization.py: strawberry splits into str/aw/berry -- no single-letter tokens exist to count"
+  loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<p><code>tiktoken</code> splits &ldquo;strawberry&rdquo; into <code>str</code>, <code>aw</code>, <code>berry</code>: three pieces, none of which is a single letter. Asking the model how many <code>r</code>'s are in the word is asking it to count something its own input representation never directly shows it.</p>
+
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Where to get a tokenizer</h2>
+<ul>
+<li><strong>OpenAI models</strong> &ndash; <code>tiktoken</code> (<code>pip install tiktoken</code>).</li>
+<li><strong>Open Hugging Face models</strong> &ndash; <code>transformers.AutoTokenizer.from_pretrained(model_name)</code>, or the standalone <code>tokenizers</code> library.</li>
+<li><strong>Llama- and T5-style models</strong> &ndash; SentencePiece (Kudo &amp; Richardson, 2018), usually loaded through that same <code>AutoTokenizer.from_pretrained</code> call.</li>
+</ul>
+<p>Different model families, different tokenizer libraries, but the same underlying idea: a vocabulary of subword pieces built by merging frequent adjacent symbols, so that no input string is ever truly unrepresentable.</p>

@@ -1,8 +1,8 @@
-"""LSTM encoder-decoder for English-to-French translation (6.3).
+"""LSTM encoder-decoder for English-to-French translation (6.5).
 
-Same corpus, same training loop, same evaluation sentences as 01_rnn_mt.py --
+Same corpus, same training loop, same evaluation sentences as 03_rnn_mt.py --
 the only change is nn.RNN -> nn.LSTM, plus an added cell state that travels
-alongside the hidden state. Compare this file line-by-line with 01_rnn_mt.py:
+alongside the hidden state. Compare this file line-by-line with 03_rnn_mt.py:
 gating doesn't remove the fixed-size bottleneck (the decoder still starts
 from a single encoder-produced state), it just lets the network learn what's
 worth protecting inside that state as the source sentence gets longer.
@@ -36,7 +36,7 @@ class Encoder(nn.Module):
 
     def forward(self, src):
         _, state = self.rnn(self.embed(src))
-        return state  # (hidden, cell) -- the gated cell state is the only new thing vs. 01_rnn_mt.py
+        return state  # (hidden, cell) -- the gated cell state is the only new thing vs. 03_rnn_mt.py
 
 
 class Decoder(nn.Module):
@@ -100,7 +100,7 @@ def translate(sentence, encoder, decoder, src_vocab, tgt_vocab):
 
 @torch.no_grad()
 def reference_loss(en, fr, encoder, decoder, src_vocab, tgt_vocab, criterion):
-    """Teacher-forced loss on the TRUE French reference -- see 01_rnn_mt.py
+    """Teacher-forced loss on the TRUE French reference -- see 03_rnn_mt.py
     for why this is a fairer cross-length comparison than greedy output."""
     encoder.eval(), decoder.eval()
     src = torch.tensor([src_vocab.encode(en)])
@@ -135,7 +135,7 @@ def main():
     print(f"\n(using the checkpoint with the lowest validation loss: {best_val_loss:.3f})")
 
     print("\nGreedy translations and reference loss on the module's fixed evaluation sentences")
-    print("(same sentences, same corpus, same training loop as 01_rnn_mt.py --")
+    print("(same sentences, same corpus, same training loop as 03_rnn_mt.py --")
     print(" only nn.RNN -> nn.LSTM changed):\n")
     for en, fr in EVAL_PAIRS:
         loss = reference_loss(en, fr, encoder, decoder, src_vocab, tgt_vocab, criterion)

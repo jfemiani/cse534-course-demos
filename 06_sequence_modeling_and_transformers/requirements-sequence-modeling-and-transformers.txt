@@ -1,2 +1,7 @@
 torch
 datasets
+tiktoken
+transformers
+nltk
+scikit-learn
+matplotlib

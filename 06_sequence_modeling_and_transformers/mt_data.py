@@ -42,7 +42,8 @@ EVAL_SENTENCES = [en for en, _ in EVAL_PAIRS]
 def _tokenize(sentence: str) -> list[str]:
     """Lowercase, whitespace/punctuation split. Word-level on purpose: a
     from-scratch vocabulary keeps the three architectures directly
-    comparable, unlike the subword tokenizer (tiktoken) used in Module 2."""
+    comparable, unlike the subword tokenizer (BPE/tiktoken) this module's
+    own 6.2 Tokenization lesson covers."""
     sentence = sentence.strip().lower()
     for ch in ".,!?;:\"'":
         sentence = sentence.replace(ch, f" {ch} ")

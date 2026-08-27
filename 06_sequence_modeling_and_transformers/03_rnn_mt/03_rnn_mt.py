@@ -1,4 +1,4 @@
-"""RNN encoder-decoder for English-to-French translation (6.2).
+"""RNN encoder-decoder for English-to-French translation (6.4).
 
 Trains a plain recurrent encoder-decoder on the shared opus-100 corpus built
 by mt_data.py, then greedily translates the module's fixed evaluation
@@ -8,8 +8,8 @@ vector (the "context vector"), and that single vector is all the decoder
 gets to work with. As the source sentence gets longer, there's more to
 squeeze into the same fixed-size vector, and translation quality drops.
 
-Compare this file's output with 02_lstm_mt.py (same data, same training
-loop, only nn.RNN -> nn.LSTM changes) and 03_transformer_mt.py (attention
+Compare this file's output with 04_lstm_mt.py (same data, same training
+loop, only nn.RNN -> nn.LSTM changes) and 05_transformer_mt.py (attention
 removes the fixed-size bottleneck entirely).
 
 pip install torch datasets

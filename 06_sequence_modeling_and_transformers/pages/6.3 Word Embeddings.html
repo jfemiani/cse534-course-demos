@@ -1,0 +1,53 @@
+<p>Tokenization (last lesson) turns text into a sequence of discrete piece-ids. But an id by itself carries no meaning: id 4271 isn't "closer" to id 4272 in any useful sense. Something has to turn a token into a representation that captures what it <em>means</em>, so that "happy" and "joyful" end up close together and "happy" and "hungry" don't. This lesson looks at two fundamentally different answers to that problem.</p>
+
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">A hand-built dictionary: WordNet</h2>
+<p><a href="https://wordnet.princeton.edu/" target="_blank" rel="noopener">WordNet</a> (Miller, 1995) represents meaning symbolically: a human lexicographer organized English words into <strong>synsets</strong> (groups of words with the same sense), connected by relations like hypernym (more general) and hyponym (more specific). Every sense a word can have is its own explicit, hand-written entry.</p>
+<p>The code below is available in full on GitHub at <a href="https://github.com/jfemiani/cse534-course-demos/blob/master/06_sequence_modeling_and_transformers/02_word_embeddings/02_word_embeddings.py" target="_blank"><code>02_word_embeddings.py</code></a>; we'll walk through the parts that matter.</p>
+<p><iframe
+  src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2F06_sequence_modeling_and_transformers%2F02_word_embeddings%2F02_word_embeddings.py%23L58-L64&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on"
+  style="width: min(100%, 750px); height: 200px; border: 0;"
+  title="02_word_embeddings.py: WordNet synsets for an ambiguous word"
+  loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<p>Run this on the word <strong>bank</strong> and WordNet returns 18 separate synsets: sloping land beside water, a financial institution, a long ridge, a row of switches, and more. Each one is a distinct, hand-written entry: a lexicographer decided these are different meanings.</p>
+
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">A learned vector: word2vec and GloVe</h2>
+<p>WordNet's coverage is limited to whatever a lexicographer thought to write down. An entirely different approach starts from the <strong>distributional hypothesis</strong>: words that occur in similar contexts tend to mean similar things (Harris, 1954; popularly paraphrased by Firth, 1957, as "a word is characterized by the company it keeps"). <strong>word2vec</strong> (Mikolov et al., 2013) learns a vector for each word by predicting it from its surrounding context; <strong>GloVe</strong> (Pennington, Socher &amp; Manning, 2014) learns one instead by factorizing how often every pair of words co-occurs across a huge corpus. Both end up in the same place: one dense vector per word, learned entirely from data, no dictionary required.</p>
+<p>Predict-before-reveal: "bank" has both a riverbank sense and a financial sense. Will a single learned vector show both, or just one?</p>
+<p><iframe
+  src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2F06_sequence_modeling_and_transformers%2F02_word_embeddings%2F02_word_embeddings.py%23L69-L80&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on"
+  style="width: min(100%, 750px); height: 280px; border: 0;"
+  title="02_word_embeddings.py: cosine-similarity nearest neighbors of 'bank' in GloVe space"
+  loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<p>One real run produced this (full captured output: <a href="https://github.com/jfemiani/cse534-course-demos/blob/master/06_sequence_modeling_and_transformers/02_word_embeddings/02_word_embeddings.output.txt" target="_blank"><code>02_word_embeddings.output.txt</code></a>):</p>
+<table style="border-collapse: collapse; width: 100%;">
+<caption style="caption-side: top; text-align: left; font-weight: bold; padding: 4px 0;">Table 1: GloVe's 6 nearest neighbors to &ldquo;bank&rdquo;, by cosine similarity</caption>
+<thead>
+<tr style="background-color: #f2f2f2;">
+<th style="border: 1px solid #ccc; padding: 6px; text-align: left;">Neighbor</th>
+<th style="border: 1px solid #ccc; padding: 6px; text-align: right;">Cosine similarity</th>
+</tr>
+</thead>
+<tbody>
+<tr><td style="border: 1px solid #ccc; padding: 6px;">securities</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">0.800</td></tr>
+<tr><td style="border: 1px solid #ccc; padding: 6px;">banking</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">0.797</td></tr>
+<tr><td style="border: 1px solid #ccc; padding: 6px;">investment</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">0.785</td></tr>
+<tr><td style="border: 1px solid #ccc; padding: 6px;">financial</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">0.767</td></tr>
+<tr><td style="border: 1px solid #ccc; padding: 6px;">credit</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">0.765</td></tr>
+<tr><td style="border: 1px solid #ccc; padding: 6px;">finance</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">0.708</td></tr>
+</tbody>
+</table>
+<p>Every single neighbor is financial. The riverbank sense doesn't surface at all, not even in eighth or tenth place. That holds even against the full 400,000-word GloVe vocabulary, not just this lesson's small subset. Whichever sense is more common in the training text dominates the single vector completely, because there is only one vector to hold both meanings. That is the central limitation of a <strong>static</strong> embedding: one word, one vector, regardless of which sense (or which sentence) it appears in.</p>
+
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Actually looking at the vectors: PCA</h2>
+<p>A 50-number vector can't be inspected directly. Module 3's eigenfaces lesson faced the identical problem with face images (thousands of pixel values per face) and solved it with PCA: find the directions of greatest variance in a cloud of vectors, and project onto the top few. Nothing changes here except which cloud of points goes in.</p>
+<p><iframe
+  src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2F06_sequence_modeling_and_transformers%2F02_word_embeddings%2F02_word_embeddings.py%23L85-L96&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on"
+  style="width: min(100%, 750px); height: 280px; border: 0;"
+  title="02_word_embeddings.py: the same sklearn.decomposition.PCA call as Module 3's eigenfaces demo"
+  loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
+<p>Predict-before-reveal: with roughly three dozen words spanning countries, animals, professions, emotions, and money/river vocabulary, which words do you expect to land closest together?</p>
+<p><img src="https://raw.githubusercontent.com/jfemiani/cse534-course-demos/master/06_sequence_modeling_and_transformers/02_word_embeddings/glove_pca.png" alt="Scatterplot of GloVe word vectors projected to 2D with PCA, showing countries, animals, professions, emotions, and finance/river words each forming their own visible cluster" style="max-width: 100%; height: auto;" /></p>
+<p>PCA knows nothing about language; it only finds directions of greatest variance in whatever vectors it's handed. Here, those directions line up with a good deal of human-recognizable structure: animals cluster tightly together, emotions cluster together, and the European countries and their capitals (<code>france</code>, <code>germany</code>, <code>spain</code>, <code>italy</code>, and their capitals) sit in their own region, though <code>japan</code>/<code>tokyo</code> land well away from that group, a reminder that a 2D projection is a simplification, not a perfect map. The finance words <code>bank</code>, <code>banking</code>, <code>loan</code>, and <code>credit</code> sit close together, too, while <code>money</code> and <code>finance</code> drift further off, closer to the river words (<code>river</code>, <code>creek</code>, <code>stream</code>, <code>shore</code>) than you might expect. (PCA keeps only the top two of fifty dimensions, so this view is lossy; Module 3's <code>13_eigenfaces</code> folder already shows what UMAP and t-SNE do differently when a linear projection like this one hides a cluster.)</p>
+
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Three senses of "embedding"</h2>
+<p>This course now uses the word "embedding" three different ways, and one of them changes again in a later lesson. Module 4's retrieval lessons called an opaque vector returned by an API call an embedding, used only to rank document chunks by similarity. This lesson's GloVe vectors are a second sense: a static, pretrained vector, one per word, frozen and reusable across any task. Module 6.4 and 6.5's <code>nn.Embedding</code> layer is a third sense: a trainable lookup table, learned jointly with the RNN or LSTM's translation task via backpropagation, not frozen at all. Module 6.6's attention mechanism changes the idea again: a word's vector there depends on the sentence it's in, which is exactly the fix for this lesson's "bank" problem, where a single frozen vector had to pick one dominant sense and lose the other.</p>

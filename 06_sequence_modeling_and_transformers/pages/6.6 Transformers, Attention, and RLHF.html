@@ -3,17 +3,17 @@
 
 <h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Attention: a learned, per-step lookup</h2>
 <p>Recall Module 4's retrieval demos: given a query, you compared it against a set of candidate vectors using a dot-product similarity score, then used those scores to decide which candidates mattered. Attention is that same idea, but learned end-to-end and used inside the network itself, at every decoding step. At each step, the decoder builds a <strong>query</strong> from what it has generated so far, compares it against a <strong>key</strong> vector for every position in the source sentence, turns those similarity scores into a set of weights that sum to 1 (a softmax), and uses those weights to combine the corresponding <strong>value</strong> vectors into a single, freshly-computed summary, one that can be completely different at every decoding step, unlike the encoder-decoder's one fixed vector.</p>
-<p>The code below is available in full on GitHub at <a href="https://github.com/jfemiani/cse534-course-demos/blob/master/06_sequence_modeling_and_transformers/03_transformer_mt/03_transformer_mt.py" target="_blank"><code>03_transformer_mt.py</code></a>. The encoder here is just PyTorch's built-in <code>nn.TransformerEncoder</code>; nothing hand-rolled. The decoder is built from PyTorch's built-in <code>nn.MultiheadAttention</code> blocks directly, rather than PyTorch's built-in <code>nn.TransformerDecoderLayer</code>, for one specific reason: doing it this way makes the cross-attention weights easy to pull out afterward for the visualization later in this lesson. The attention math itself is entirely PyTorch's; nothing about the computation is hand-rolled.</p>
+<p>The code below is available in full on GitHub at <a href="https://github.com/jfemiani/cse534-course-demos/blob/master/06_sequence_modeling_and_transformers/05_transformer_mt/05_transformer_mt.py" target="_blank"><code>05_transformer_mt.py</code></a>. The encoder here is just PyTorch's built-in <code>nn.TransformerEncoder</code>; nothing hand-rolled. The decoder is built from PyTorch's built-in <code>nn.MultiheadAttention</code> blocks directly, rather than PyTorch's built-in <code>nn.TransformerDecoderLayer</code>, for one specific reason: doing it this way makes the cross-attention weights easy to pull out afterward for the visualization later in this lesson. The attention math itself is entirely PyTorch's; nothing about the computation is hand-rolled.</p>
 <p><iframe
-  src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2F06_sequence_modeling_and_transformers%2F03_transformer_mt%2F03_transformer_mt.py%23L78-L86&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on"
+  src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2F06_sequence_modeling_and_transformers%2F05_transformer_mt%2F05_transformer_mt.py%23L78-L86&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on"
   style="width: min(100%, 750px); height: 260px; border: 0;"
-  title="03_transformer_mt.py: one decoder step, self-attention, then cross-attention over the whole source sentence, then a feedforward layer"
+  title="05_transformer_mt.py: one decoder step, self-attention, then cross-attention over the whole source sentence, then a feedforward layer"
   loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
 <p>Notice there is no hidden state being carried from step to step anywhere in that method. Every call recomputes cross-attention fresh, over every encoder output position at once. That is the whole architectural difference from the last two lessons: no recurrence, no fixed-size bottleneck vector, just a learned lookup, recomputed at every step.</p>
 <p>Look at the three steps inside that method in order. <strong>Self-attention</strong> comes first: the decoder attends over its own previous output words, the same query/key/value mechanism described above, but applied to what the decoder has generated so far rather than to the source sentence, so each position can take into account the words that came before it. <strong>Cross-attention</strong> comes second: this is the step that looks at the source sentence, using the decoder's state as the query and the encoder's output as both keys and values, which is what actually removes the fixed-size bottleneck. A <strong>feedforward layer</strong> comes last, a plain two-layer neural network (visible as <code>self.ff</code> in the code above) applied independently at every position, giving the model some extra capacity to transform each position's representation after attention has gathered the relevant information.</p>
 
 <h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Same task, same data: does removing the bottleneck help?</h2>
-<p>This demo uses the identical opus-100 corpus, training loop with best-validation-loss checkpointing, and five held-out evaluation sentences as the RNN and LSTM lessons. One real run produced this (full captured output: <a href="https://github.com/jfemiani/cse534-course-demos/blob/master/06_sequence_modeling_and_transformers/03_transformer_mt/03_transformer_mt.output.txt" target="_blank"><code>03_transformer_mt.output.txt</code></a>):</p>
+<p>This demo uses the identical opus-100 corpus, training loop with best-validation-loss checkpointing, and five held-out evaluation sentences as the RNN and LSTM lessons. One real run produced this (full captured output: <a href="https://github.com/jfemiani/cse534-course-demos/blob/master/06_sequence_modeling_and_transformers/05_transformer_mt/05_transformer_mt.output.txt" target="_blank"><code>05_transformer_mt.output.txt</code></a>):</p>
 <table style="border-collapse: collapse; width: 100%;">
 <caption style="caption-side: top; text-align: left; font-weight: bold; padding: 4px 0;">Table 1: aggregate best validation loss across all three architectures</caption>
 <thead>
@@ -23,8 +23,8 @@
 </tr>
 </thead>
 <tbody>
-<tr><td style="border: 1px solid #ccc; padding: 6px;">RNN (6.2)</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">4.683</td></tr>
-<tr><td style="border: 1px solid #ccc; padding: 6px;"><em>LSTM (6.3)</em></td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;"><em>4.287</em></td></tr>
+<tr><td style="border: 1px solid #ccc; padding: 6px;">RNN (6.4)</td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;">4.683</td></tr>
+<tr><td style="border: 1px solid #ccc; padding: 6px;"><em>LSTM (6.5)</em></td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;"><em>4.287</em></td></tr>
 <tr><td style="border: 1px solid #ccc; padding: 6px;"><strong>Transformer</strong></td><td style="border: 1px solid #ccc; padding: 6px; text-align: right;"><strong>4.035</strong></td></tr>
 </tbody>
 </table>
@@ -33,9 +33,9 @@
 <h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">Looking inside: what is the decoder attending to?</h2>
 <p>Aggregate numbers do not show <em>how</em> attention works. This demo also prints, for the long evaluation sentence, which source word the decoder's cross-attention weighted most heavily while generating each output word.</p>
 <p><iframe
-  src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2F06_sequence_modeling_and_transformers%2F03_transformer_mt%2F03_transformer_mt.py%23L157-L172&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on"
+  src="https://emgithub.com/iframe.html?target=https%3A%2F%2Fgithub.com%2Fjfemiani%2Fcse534-course-demos%2Fblob%2Fmaster%2F06_sequence_modeling_and_transformers%2F05_transformer_mt%2F05_transformer_mt.py%23L157-L172&amp;style=codepen-embed&amp;type=code&amp;showBorder=on&amp;showLineNumbers=on&amp;showFileMeta=on&amp;showFullPath=on&amp;showCopy=on"
   style="width: min(100%, 750px); height: 320px; border: 0;"
-  title="03_transformer_mt.py: pulling out and printing the strongest cross-attention weight per output word"
+  title="05_transformer_mt.py: pulling out and printing the strongest cross-attention weight per output word"
   loading="lazy" allow="clipboard-write" frameborder="0" scrolling="yes"></iframe></p>
 <p>On &ldquo;Have any of your friends ever been arrested?&rdquo;, one run produced this:</p>
 <table style="border-collapse: collapse; width: 100%;">

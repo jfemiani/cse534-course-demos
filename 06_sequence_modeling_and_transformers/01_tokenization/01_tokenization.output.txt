@@ -1,0 +1,34 @@
+=== Part 1: the out-of-vocabulary problem ===
+'cat'                                 -> id 5 (a real vocabulary entry)
+'supercalifragilisticexpialidocious' -> id 3 (the SAME id every unknown word gets)
+A word-level vocabulary has exactly one bucket for 'everything I've never seen.'
+
+=== Part 2: training BPE from scratch on a tiny corpus ===
+Training BPE on toy corpus ['low', 'lower', 'lowest', 'newer', 'wider'] for 8 merges:
+
+merge 1: ('l', 'o') (frequency 3) -> ['lo-w-</w>', 'lo-w-e-r-</w>', 'lo-w-e-s-t-</w>', 'n-e-w-e-r-</w>', 'w-i-d-e-r-</w>']
+merge 2: ('lo', 'w') (frequency 3) -> ['low-</w>', 'low-e-r-</w>', 'low-e-s-t-</w>', 'n-e-w-e-r-</w>', 'w-i-d-e-r-</w>']
+merge 3: ('e', 'r') (frequency 3) -> ['low-</w>', 'low-er-</w>', 'low-e-s-t-</w>', 'n-e-w-er-</w>', 'w-i-d-er-</w>']
+merge 4: ('er', '</w>') (frequency 3) -> ['low-</w>', 'low-er</w>', 'low-e-s-t-</w>', 'n-e-w-er</w>', 'w-i-d-er</w>']
+merge 5: ('low', '</w>') (frequency 1) -> ['low</w>', 'low-er</w>', 'low-e-s-t-</w>', 'n-e-w-er</w>', 'w-i-d-er</w>']
+merge 6: ('low', 'er</w>') (frequency 1) -> ['low</w>', 'lower</w>', 'low-e-s-t-</w>', 'n-e-w-er</w>', 'w-i-d-er</w>']
+merge 7: ('low', 'e') (frequency 1) -> ['low</w>', 'lower</w>', 'lowe-s-t-</w>', 'n-e-w-er</w>', 'w-i-d-er</w>']
+merge 8: ('lowe', 's') (frequency 1) -> ['low</w>', 'lower</w>', 'lowes-t-</w>', 'n-e-w-er</w>', 'w-i-d-er</w>']
+
+Applying the learned merges to an unseen word, 'lowering':
+  -> ['low', 'er', 'i', 'n', 'g', '</w>']
+A word the trainer never saw still gets tokenized -- worst case, one piece per character, never a single <unk> symbol.
+
+=== Part 3: real tokenizers on the same sentence ===
+tiktoken (cl100k_base, GPT-4 family): 10 tokens
+  pieces: ['The', ' c', 'se', '534', ' students', ' are', ' token', 'izing', ' sentences', '.']
+
+Hugging Face AutoTokenizer ('gpt2'): 11 tokens
+  pieces: ['The', 'Ġc', 'se', '5', '34', 'Ġstudents', 'Ġare', 'Ġtoken', 'izing', 'Ġsentences', '.']
+
+Predict-before-reveal: how many tiktoken tokens for 'supercalifragilisticexpialidocious'?
+  -> 11 tokens: ['sup', 'erc', 'al', 'if', 'rag', 'il', 'istic', 'exp', 'ial', 'id', 'ocious']
+
+'strawberry' -> ['str', 'aw', 'berry'] (3 tokens)
+The model never sees individual letters, only these pieces -- that's why asking it to count the letter 'r' in 'strawberry' is asking it to do something its input representation doesn't directly support.
+

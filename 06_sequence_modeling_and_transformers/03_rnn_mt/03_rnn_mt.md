@@ -3,7 +3,7 @@
 Concept: a recurrent neural network keeps a hidden state that updates at
 every input step, instead of the fixed-size window a Module 3 n-gram model
 uses. This is the module's baseline architecture -- read this file before
-`02_lstm_mt.py` and `03_transformer_mt.py`, since both of those are written
+`04_lstm_mt.py` and `05_transformer_mt.py`, since both of those are written
 as direct, minimal-diff comparisons against this one.
 
 ## What the demo does
@@ -19,7 +19,7 @@ as direct, minimal-diff comparisons against this one.
    lowest validation loss, the same idea Module 5 used to pick the best
    n-gram order instead of just training as long as possible.
 4. Reports two kinds of evidence on five fixed evaluation sentences (the
-   same five sentences `02_lstm_mt.py` and `03_transformer_mt.py` use):
+   same five sentences `04_lstm_mt.py` and `05_transformer_mt.py` use):
    the model's own greedy-decoded guess, and a **reference loss** --
    how surprised the model is by the *correct* French translation, even
    when its own guess is wrong. Reference loss is the fairer comparison
@@ -33,7 +33,7 @@ being squeezed into one fixed-size vector before the decoder ever sees it.
 Look at the reference-loss column across the five evaluation sentences: the
 model is generally less surprised by short, common sentences and more
 surprised by the longest one -- there simply isn't room in that one vector
-to preserve everything a long sentence needs. `02_lstm_mt.py` changes
+to preserve everything a long sentence needs. `04_lstm_mt.py` changes
 exactly one thing (the cell type) and the same evaluation improves.
 
 ## Honest caveats (read before treating any single number as gospel)

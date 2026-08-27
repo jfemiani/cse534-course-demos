@@ -1,0 +1,23 @@
+=== Part 1: WordNet -- a hand-built symbolic lookup ===
+WordNet has 18 synsets for 'bank'. The first few:
+  bank.n.01              sloping land (especially the slope beside a body of water)
+  depository_financial_institution.n.01 a financial institution that accepts deposits and channels the money into lending activities
+  bank.n.03              a long ridge or pile
+  bank.n.04              an arrangement of similar objects in a row or in tiers
+Each sense is a separate, hand-written entry -- a lexicographer decided these are different meanings.
+
+=== Part 2: GloVe -- a learned distributional vector ===
+Predict-before-reveal: 'bank' has a riverbank sense and a financial sense. Will GloVe's nearest neighbors show both, or just one?
+GloVe's 6 nearest neighbors to 'bank' (one vector, no senses):
+  securities cosine similarity 0.800
+  banking    cosine similarity 0.797
+  investment cosine similarity 0.785
+  financial  cosine similarity 0.767
+  credit     cosine similarity 0.765
+  finance    cosine similarity 0.708
+Every neighbor is financial. The riverbank sense doesn't even appear: whichever sense dominates the training text swallows the other one completely, because there is only one vector to hold both.
+
+=== Part 3: PCA, the same call as Module 3's eigenfaces demo ===
+Saved scatterplot to /home/femianjc/Courses/CSE534-live/cse534-course-demos/06_sequence_modeling_and_transformers/02_word_embeddings/glove_pca.png
+Country words cluster tightly: mean distance to their own centroid is 0.89 in the projected 2D space.
+

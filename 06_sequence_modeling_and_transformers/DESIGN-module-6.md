@@ -4,6 +4,14 @@
 > was renamed to Module 6 (folder `06_sequence_modeling_and_transformers`)
 > to close a numbering gap; internal `7.x`/`M7.x` references below are left
 > as originally written and should be read as `6.x`/`M6.x`.
+>
+> Second historical note: this brief covers only the original four items
+> (Overview, RNNs, LSTMs, Transformers). Two prerequisite pages -- 6.2
+> Tokenization and 6.3 Word Embeddings -- were added in a later pass (see
+> `01_tokenization/` and `02_word_embeddings/`), shifting the original
+> 6.2/6.3/6.4 items to 6.4/6.5/6.6 and the discussions to 6.7/6.8. Those two
+> new pages have no separate design brief of their own; see their
+> companion `.md` files for what they teach.
 
 **Status: planning artifact only.** No student-facing HTML, slides, or demo code
 were authored in this pass (see "Why authoring was deferred" below). This file

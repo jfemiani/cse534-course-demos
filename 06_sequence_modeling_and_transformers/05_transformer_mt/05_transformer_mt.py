@@ -1,7 +1,7 @@
-"""Transformer encoder-decoder for English-to-French translation (6.4).
+"""Transformer encoder-decoder for English-to-French translation (6.6).
 
-Same corpus, same training loop, same evaluation sentences as 01_rnn_mt.py
-and 02_lstm_mt.py. What changes: there is no hidden state carried step by
+Same corpus, same training loop, same evaluation sentences as 03_rnn_mt.py
+and 04_lstm_mt.py. What changes: there is no hidden state carried step by
 step, and no single fixed-size bottleneck vector. Instead, at every decoding
 step the decoder computes fresh attention weights over every encoder output
 position -- a learned version of the same dot-product similarity used for
@@ -144,7 +144,7 @@ def translate(sentence, encoder, decoder, src_vocab, tgt_vocab):
 
 @torch.no_grad()
 def reference_loss(en, fr, encoder, decoder, src_vocab, tgt_vocab, criterion):
-    """Teacher-forced loss on the TRUE French reference -- see 01_rnn_mt.py
+    """Teacher-forced loss on the TRUE French reference -- see 03_rnn_mt.py
     for why this is a fairer cross-length comparison than greedy output."""
     encoder.eval(), decoder.eval()
     src = torch.tensor([src_vocab.encode(en)])
@@ -198,8 +198,8 @@ def main():
     print(f"\n(using the checkpoint with the lowest validation loss: {best_val_loss:.3f})")
 
     print("\nGreedy translations and reference loss on the module's fixed evaluation sentences")
-    print("(same sentences, same corpus, same training loop as 01_rnn_mt.py and")
-    print(" 02_lstm_mt.py -- recurrence is gone entirely, replaced by attention):\n")
+    print("(same sentences, same corpus, same training loop as 03_rnn_mt.py and")
+    print(" 04_lstm_mt.py -- recurrence is gone entirely, replaced by attention):\n")
     for en, fr in EVAL_PAIRS:
         loss = reference_loss(en, fr, encoder, decoder, src_vocab, tgt_vocab, criterion)
         guess = translate(en, encoder, decoder, src_vocab, tgt_vocab)
