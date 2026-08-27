@@ -1,0 +1,76 @@
+epoch  1  train_loss 5.425  val_loss 4.651
+epoch  2  train_loss 4.100  val_loss 4.280
+epoch  3  train_loss 3.539  val_loss 4.120
+epoch  4  train_loss 3.085  val_loss 4.062
+epoch  5  train_loss 2.651  val_loss 4.035
+epoch  6  train_loss 2.221  val_loss 4.108
+epoch  7  train_loss 1.811  val_loss 4.197
+epoch  8  train_loss 1.450  val_loss 4.278
+epoch  9  train_loss 1.165  val_loss 4.376
+epoch 10  train_loss 0.959  val_loss 4.535
+epoch 11  train_loss 0.798  val_loss 4.697
+epoch 12  train_loss 0.677  val_loss 4.840
+epoch 13  train_loss 0.579  val_loss 4.998
+epoch 14  train_loss 0.502  val_loss 5.145
+epoch 15  train_loss 0.440  val_loss 5.195
+epoch 16  train_loss 0.382  val_loss 5.407
+epoch 17  train_loss 0.349  val_loss 5.477
+epoch 18  train_loss 0.310  val_loss 5.615
+epoch 19  train_loss 0.275  val_loss 5.734
+epoch 20  train_loss 0.254  val_loss 5.837
+epoch 21  train_loss 0.234  val_loss 5.935
+epoch 22  train_loss 0.213  val_loss 6.022
+epoch 23  train_loss 0.204  val_loss 6.098
+epoch 24  train_loss 0.192  val_loss 6.174
+epoch 25  train_loss 0.188  val_loss 6.259
+
+(using the checkpoint with the lowest validation loss: 4.035)
+
+Greedy translations and reference loss on the module's fixed evaluation sentences
+(same sentences, same corpus, same training loop as 01_rnn_mt.py and
+ 02_lstm_mt.py -- recurrence is gone entirely, replaced by attention):
+
+  en:  I know my job.
+  fr (reference): Je connais mon travail.
+  fr (model's greedy guess): je sais mon travail .
+  reference loss: 1.686  (4 source words)
+
+  en:  OK, that's it.
+  fr (reference): Voilà, c'était tout.
+  fr (model's greedy guess): ok , c ' est .
+  reference loss: 3.569  (3 source words)
+
+  en:  Here it is.
+  fr (reference): Le voilà.
+  fr (model's greedy guess): c ' est ça .
+  reference loss: 2.878  (3 source words)
+
+  en:  I'll take care of the kids.
+  fr (reference): Je m'occuperai des enfants.
+  fr (model's greedy guess): je vais prendre un jeu .
+  reference loss: 4.275  (6 source words)
+
+  en:  Have any of your friends ever been arrested?
+  fr (reference): L'une quelconque de vos amies s'est-elle jamais fait arrêter ?
+  fr (model's greedy guess): avez-vous longtemps la maison des trucs .
+  reference loss: 9.036  (8 source words)
+
+Attention: which source word does each output word look at?
+  en: Have any of your friends ever been arrested?
+  fr (reference): L'une quelconque de vos amies s'est-elle jamais fait arrêter ?
+  source words: ['have', 'any', 'of', 'your', 'friends', 'ever', 'been', 'arrested', '?']
+    "l" attends most to "have"
+    "'" attends most to "any"
+    "une" attends most to "any"
+    "<unk>" attends most to "ever"
+    "de" attends most to "ever"
+    "vos" attends most to "ever"
+    "amies" attends most to "arrested"
+    "s" attends most to "?"
+    "'" attends most to "arrested"
+    "est-elle" attends most to "any"
+    "jamais" attends most to "of"
+    "fait" attends most to "your"
+    "arrêter" attends most to "of"
+    "?" attends most to "?"
+
