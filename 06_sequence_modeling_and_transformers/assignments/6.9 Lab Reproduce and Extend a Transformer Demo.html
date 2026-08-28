@@ -1,0 +1,41 @@
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">What this lab asks you to do</h2>
+<p>This module trained the same translation task, on the same corpus and the same five held-out sentences, three times: as a plain RNN, as an LSTM, and as a Transformer. This lab focuses on the Transformer, since attention is the mechanism this module builds up to and the one behind every modern large language model. Choose <strong>one</strong> change to <code>05_transformer_mt.py</code> and develop it into a finished submission.</p>
+<p>You do not need to repeat the demonstration or retrain a bigger model. Submit one working Python file based on <code>05_transformer_mt.py</code>, show your changed version running, and explain the one change you made.</p>
+
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">1. Start from the Transformer demo</h2>
+<p><strong>Demo:</strong> a small Transformer encoder-decoder, trained on the module's shared English-French corpus, that visualizes which source word the decoder's cross-attention weighted most heavily while generating each output word &ndash; <a href="https://github.com/jfemiani/cse534-course-demos/blob/master/06_sequence_modeling_and_transformers/05_transformer_mt/05_transformer_mt.py" target="_blank"><code>05_transformer_mt.py</code></a>.</p>
+<p>If you need to reinstall the packages, download <a href="https://github.com/jfemiani/cse534-course-demos/blob/master/06_sequence_modeling_and_transformers/requirements-sequence-modeling-and-transformers.txt" target="_blank"><code>requirements-sequence-modeling-and-transformers.txt</code></a> and run <code>python -m pip install -r requirements-sequence-modeling-and-transformers.txt</code>. You will also need <code>mt_data.py</code> from the same module folder, since the demo imports its shared data pipeline from there.</p>
+
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">2. Make one small change</h2>
+<p>Make one change that adds to the original demonstration without replacing its main idea. You may use the suggested change below or propose your own.</p>
+<ul>
+<li><strong>Suggested change:</strong> Add a sixth sentence of your own choosing to <code>EVAL_PAIRS</code> in <code>mt_data.py</code> (or a local copy of it), and extend the demo's evaluation and attention-visualization code so it also reports that sentence's reference loss and prints a cross-attention table for it, in the same style as the module's Table 1 and Table 2. Pick a sentence that is meaningfully different from the module's existing five (for example, noticeably longer, or built from a different sentence structure), and say why you picked it.</li>
+</ul>
+<p><strong>If you choose a different change:</strong> identify the exact variable, function, or hyperparameter you will alter (for example, <code>N_HEAD</code>, <code>D_MODEL</code>, <code>EPOCHS</code>, or which sentence the attention visualization is printed for) and what specific output you expect to change as a result. "Make the model better" is not specific enough. State which value is being changed, where it appears in the code, and what you expect to see differently in the printed loss table or attention output because of it.</p>
+<p>Keep the program small. You do not need a graphical interface, a larger dataset, or a different architecture.</p>
+
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">3. Run the original and changed versions</h2>
+<ol>
+<li>Run the original course example and confirm that it works.</li>
+<li>Make your change.</li>
+<li>Run the changed version and confirm that your change produces the result you intended.</li>
+<li>Capture a short recording or screenshots that show the changed version running, including its printed loss table and attention output.</li>
+</ol>
+
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">4. Submit these three items</h2>
+<p>Use the <strong>File Upload</strong> option and upload all required files in the same submission. You may select more than one file. If you use a Canvas Studio recording instead of screenshots, place a viewable link to the recording in your change-note file.</p>
+<ol>
+<li><strong>Your changed Python file(s).</strong> Submit the final <code>.py</code> file (and a modified <code>mt_data.py</code>, if you changed it). A notebook is acceptable only if all required cells are included and have been run in order.</li>
+<li><strong>Evidence that it works.</strong> Upload 1&ndash;3 screenshots showing you running the changed program and its result, including the printed loss table and attention output. Instead of screenshots, you may include a viewable link to a 1&ndash;3 minute Canvas Studio recording in your change note.</li>
+<li><strong>A 100&ndash;200 word change-note file.</strong> Submit this as a readable <code>.txt</code>, <code>.docx</code>, or <code>.pdf</code> file. Describe the one change you made, identify the relevant part of the code, and explain what happened when you ran it, including what the new output shows and whether it matched what you expected.</li>
+</ol>
+
+<h2 class="content-box pad-box-mini" style="background-color: #941728; color: #ffffff;">How this lab will be assessed</h2>
+<p>The lab is worth 100 points. Each part below is based only on evidence contained in the three items you submit.</p>
+<ul>
+<li><strong>25 points &ndash; The program runs:</strong> Your recording or screenshots show the changed program running and producing a visible result.</li>
+<li><strong>30 points &ndash; The original demonstration's idea remains clear:</strong> Your submitted code and evidence still demonstrate the main idea of the Transformer demo: attention as a fresh, learned lookup over the source sentence at every decoding step, not a single fixed-size bottleneck vector.</li>
+<li><strong>30 points &ndash; Your change is visible and explained:</strong> The change appears in the submitted code, works in the recording or screenshots, and is accurately described in your change note.</li>
+<li><strong>15 points &ndash; The submission is complete and readable:</strong> All three required items are present, open correctly, and contain enough information to grade the work.</li>
+</ul>
+<p>A grader should not have to guess what you changed or whether it worked. Make the changed code and its result easy to find.</p>

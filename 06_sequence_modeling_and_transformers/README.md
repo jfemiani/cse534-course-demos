@@ -69,13 +69,21 @@ taught with the n-gram order sweep).
 `pages/` holds the working copies of the seven Canvas lesson pages (6.1
 Module Overview, 6.2 Tokenization, 6.3 Word Embeddings, 6.4 RNNs, 6.5
 LSTMs, 6.6 Transformers and Attention, 6.7 Fine-Tuning and RLHF), built
-from this module's real, captured demo output. `discussion/` holds the
-working copies of the 6.8 and 6.9 discussion prompts, rewritten to ask
-students to reason about the specific numbers and examples in 6.4/6.5's
-demo output rather than generic RNN/LSTM trivia. See `DESIGN-module-6.md`
-for the design brief 6.1/6.4-6.6 were authored from (written when this
-module was still numbered 7; renumbered to 6 to close a numbering gap;
-6.6 was later split into 6.6 Transformers/Attention and 6.7 Fine-Tuning
-and RLHF, which bumped the discussion prompts from 6.7/6.8 to 6.8/6.9);
-6.2 and 6.3 were added in a later pass to cover tokenization and word
-embeddings as prerequisites for the rest of the module.
+from this module's real, captured demo output. `quizzes/` holds the
+working copy of the single combined 6.8 quiz (text2qti format, 25
+questions, weighted toward Transformers/Attention/RLHF as the module's
+main payoff); it replaced three legacy per-architecture pretest quizzes
+(RNN, LSTM, Transformer), which were unpublished rather than deleted for
+reversibility. `assignments/` holds the working copy of the 6.9 lab
+("Reproduce and Extend a Transformer Demo"), following the same
+reproduce-and-extend format as the labs in modules 2 and 4. `discussion/`
+still holds the local copies of the original 6.8/6.9 discussion prompts,
+but both were retired from the live module (unpublished, prefixed
+`[Retired]`, and removed from the module) rather than kept active,
+since the module already carries seven pages, a quiz, and a lab. See
+`DESIGN-module-6.md` for the design brief 6.1/6.4-6.6 were authored from
+(written when this module was still numbered 7; renumbered to 6 to close
+a numbering gap; 6.6 was later split into 6.6 Transformers/Attention and
+6.7 Fine-Tuning and RLHF); 6.2 and 6.3 were added in a later pass to
+cover tokenization and word embeddings as prerequisites for the rest of
+the module.

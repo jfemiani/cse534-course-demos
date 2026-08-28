@@ -1,0 +1,341 @@
+Quiz title: 6.8 Quiz: Sequence Modeling and Transformers
+Quiz description: This quiz covers Module 6's learning outcomes.
+
+    Learning outcomes:
+
+    - Explain why a fixed, word-level vocabulary has an out-of-vocabulary problem, and why subword tokenization (BPE) avoids it.
+    - Contrast a hand-built symbolic lookup for word meaning (WordNet) with a learned distributional vector (word2vec, GloVe).
+    - Explain why a fixed-context model cannot represent arbitrary-length dependencies, and why a persistent state can.
+    - Train a recurrent encoder-decoder (RNN) on a sequence-to-sequence task, and diagnose the specific way it fails as sentences get longer.
+    - Train a gated (LSTM) encoder-decoder on the identical task, and explain mechanistically why gating extends effective memory.
+    - Explain attention as a learned, per-step weighted lookup over the whole source sequence, not a compressed summary vector.
+    - Explain why a Transformer decoder needs causal masking, and how multi-head attention and positional encoding fill in what raw attention lacks.
+    - Describe the SFT / reward-model / PPO pipeline that turns a pretrained next-token predictor into an instruction-following assistant, and identify a second source of bias it introduces.
+    - Compare RNN, LSTM, and Transformer translation quality on the same held-out sentences, and state which architectural property explains each gap.
+shuffle answers: true
+show correct answers: false
+
+Title: The Out-of-Vocabulary Problem
+Points: 1
+1. A word-level vocabulary is built once from training text and frozen. What happens when the model later encounters a word it never saw during training?
+... General: Aligns with the outcome on the out-of-vocabulary problem. If you missed this, review 6.2 Tokenization.
+a) The model splits the word into individual letters and processes those instead
+... Incorrect. A closed word-level vocabulary has no letter-level fallback; that per-character behavior is what byte-pair encoding adds instead.
+*b) The word is mapped to the same shared "unknown" id as every other unseen word, so the model cannot tell them apart
+... Correct! A frozen word-level vocabulary collapses every unseen word into one shared bucket, losing any information that could distinguish them.
+c) The model automatically adds the new word to its vocabulary and continues training
+... Incorrect. A vocabulary described as fixed and frozen does not grow at inference time; that would require retraining.
+d) The word is dropped from the input entirely and the model proceeds as if it were never there
+... Incorrect. The word is not silently removed; it is still present in the sequence, just represented by the same generic unknown-word id as every other unseen word.
+
+Title: Why Byte-Pair Encoding Has No Unrepresentable Strings
+Points: 1
+2. Byte-pair encoding (BPE) builds its vocabulary by starting from individual characters and repeating one step. What is that step?
+... General: Aligns with the outcome on subword tokenization. If you missed this, review 6.2 Tokenization.
+a) Count how often each whole word appears in the corpus, and keep only the most frequent ones
+... Incorrect. That describes building a closed word-level vocabulary, the exact approach BPE is replacing.
+*b) Count how often each adjacent pair of symbols occurs, and merge the most frequent pair into a new symbol
+... Correct! Repeating this count-and-merge step is the entire algorithm; it is what lets BPE build pieces like "low" and "er" from individual characters.
+c) Randomly group characters into fixed-length chunks of a few letters each
+... Incorrect. BPE's merges are chosen by frequency, not by a fixed chunk length; two different words can split into differently-sized pieces.
+d) Remove any character that never appears at the start of a word
+... Incorrect. BPE does not delete characters; it merges frequently co-occurring symbols into larger pieces, and any character can still appear on its own if needed.
+
+Title: WordNet vs. a Learned Embedding
+Points: 1
+3. WordNet represents a word's meaning through hand-written synsets organized by a lexicographer. How does a learned embedding like GloVe build its representation instead?
+... General: Aligns with the outcome on symbolic vs. learned word representations. If you missed this, review 6.3 Word Embeddings.
+a) It also relies on a human editor, but one who writes vectors of numbers instead of word relations
+... Incorrect. GloVe's vectors are learned automatically from data; no human hand-assigns the numbers in the vector.
+b) It looks up each word in an existing dictionary and converts the definition into a vector
+... Incorrect. GloVe does not consult dictionary definitions at all; it works purely from how words co-occur in a large corpus of text.
+*c) It learns a vector from statistics of how often words co-occur with each other across a large corpus, with no hand-written entries
+... Correct! GloVe factorizes a co-occurrence table built purely from corpus statistics; nothing about the resulting vector is hand-written.
+d) It builds a tree of hypernym/hyponym relationships automatically from co-occurrence counts
+... Incorrect. Hypernym/hyponym relationships are WordNet's hand-built structure; GloVe produces a single dense vector, not a relationship tree.
+
+Title: The Limitation of a Static Embedding
+Points: 1
+4. GloVe's vector for "bank" showed only financial-sense neighbors, with no riverbank sense visible at all. What does this demonstrate about a static embedding?
+... General: Aligns with the outcome on static embeddings' limitations. If you missed this, review 6.3 Word Embeddings.
+a) GloVe's training corpus never contained the word "bank" used in its riverbank sense
+... Incorrect. The lesson does not claim the riverbank sense was absent from training; the issue is that one fixed vector cannot represent two senses at once, regardless of how often each appeared.
+*b) One word gets exactly one vector, so whichever sense is more common in training dominates the vector completely
+... Correct! A static embedding assigns a single fixed vector per word; there is no mechanism for a second sense to also be represented once the more common sense dominates.
+c) GloVe vectors are recomputed for each new sentence, so the dominant sense should have changed here
+... Incorrect. That describes what attention does, not GloVe. GloVe's vectors are fixed once from corpus-wide statistics and do not change per sentence.
+d) Cosine similarity cannot measure similarity between financial and geographic words
+... Incorrect. Cosine similarity works the same way regardless of a word's topic; the issue is which single meaning the fixed vector happened to encode, not a limitation of the similarity measure.
+
+Title: What an RNN's Hidden State Actually Depends On
+Points: 1
+5. At each step, what does an RNN's hidden state get computed from?
+... General: Aligns with the outcome on recurrent state. If you missed this, review 6.4 RNNs.
+a) The current input and the previous step's output word only
+... Incorrect. The previous output word is not what feeds the recurrence; the hidden state is what carries information forward, and it is not the same thing as an output.
+*b) The current input and the previous step's hidden state
+... Correct! This is the recurrence: each hidden state is a function of the current input and the hidden state from the step before, forming a chain across the whole sequence.
+c) Only the current input, independent of any previous step
+... Incorrect. Processing each input independently, with no memory of previous steps, describes a feedforward network, not a recurrent one.
+d) The full sequence of all previous inputs, stored and reprocessed at every step
+... Incorrect. An RNN does not re-read every previous input at each step; it only carries forward a single fixed-size hidden state that summarizes what came before.
+
+Title: Why the RNN Struggled Most on the Longest Sentence
+Points: 1
+6. Across this module's five held-out evaluation sentences, the plain RNN's reference loss was worst on the longest one. What explains this?
+... General: Aligns with the outcome on diagnosing an RNN's failure mode. If you missed this, review 6.4 RNNs.
+a) Longer sentences contain words the vocabulary had never seen before, so they get mapped to the unknown-word id
+... Incorrect. This is about sentence length degrading translation quality, not about out-of-vocabulary words; the lesson's explanation does not depend on unseen words.
+*b) The entire source sentence has to be compressed into one fixed-size hidden vector, and earlier information tends to fade before reaching the decoder
+... Correct! A single fixed-size vector has to stand in for the whole sentence, and the vanishing-gradient problem means information from early words is the first to fade as the sentence gets longer.
+c) Longer sentences take more training epochs to converge, so the model was simply undertrained on them
+... Incorrect. All five evaluation sentences were evaluated on the same trained model; the difference is architectural, not a matter of needing more training time for longer inputs.
+d) The decoder generates one word per encoder layer, so longer sentences run out of layers before finishing
+... Incorrect. The number of decoder outputs is not tied to a fixed number of layers in this way; the bottleneck is the single fixed-size hidden vector, not a layer-count limit.
+
+Title: Why Translation Needs Two RNNs
+Points: 1
+7. Why does this module's translation task use a separate encoder RNN and decoder RNN, rather than one single autoregressive RNN?
+... General: Aligns with the outcome on the encoder-decoder rationale. If you missed this, review 6.4 RNNs.
+a) Two separate networks train faster than one, purely as a computational optimization
+... Incorrect. The reason for splitting into encoder and decoder is about what each one needs to condition on, not training speed.
+*b) A single autoregressive RNN has nothing yet generated to condition on when it needs to read and understand the source sentence first
+... Correct! The encoder's job (reading the source sentence) and the decoder's job (generating conditioned on that source) are different enough that one autoregressive RNN cannot do both at once.
+c) The source and target languages require different vocabularies, and a single RNN can only use one vocabulary
+... Incorrect. Needing two vocabularies does not by itself require two separate recurrent networks; the real reason is what each network needs to condition on.
+d) One RNN cannot be trained with teacher forcing, so a second one is added specifically to enable it
+... Incorrect. Teacher forcing is used within the decoder itself; it is not the reason a separate encoder network is needed.
+
+Title: What an LSTM's Gates Are For
+Points: 1
+8. An LSTM cell adds forget, input, and output gates on top of a plain RNN's recurrence. What do these gates let the network do?
+... General: Aligns with the outcome on gating. If you missed this, review 6.5 LSTMs.
+a) Skip processing certain time steps entirely to save computation
+... Incorrect. Gating does not skip time steps; every step is still processed, but the gates control how much information is kept, added, or exposed at each step.
+*b) Learn what information in the cell state is worth keeping, adding, or exposing at each step
+... Correct! The three gates let the network learn to protect useful information across more steps than a plain RNN's recurrence can, rather than being forced to overwrite everything at every step.
+c) Remove the need for a fixed-size hidden vector entirely
+... Incorrect. An LSTM still passes a fixed-size vector forward at each step; gating changes what the network keeps in that vector, but the bottleneck itself remains.
+d) Allow the decoder to look directly at every source word, the same way attention does
+... Incorrect. Looking directly at every source word is what attention adds in the Transformer lesson; gating only changes what an LSTM keeps in its own recurrent state.
+
+Title: What Gating Did Not Fix
+Points: 1
+9. This module's LSTM beat the plain RNN's reference loss on every held-out sentence, yet the longest sentence was still its hardest one. What does that show?
+... General: Aligns with the outcome on what gating does and does not fix. If you missed this, review 6.5 LSTMs.
+a) The LSTM's gates were not functioning correctly in this particular training run
+... Incorrect. The lesson does not attribute this result to a malfunction; it is presented as an expected consequence of the architecture.
+*b) Gating made better use of the same fixed-size bottleneck, but it did not remove that bottleneck
+... Correct! An LSTM still has to compress the whole source sentence into one vector passed to the decoder; gating improves what it does with that vector, without eliminating the underlying limitation.
+c) The LSTM and the RNN have the exact same architecture, so no real difference was expected
+... Incorrect. An LSTM's gating mechanism is a real architectural difference from a plain RNN, which is why it outperformed the RNN on every sentence.
+d) Longer sentences always perform worse regardless of architecture, so this result is unrelated to gating
+... Incorrect. The Transformer lesson shows a different pattern on the same sentences, so architecture does affect how sentence length impacts performance.
+
+Title: What Fixed-Vector Bottleneck Attention Removes
+Points: 1
+10. What does attention let a Transformer decoder do that an RNN or LSTM decoder, relying on one fixed-size context vector, cannot?
+... General: Aligns with the outcome on attention as a learned lookup. If you missed this, review 6.6 Transformers and Attention.
+a) Generate every output word simultaneously instead of one at a time
+... Incorrect. Simultaneous generation of every output word is not what attention itself provides; the Transformer decoder still generates one word at a time at translation time, just as the RNN and LSTM decoders do.
+*b) Compute a fresh, learned lookup over every source word at each individual decoding step
+... Correct! Instead of relying on one fixed vector produced once by the encoder, attention recomputes which source words matter at every single decoding step.
+c) Avoid needing an encoder to process the source sentence at all
+... Incorrect. The Transformer still uses an encoder to read the source sentence; attention changes how the decoder uses that encoder's output, not whether an encoder exists.
+d) Skip the vanishing-gradient problem by removing all gradient-based training
+... Incorrect. Transformers are still trained with gradient descent and backpropagation; attention addresses the fixed-vector bottleneck, not the training method itself.
+
+Title: Query, Key, and Value
+Points: 1
+11. In the attention mechanism, what role does the decoder's "query" play?
+... General: Aligns with the outcome on attention's query/key/value mechanism. If you missed this, review 6.6 Transformers and Attention.
+a) It is a fixed vector computed once from the entire source sentence and reused at every step
+... Incorrect. That describes the fixed context vector attention replaces; a query is instead built fresh at each decoding step from what has been generated so far.
+*b) It is built from what the decoder has generated so far and compared against a key vector for each source position to produce similarity scores
+... Correct! The query is compared against every position's key to produce the per-position scores that, after softmax, determine how much each source position's value contributes.
+c) It is the final combined output that gets passed on to the feedforward layer
+... Incorrect. The final combined output is the weighted sum of value vectors, not the query; the query is used earlier, to produce the similarity scores.
+d) It replaces the need for a key or value vector entirely
+... Incorrect. Query, key, and value are three distinct vectors that all participate in attention; the query does not replace the other two.
+
+Title: Why Softmax Instead of a Hard Maximum
+Points: 1
+12. Attention turns similarity scores into weights using softmax rather than simply picking the single highest-scoring key. Why?
+... General: Aligns with the outcome on attention's softmax step. If you missed this, review 6.6 Transformers and Attention.
+a) Softmax runs faster on a GPU than comparing scores to find a maximum
+... Incorrect. The lesson's reasoning is about trainability through gradient descent, not raw computational speed.
+*b) A hard, all-or-nothing choice gives gradient descent nothing to learn from, since a small change in scores would not change which key is picked until it suddenly overtakes another
+... Correct! Softmax keeps every key contributing some share of the weight, however small, so a small change in the underlying scores produces a small, learnable change in the output.
+c) Softmax guarantees the model always attends to the grammatically correct word
+... Incorrect. Softmax does not guarantee grammatical correctness; it only produces a set of weights that sum to one, learned entirely from training data.
+d) A hard maximum would require more key vectors than softmax does
+... Incorrect. Both approaches would use the same number of key vectors; the difference is how the scores are converted into weights, not how many keys exist.
+
+Title: An Encoder Layer's Job vs. a Decoder Layer's Job
+Points: 1
+13. Why can the Transformer's encoder read the entire source sentence at once, while its decoder cannot do the same with the target sentence during training?
+... General: Aligns with the outcome on why the decoder needs causal masking. If you missed this, review 6.6 Transformers and Attention.
+a) The encoder uses a smaller vocabulary, so processing everything at once is computationally cheaper
+... Incorrect. Vocabulary size is not what determines whether a network can see its whole input at once; it is about whether there is something later in the sequence that must stay hidden.
+*b) The encoder has nothing left to predict, so nothing needs to stay hidden from it, while the decoder must not be allowed to see words it has not generated yet
+... Correct! The encoder's only job is reading, with no future words to protect; the decoder is generating a sequence, so at translation time it genuinely cannot see words it has not produced, and training must respect that same restriction.
+c) The encoder is trained with a different loss function than the decoder
+... Incorrect. The distinction the lesson draws is about what information is available to look at, not about which loss function is used.
+d) The decoder does not use attention at all, only the encoder does
+... Incorrect. The decoder lesson describes both self-attention and cross-attention happening inside the decoder; attention is not exclusive to the encoder.
+
+Title: Why Teacher-Forced Training Still Needs a Mask
+Points: 1
+14. During training, teacher forcing supplies the entire true target sentence in advance. Why does the decoder still need a causal mask instead of simply attending over that whole sentence?
+... General: Aligns with the outcome on causal masking. If you missed this, review 6.6 Transformers and Attention.
+a) Without a mask, training would run too slowly to be practical
+... Incorrect. The mask is not primarily a speed optimization; parallel training is already what makes the unmasked, all-at-once computation fast. The mask exists to restrict what each position can see, not to speed anything up.
+*b) Without a mask, an early word's prediction could attend to later words it would never actually have access to at translation time, giving training different information than translation ever provides
+... Correct! The mask blocks every position from attending to positions after it, so the parallel training pass sees exactly the same restricted view that step-by-step translation would produce.
+c) The mask is only needed because the encoder and decoder share the same set of weights
+... Incorrect. The encoder and decoder are separate components in this architecture; weight sharing is not the reason the mask is needed.
+d) The mask replaces the need for cross-attention over the source sentence
+... Incorrect. The causal mask is applied to the decoder's self-attention over its own previous outputs; cross-attention over the encoder's output is a separate step that still happens.
+
+Title: What Multi-Head Attention Adds
+Points: 1
+15. Rather than computing attention once per layer, the Transformer computes it several times in parallel, each with its own learned query/key/value weights. What does this buy the model?
+... General: Aligns with the outcome on multi-head attention. If you missed this, review 6.6 Transformers and Attention.
+a) It lets the model process a longer source sentence than a single attention computation could handle
+... Incorrect. Sequence length is handled by the attention mechanism itself, not by how many heads are used; multiple heads do not by themselves extend the maximum sentence length.
+*b) Each head is free to learn a different notion of relevance, and their outputs are combined into one richer representation
+... Correct! One head might track something like subject-verb agreement while another tracks nearby adjectives; concatenating and projecting all heads' outputs combines these different learned relevance patterns.
+c) It removes the need for positional encoding, since multiple heads already encode position information
+... Incorrect. Positional encoding and multi-head attention address two different gaps; positional encoding is still needed separately to give the model any sense of word order.
+d) It allows the encoder and decoder to share the exact same attention weights
+... Incorrect. Multi-head attention does not involve sharing weights between the encoder and decoder; each attention computation, in each head, has its own learned weights.
+
+Title: Why Attention Needs Positional Encoding
+Points: 1
+16. Attention computes a dot product between a query and a key. Why does the Transformer need a separate positional encoding added to each input, given how attention already works?
+... General: Aligns with the outcome on what raw attention lacks. If you missed this, review 6.6 Transformers and Attention.
+a) Positional encoding is required so that softmax weights sum to exactly one
+... Incorrect. Softmax already guarantees weights sum to one on its own; that property has nothing to do with positional encoding.
+*b) A dot product between a query and a key does not change if the input positions are shuffled, so without positional encoding the model could not tell word order apart
+... Correct! Attention alone has no built-in sense of order; positional encoding is added directly to each position's embedding specifically to give the network a way to distinguish the first word from the seventh.
+c) Positional encoding is what allows the decoder to be trained in parallel rather than one step at a time
+... Incorrect. Parallel training comes from removing recurrence and using teacher forcing with a causal mask; positional encoding solves a separate problem, the lack of any built-in sense of order.
+d) Positional encoding replaces the need for a causal mask in the decoder
+... Incorrect. These are two separate mechanisms solving two separate problems: positional encoding gives the model a sense of order, while the causal mask restricts what a position is allowed to attend to.
+
+Title: What Base-Model Pretraining Does Not Do
+Points: 1
+17. Every architecture in this module, including the Transformer, is trained on the same next-token-prediction objective. What does a model trained only this way fail to do?
+... General: Aligns with the outcome on the instruct-task distinction. If you missed this, review 6.7 Fine-Tuning and RLHF.
+a) It fails to produce grammatically correct text of any kind
+... Incorrect. Next-token prediction, at large scale, is exactly what produces fluent, grammatical text; fluency is not the missing piece.
+*b) It has no built-in reason to prefer a genuinely helpful response over any other statistically likely continuation of the prompt
+... Correct! A model trained only to predict plausible next tokens will continue a prompt in whatever way is most likely, which is not the same as trying to help the specific person asking.
+c) It cannot represent long-range dependencies across a sentence
+... Incorrect. Handling long-range dependencies is exactly what the attention mechanism earlier in this module addresses; it is not the gap RLHF exists to close.
+d) It cannot be trained using gradient descent
+... Incorrect. Next-token prediction is trained with ordinary gradient descent and backpropagation, the same as every other model in this module.
+
+Title: The Three Stages of RLHF
+Points: 1
+18. RLHF is usually described in three stages. What does the reward-modeling stage specifically add that supervised fine-tuning (SFT) alone does not provide?
+... General: Aligns with the outcome on the SFT/reward-model/PPO pipeline. If you missed this, review 6.7 Fine-Tuning and RLHF.
+a) A larger vocabulary that lets the model discuss more topics
+... Incorrect. Vocabulary size is a tokenization concern from earlier in the module, not something the reward-modeling stage of RLHF addresses.
+*b) A trained scalar score standing in for human judgment about which of two responses is better, at a scale no human could keep up with directly
+... Correct! SFT can only imitate the specific curated examples it was shown; the reward model is trained on human comparisons so it can score many more responses than a human could rank one by one.
+c) A guarantee that the model's responses will always be factually correct
+... Incorrect. Nothing about training a reward model guarantees factual correctness; it only predicts what human raters tend to prefer, which is a different thing than being correct.
+d) A way to train the model without using any human-provided data at all
+... Incorrect. The reward model is trained specifically on human comparisons; removing human data would defeat its purpose.
+
+Title: Reward Hacking and Goodhart's Law
+Points: 1
+19. Pushing PPO too hard against the reward model's score can produce outputs that score well without actually being more helpful. What is this failure mode called, and what guards against it?
+... General: Aligns with the outcome on reward hacking. If you missed this, review 6.7 Fine-Tuning and RLHF.
+a) Overfitting, guarded against by using a larger training corpus for the reward model
+... Incorrect. A larger corpus is not the guardrail the lesson describes; the specific mitigation named is a penalty term keeping the model close to its starting point.
+*b) Reward hacking, an instance of Goodhart's Law, guarded against by a KL penalty that keeps the updated model from drifting too far from the original SFT model
+... Correct! Optimizing hard against an imperfect proxy for a goal is Goodhart's Law; the KL penalty is a mitigation against drifting too far from the SFT model in pursuit of a higher reward score.
+c) Catastrophic forgetting, guarded against by freezing all of the model's weights during PPO
+... Incorrect. PPO's entire purpose is to update the model's weights; freezing them would prevent RLHF from having any effect at all.
+d) Mode collapse, guarded against by increasing the model's vocabulary size
+... Incorrect. Vocabulary size does not address a reward model being gamed; the actual guardrail described is the KL penalty against the original SFT model.
+
+Title: A Second Source of Bias
+Points: 1
+20. Besides bias absorbed from pretraining data, RLHF can introduce a second, separate source of bias. Where does it come from?
+... General: Aligns with the outcome on bias introduced at the RLHF stage. If you missed this, review 6.7 Fine-Tuning and RLHF.
+a) From errors in the tokenizer misreading certain words
+... Incorrect. Tokenizer behavior is a separate topic from earlier in the module; it is not the source of bias RLHF specifically introduces.
+*b) From the reward model faithfully reproducing whatever a limited, finite group of human raters happened to prefer
+... Correct! The reward model's target is whatever that specific group of raters preferred on average, which can produce failure modes like rewarding longer, more agreeable answers or sycophantic agreement, independent of any bias already present in the pretraining data.
+c) From the encoder attending to the wrong source words during translation
+... Incorrect. Attention alignment quality is a Transformer-architecture concern from earlier in the module, not a source of bias specific to the RLHF pipeline.
+d) From using too small a vocabulary during supervised fine-tuning
+... Incorrect. Vocabulary size is unrelated to the bias mechanism described; the issue is whose preferences the reward model was trained to match, not how large its vocabulary is.
+
+Title: The OpenAI/Sama Kenya Data-Labeling Investigation
+Points: 1
+21. A 2023 TIME investigation found that OpenAI's outsourcing partner Sama paid Kenyan workers a low hourly wage to read and label disturbing text for a safety classifier. What does this episode illustrate about pipelines like RLHF?
+... General: Aligns with the outcome on the human labor behind alignment pipelines. If you missed this, review 6.7 Fine-Tuning and RLHF.
+a) It shows that RLHF's reward-model comparisons are always performed by underpaid workers in a single country
+... Incorrect. The lesson is explicit that this investigation was about labeling for a toxicity/content-moderation classifier, not literally the reward-model preference comparisons described earlier on the page, and it does not claim this is universally true of every RLHF pipeline.
+*b) It shows that pipelines built on large volumes of human judgment depend on real, paid labor, and that labor's conditions are a real ethical concern, not just a footnote
+... Correct! Every stage of a pipeline like this depends on people reading text and making judgment calls at a volume no research team could handle alone, and this investigation is a documented example of what those working conditions can look like.
+c) It shows that reward models eliminate the need for any human-labeled data once they are trained
+... Incorrect. This directly contradicts how the reward model is described: it is trained specifically on human comparisons, so removing human-labeled data would defeat its purpose.
+d) It shows that Goodhart's Law only applies to reward models, not to any other part of a training pipeline
+... Incorrect. This investigation is about labor conditions behind data labeling, not about Goodhart's Law or reward hacking, which are a separate concept covered earlier in the lesson.
+
+Title: Self-Attention vs. Cross-Attention in the Decoder
+Points: 1
+22. Inside the Transformer decoder, self-attention runs first, then cross-attention. What is the difference between what each one attends to?
+... General: Aligns with the outcome on the Transformer decoder's internal steps. If you missed this, review 6.6 Transformers and Attention.
+a) Self-attention looks at the source sentence, while cross-attention looks at the decoder's own previous outputs
+... Incorrect. This has the two reversed: self-attention is over the decoder's own previous outputs, and cross-attention is what looks at the source sentence.
+*b) Self-attention looks at the decoder's own previous outputs, while cross-attention looks at the encoder's output (the source sentence)
+... Correct! Self-attention lets each position take into account the decoder's own words generated so far; cross-attention is the step that actually removes the fixed-size bottleneck by looking at the source sentence, using the encoder's output as keys and values.
+c) Self-attention and cross-attention both attend only to the source sentence, but at different layers
+... Incorrect. Only cross-attention attends to the source sentence; self-attention is restricted to the decoder's own previous outputs.
+d) Self-attention only runs during training, while cross-attention only runs during translation
+... Incorrect. Both self-attention and cross-attention run during both training and translation; what changes between the two is only whether an entire sentence is processed in parallel or one step at a time.
+
+Title: LSTMs Before the Transformer
+Points: 1
+23. Before Transformers displaced them starting around 2017, what was the role of LSTMs (and the closely related GRU) in sequence modeling?
+... General: Aligns with the outcome on gated recurrent architectures. If you missed this, review 6.5 LSTMs.
+a) They were a niche, rarely-used architecture that never saw practical adoption
+... Incorrect. The lesson describes the opposite: LSTMs and GRUs were the default choice for sequence modeling for roughly two decades, especially once GPUs made training them at scale practical.
+*b) They were the default choice for sequence modeling for roughly two decades, especially once GPUs made large-scale training practical
+... Correct! From their 1997 introduction through the 2010s, LSTMs and GRUs were the standard architecture for sequence modeling, before the Transformer took over starting around 2017.
+c) They were introduced after the Transformer, as a lighter-weight alternative to attention
+... Incorrect. The order is reversed: LSTMs were introduced in 1997, two decades before the Transformer, which displaced them rather than following them.
+d) They removed the fixed-size bottleneck that plain RNNs had
+... Incorrect. As this module's own results show, gating did not remove the fixed-size bottleneck; it only made better use of it. Removing the bottleneck entirely is what attention does.
+
+Title: One Idea, Several Mechanisms
+Points: 1
+24. GloVe's word vectors, an RNN's nn.Embedding table, and the Transformer's attention-adjusted vectors are all described as the same underlying idea. What is that idea, and what changes across the three?
+... General: Aligns with the outcome on embeddings as a cross-cutting concept. If you missed this, review 6.3 Word Embeddings and 6.6 Transformers and Attention.
+a) All three are fixed once from corpus-wide co-occurrence counts and never change afterward
+... Incorrect. This describes only GloVe. An nn.Embedding table is adjusted by backpropagation during training, and attention shifts a word's vector per sentence; neither is fixed the way GloVe's vectors are.
+*b) All three are vectors encoding meaning by proximity, but how the vector gets assigned becomes more flexible: fixed from co-occurrence counts, then adjusted by training, then shifted per sentence by attention
+... Correct! GloVe fixes its vector before any downstream task exists, an nn.Embedding table is adjusted by backpropagation for a specific task, and attention lets a word's vector shift again using its neighbors as context, one sentence at a time.
+c) All three require a hand-built dictionary of word senses, similar to WordNet
+... Incorrect. None of the three depend on a hand-built dictionary; that symbolic approach is exactly what WordNet represents, in contrast to all three of these learned, vector-based approaches.
+d) All three are recomputed fresh at every single decoding step, with nothing fixed in advance
+... Incorrect. This is only true of the Transformer's attention-adjusted vectors; GloVe's vectors are fixed before training on any downstream task, and an nn.Embedding table starts from a single learned table rather than being recomputed at each step.
+
+Title: Comparing RNN, LSTM, and Transformer on the Same Task
+Points: 1
+25. This module trained an RNN, an LSTM, and a Transformer on the identical corpus and the same five held-out sentences. What pattern did their aggregate validation loss show, and what does it illustrate?
+... General: Aligns with the outcome on comparing the three architectures. If you missed this, review 6.6 Transformers and Attention.
+a) All three architectures produced nearly identical aggregate validation loss, showing that architecture does not matter for this task
+... Incorrect. The module's results show a clear, monotonic improvement across the three architectures, not near-identical performance.
+*b) Aggregate validation loss improved monotonically from RNN to LSTM to Transformer, though the Transformer did not win on every individual sentence
+... Correct! Aggregate validation loss improved at each step, RNN to LSTM to Transformer, but on one sentence the LSTM's reference loss was actually lower, a reminder that an averaged number can hide individual examples going the other way.
+c) The RNN had the lowest aggregate validation loss, since it is the simplest model and easiest to optimize
+... Incorrect. The module's results show the opposite ordering: the RNN had the highest (worst) aggregate validation loss of the three.
+d) The Transformer had the lowest reference loss on every single one of the five sentences, with no exceptions
+... Incorrect. The Transformer had the best aggregate loss, but not a clean sweep; the LSTM actually had the lower reference loss on several individual sentences, including the longest one.
