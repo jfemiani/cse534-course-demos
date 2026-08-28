@@ -66,14 +66,16 @@ taught with the n-gram order sweep).
 
 ## Canvas pages and activities
 
-`pages/` holds the working copies of the six Canvas lesson pages (6.1
+`pages/` holds the working copies of the seven Canvas lesson pages (6.1
 Module Overview, 6.2 Tokenization, 6.3 Word Embeddings, 6.4 RNNs, 6.5
-LSTMs, 6.6 Transformers/Attention/RLHF), built from this module's real,
-captured demo output. `discussion/` holds the working copies of the 6.7
-and 6.8 discussion prompts, rewritten to ask students to reason about the
-specific numbers and examples in 6.4/6.5's demo output rather than generic
-RNN/LSTM trivia. See `DESIGN-module-6.md` for the design brief 6.1/6.4-6.6
-were authored from (written when this module was still numbered 7;
-renumbered to 6 to close a numbering gap); 6.2 and 6.3 were added in a
-later pass to cover tokenization and word embeddings as prerequisites for
-the rest of the module.
+LSTMs, 6.6 Transformers and Attention, 6.7 Fine-Tuning and RLHF), built
+from this module's real, captured demo output. `discussion/` holds the
+working copies of the 6.8 and 6.9 discussion prompts, rewritten to ask
+students to reason about the specific numbers and examples in 6.4/6.5's
+demo output rather than generic RNN/LSTM trivia. See `DESIGN-module-6.md`
+for the design brief 6.1/6.4-6.6 were authored from (written when this
+module was still numbered 7; renumbered to 6 to close a numbering gap;
+6.6 was later split into 6.6 Transformers/Attention and 6.7 Fine-Tuning
+and RLHF, which bumped the discussion prompts from 6.7/6.8 to 6.8/6.9);
+6.2 and 6.3 were added in a later pass to cover tokenization and word
+embeddings as prerequisites for the rest of the module.
